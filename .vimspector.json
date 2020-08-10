@@ -1,0 +1,14 @@
+{
+                "configurations": {
+                    "Launch": {
+                        "adapter": "vscode-cpptools",
+                        "configuration": {
+                            "request": "launch",
+                            "program": "build/app/debug",
+                            "cwd": "",
+                            "externameConsole": true,
+                            "MIMode": "gdb"
+                        }
+                    }
+                }
+            }

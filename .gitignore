@@ -1,0 +1,5 @@
+*.sw[a-z]
+build
+compile_commands.json
+.vimrc
+.nvimrc
