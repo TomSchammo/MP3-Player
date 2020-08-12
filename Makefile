@@ -8,7 +8,7 @@ OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 DEBUG 	 := $(APP_DIR)/debug
 RELEASE  := $(APP_DIR)/release
-TARGET   := program
+TARGET   := player
 INCLUDE  := -Iinclude/
 SRC	 := $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
 
