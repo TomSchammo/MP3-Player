@@ -10,7 +10,7 @@ Filehandler::Filehandler(const char* filename) {
     this->filename = filename;
 
     if (exists()) {
-        this->stream.open(filename, std::ios::in);
+        this->stream.open(filename, std::ios::binary | std::ios::in);
     }
 }
 
@@ -25,6 +25,37 @@ inline bool Filehandler::exists() {
     return (stat (filename, &buffer) == 0);
 }
 
+/**
+ * Reads "bytes" bytes from a stream, starting at byte "position".
+ *
+ * @param position  The starting position of the pointer
+ * @param bytes     The number of bytes that should be read
+ * @return a pointer to the first byte of a char array containing the requested bytes
+ */
+char* Filehandler::read(const unsigned int &position, const unsigned char &bytes) {
+    char *buffer = new char[bytes];
+
+    stream.seekg(position);
+    stream.read(buffer, bytes);
+
+    return buffer;
+}
+
+/**
+ * Reads "bytes" bytes from a stream, starting at byte "position".
+ *
+ * @param position  The starting position of the pointer
+ * @param bytes     The number of bytes that should be read
+ * @return a pointer to the first byte of a char array containing the requested bytes
+ */
+char* Filehandler::read(const unsigned int &position, enum std::_Ios_Seekdir way, const unsigned char &bytes) {
+    char *buffer = new char[bytes];
+
+    stream.seekg(position, way);
+    stream.read(buffer, bytes);
+
+    return buffer;
+}
 
 /**
  * Class destructor, closes the filestream if open.
