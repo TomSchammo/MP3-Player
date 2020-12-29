@@ -35,7 +35,7 @@ inline bool Filehandler::exists() {
 char* Filehandler::read(const unsigned int &position, const unsigned char &bytes) {
     char *buffer = new char[bytes];
 
-    stream.seekg(position);
+    stream.seekg(position, std::ios::beg);
     stream.read(buffer, bytes);
 
     return buffer;
