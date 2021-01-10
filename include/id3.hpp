@@ -44,6 +44,13 @@ typedef struct {
 
 } ID3Tag;
 
+bool dectectID3(Filehandler &handler);
+unsigned char getVersion(Filehandler &handler);
+unsigned char getFlags(Filehandler &handler);
+void readFrame(Filehandler &handler, unsigned char &position);
+void parseFrameData(char* data, FrameID frameID);
+unsigned int getSize(Filehandler &handler, const bool &extended);
+void readID3(const char* name);
 
 
 #endif // ID3_HPP
