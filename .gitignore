@@ -4,3 +4,5 @@ compile_commands.json
 .vimrc
 .nvimrc
 .clangd
+.vim
+test_files
