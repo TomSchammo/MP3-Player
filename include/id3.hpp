@@ -13,6 +13,8 @@ constexpr unsigned char SIZE_OF_VERSION = 1;
 constexpr unsigned char SIZE_OF_SIZE = 4;
 constexpr unsigned char SIZE_OF_FRAME_ID = 4;
 
+// TODO reconsider readID3 return type
+
 /**
  * Enum containing every frame ID specified in the documentation for
  * ID3v2.4 Frames. See: https://id3.org/id3v2.4.0-frames
