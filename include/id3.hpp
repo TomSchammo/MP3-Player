@@ -29,6 +29,21 @@ enum class FrameID {
     WCOM, WCOP, WOAF, WOAR, WOAS, WORS, WPAY, WPUB, WXXX
 };
 
+/**
+ * Struct to hold the necessary ID3 metadata that the player is
+ * supposed to display.
+ * It also contains information that is important for decoding/playback.
+ */
+typedef struct {
+    std::string title;
+    std::string album;
+    std::string artist;
+    unsigned long length;
+    unsigned int delay;
+    char* picture;
+
+} ID3Tag;
+
 
 
 #endif // ID3_HPP
