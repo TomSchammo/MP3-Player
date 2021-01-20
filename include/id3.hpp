@@ -14,6 +14,7 @@ constexpr unsigned char SIZE_OF_SIZE = 4;
 constexpr unsigned char SIZE_OF_FRAME_ID = 4;
 
 // TODO reconsider readID3 return type
+// TODO consider wrapping everything in namespace
 
 /**
  * Enum containing every frame ID specified in the documentation for
@@ -49,9 +50,9 @@ typedef struct {
 bool dectectID3(Filehandler &handler);
 unsigned char getVersion(Filehandler &handler);
 unsigned char getFlags(Filehandler &handler);
-void readFrame(Filehandler &handler, unsigned char &position);
+void readFrame(Filehandler &handler, unsigned char position);
 void parseFrameData(char* data, FrameID frameID);
-unsigned int getSize(Filehandler &handler, const bool &extended);
+unsigned int getSize(Filehandler &handler, const bool extended);
 void readID3(const char* name);
 
 

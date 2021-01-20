@@ -32,7 +32,7 @@ inline bool Filehandler::exists() {
  * @param bytes     The number of bytes that should be read
  * @return a pointer to the first byte of a char array containing the requested bytes
  */
-char* Filehandler::read(const unsigned int &position, const unsigned char &bytes) {
+char* Filehandler::read(const unsigned int position, const unsigned char bytes) {
     char *buffer = new char[bytes];
 
     stream.seekg(position, std::ios::beg);
@@ -48,7 +48,7 @@ char* Filehandler::read(const unsigned int &position, const unsigned char &bytes
  * @param bytes     The number of bytes that should be read
  * @return a pointer to the first byte of a char array containing the requested bytes
  */
-char* Filehandler::read(const unsigned int &position, enum std::_Ios_Seekdir way, const unsigned char &bytes) {
+char* Filehandler::read(const unsigned int position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
     char *buffer = new char[bytes];
 
     stream.seekg(position, way);
