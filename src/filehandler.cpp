@@ -10,12 +10,6 @@ Filehandler::Filehandler(const char* filename) {
 }
 
 
-inline bool Filehandler::exists() {
-    struct stat buffer;
-    return (stat (filename, &buffer) == 0);
-}
-
-
 char* Filehandler::read(const unsigned int position, const unsigned char bytes) {
     char *buffer = new char[bytes];
 

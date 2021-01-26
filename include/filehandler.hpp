@@ -22,7 +22,10 @@ class Filehandler {
          *
          * @return true if the file exists, false otherwise.
          */
-        inline bool exists();
+        inline bool exists() {
+            struct stat buffer;
+            return (stat (filename, &buffer) == 0);
+        }
 
 
         /**
