@@ -1,3 +1,12 @@
+/******************************************************************************
+* File:             filehandler.hpp
+*
+* Author:           Tom Schammo
+* Created:          26/01/2021
+* Description:      Class responsible for file interactions
+*****************************************************************************/
+
+
 #ifndef FILEHANDLER_HPP
 #define FILEHANDLER_HPP
 

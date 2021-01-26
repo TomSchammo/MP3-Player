@@ -1,3 +1,12 @@
+/******************************************************************************
+* File:             song.hpp
+*
+* Author:           Tom Schammo
+* Created:          26/01/2021
+* Description:      Class wrapper for song data
+*****************************************************************************/
+
+
 #ifndef SONG_HPP
 #define SONG_HPP
 

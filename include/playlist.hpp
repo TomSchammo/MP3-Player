@@ -1,8 +1,8 @@
 /******************************************************************************
 * File:             playlist.hpp
 *
-* Author:           Tom Schammo  
-* Created:          26/01/2021 
+* Author:           Tom Schammo
+* Created:          26/01/2021
 * Description:      File that contains code to deal with playlists
 *****************************************************************************/
 

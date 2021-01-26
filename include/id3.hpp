@@ -1,3 +1,12 @@
+/******************************************************************************
+* File:             id3.hpp
+*
+* Author:           Tom Schammo
+* Created:          26/01/2021
+* Description:      File responsible for dealing with ID3 tags.
+*****************************************************************************/
+
+
 #ifndef ID3_HPP
 #define ID3_HPP
 #include <filehandler.hpp>
