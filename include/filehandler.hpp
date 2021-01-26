@@ -3,6 +3,8 @@
 
 #include <sys/stat.h>
 #include <fstream>
+#include <memory>
+#include <vector>
 
 class Filehandler {
 
@@ -46,6 +48,13 @@ class Filehandler {
          * @return a pointer to the first byte of a char array containing the requested bytes
          */
         char* read(const unsigned int position, std::_Ios_Seekdir way, const unsigned char bytes);
+
+
+        /**
+         * Reads the whole (text) file and puts every line into a vector of strings.
+         * Then a shared_ptr to that vector is returned.
+         */
+        std::shared_ptr<std::vector<std::string>> read();
 
 
         /**
