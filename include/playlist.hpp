@@ -22,6 +22,14 @@ namespace Playlist {
      * @param songlist A vector that is to be filled with the content of the playlist
      */
     void readM3U(const char* filename, std::vector<song> &songlist);
+
+
+    /**
+     * Function to shuffle a playlist based on modern Fisher-Yates algorithm.
+     *
+     * @param playlist The playlist that is supposed to be shuffled
+     */
+    void shuffle(std::vector<song> &playlist);
 }
 
 #endif /* ifndef PLAYLIST_HPP */
