@@ -25,7 +25,8 @@ namespace Playlist {
 
 
     /**
-     * Function to shuffle a playlist based on modern Fisher-Yates algorithm.
+     * Function to shuffle a playlist based on the modern Fisher-Yates algorithm.
+     * The algorithm has O(n) time complexity.
      *
      * @param playlist The playlist that is supposed to be shuffled
      */
