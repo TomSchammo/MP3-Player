@@ -1,13 +1,15 @@
 #ifndef SONG_HPP
 #define SONG_HPP
 
+#include <string>
+
 class song
 {
 public:
-    const char* title;
-    const char* album;
-    const char* artist;
-    const char* path;
+    std::string title;
+    std::string album;
+    std::string artist;
+    std::string path;
 
 public:
     song ();
