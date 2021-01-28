@@ -16,11 +16,12 @@
 class song
 {
 public:
-    std::string title;
-    std::string album;
-    std::string artist;
-    std::string genre;
-    std::uint16_t release;
+    std::string title = "Unknown Title";
+    std::string album = "Unknown Album";
+    std::string artist = "Unknown Artist";
+    std::string genre = "Unknown Genre";
+    std::uint16_t release = 0;
+    std::uint16_t duration = 0;
     std::string path;
 
 public:
