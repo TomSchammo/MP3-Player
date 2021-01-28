@@ -56,7 +56,22 @@ typedef struct {
 
 } ID3Tag;
 
+/**
+ * Checks whether ID3 metadata prepended to the file.
+ *
+ * @param handler A Filehandler object to read from the file
+ * @return true if an ID3 tag is prepended to the file, false otherwise
+ */
 bool dectectID3(Filehandler &handler);
+
+
+/**
+ * Checks whether ID3 metadata appended to the file.
+ *
+ * @param handler A Filehandler object to read from the file
+ * @return true if an ID3 tag is prepended to the file, false otherwise
+ */
+bool detectID3Footer(Filehandler &handler);
 unsigned char getVersion(Filehandler &handler);
 unsigned char getFlags(Filehandler &handler);
 void readFrame(Filehandler &handler, unsigned char position);
