@@ -21,3 +21,21 @@ bool detectID3Footer(Filehandler &handler) {
 }
 
 
+std::uint8_t getVersion(Filehandler &handler) {
+    auto ptr = handler.read(LOCATION_VERSION, SIZE_OF_VERSION);
+    auto size = *ptr;
+    delete[] ptr;
+
+    return std::uint8_t(size);
+}
+
+
+std::uint8_t getFlags(Filehandler &handler) {
+    auto ptr = handler.read(LOCATION_FLAGS, SIZE_OF_FLAGS);
+    auto flags = *ptr;
+    delete[] ptr;
+
+    return std::uint8_t(flags);
+}
+
+

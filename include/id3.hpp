@@ -10,6 +10,7 @@
 #ifndef ID3_HPP
 #define ID3_HPP
 #include <filehandler.hpp>
+#include <cstdint>
 
 // constants
 constexpr unsigned char LOCATION_START = 0;
@@ -72,8 +73,24 @@ bool dectectID3(Filehandler &handler);
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
 bool detectID3Footer(Filehandler &handler);
-unsigned char getVersion(Filehandler &handler);
-unsigned char getFlags(Filehandler &handler);
+
+
+/**
+ * Reads the byte that contains the version of the ID3 Tag
+ *
+ * @param handler A Filehandler object to read from the file
+ * @return a byte that contains the ID3 major version
+ */
+std::uint8_t getVersion(Filehandler &handler);
+
+
+/**
+ * Reads the byte that contains the flags in the ID3 header, and returns it
+ *
+ * @param handler A Filehandler object to read from the file
+ * @return a byte that contains the flags of the ID3 header.
+ */
+std::uint8_t getFlags(Filehandler &handler);
 void readFrame(Filehandler &handler, unsigned char position);
 void parseFrameData(char* data, FrameID frameID);
 unsigned int getSize(Filehandler &handler, const bool extended);
