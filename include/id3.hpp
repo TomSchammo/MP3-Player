@@ -102,7 +102,7 @@ std::uint8_t getFlags(Filehandler &handler);
 std::uint16_t getSize(Filehandler &handler, const bool extended);
 
 
-void readFrame(Filehandler &handler, unsigned char position);
+void readFrame(Filehandler &handler, std::uint16_t position);
 void parseFrameData(char* data, FrameID frameID);
 void readID3(const char* name);
 

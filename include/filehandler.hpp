@@ -10,6 +10,7 @@
 #ifndef FILEHANDLER_HPP
 #define FILEHANDLER_HPP
 
+#include <cstdint>
 #include <sys/stat.h>
 #include <fstream>
 #include <memory>
@@ -46,7 +47,7 @@ class Filehandler {
          * @param bytes     The number of bytes that should be read
          * @return a pointer to the first byte of a char array containing the requested bytes
          */
-        char* read(const unsigned int position, const unsigned char bytes);
+        char* read(const std::uint16_t position, const unsigned char bytes);
 
 
         /**
@@ -56,7 +57,7 @@ class Filehandler {
          * @param bytes     The number of bytes that should be read
          * @return a pointer to the first byte of a char array containing the requested bytes
          */
-        char* read(const unsigned int position, std::_Ios_Seekdir way, const unsigned char bytes);
+        char* read(const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
 
 
         /**
