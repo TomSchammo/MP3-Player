@@ -13,15 +13,15 @@
 #include <cstdint>
 
 // constants
-constexpr unsigned char LOCATION_START = 0;
-constexpr unsigned char LOCATION_VERSION = 3;
-constexpr unsigned char LOCATION_FLAGS = 5;
-constexpr unsigned char LOCATION_SIZE = 6;
-constexpr unsigned char LOCATION_EXTENDED_HEADER = 10;
-constexpr unsigned char SIZE_OF_FLAGS = 1;
-constexpr unsigned char SIZE_OF_VERSION = 1;
-constexpr unsigned char SIZE_OF_SIZE = 4;
-constexpr unsigned char SIZE_OF_FRAME_ID = 4;
+constexpr std::uint8_t LOCATION_START = 0;
+constexpr std::uint8_t LOCATION_VERSION = 3;
+constexpr std::uint8_t LOCATION_FLAGS = 5;
+constexpr std::uint8_t LOCATION_SIZE = 6;
+constexpr std::uint8_t LOCATION_EXTENDED_HEADER = 10;
+constexpr std::uint8_t SIZE_OF_FLAGS = 1;
+constexpr std::uint8_t SIZE_OF_VERSION = 1;
+constexpr std::uint8_t SIZE_OF_SIZE = 4;
+constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 
 // TODO reconsider readID3 return type
 // TODO consider wrapping everything in namespace
@@ -51,8 +51,8 @@ typedef struct {
     std::string title;
     std::string album;
     std::string artist;
-    unsigned long length;
-    unsigned int delay;
+    std::uint16_t length;
+    std::uint16_t delay;
     char* picture;
 
 } ID3Tag;
