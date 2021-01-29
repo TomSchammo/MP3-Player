@@ -91,9 +91,19 @@ std::uint8_t getVersion(Filehandler &handler);
  * @return a byte that contains the flags of the ID3 header.
  */
 std::uint8_t getFlags(Filehandler &handler);
+
+
+/**
+ * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
+ *
+ * @param handler A Filehandler object to read from the file
+ * @return 4 bytes that contain the size of the ID3 tag or the extended header.
+ */
+std::uint16_t getSize(Filehandler &handler, const bool extended);
+
+
 void readFrame(Filehandler &handler, unsigned char position);
 void parseFrameData(char* data, FrameID frameID);
-unsigned int getSize(Filehandler &handler, const bool extended);
 void readID3(const char* name);
 
 

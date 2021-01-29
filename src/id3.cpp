@@ -26,7 +26,7 @@ std::uint8_t getVersion(Filehandler &handler) {
     auto size = *ptr;
     delete[] ptr;
 
-    return std::uint8_t(size);
+    return static_cast<std::uint8_t>(size);
 }
 
 
@@ -35,7 +35,23 @@ std::uint8_t getFlags(Filehandler &handler) {
     auto flags = *ptr;
     delete[] ptr;
 
-    return std::uint8_t(flags);
+    return static_cast<std::uint8_t>(flags);
+}
+
+
+std::uint16_t getSize(Filehandler &handler, const bool extended) {
+    auto ptr = handler.read(extended ? LOCATION_EXTENDED_HEADER : LOCATION_SIZE, SIZE_OF_SIZE);
+    std::uint16_t size = 0;
+
+    for (int i = 0; i < SIZE_OF_SIZE; ++i) {
+        size += static_cast<std::uint16_t>(ptr[i]);
+    }
+
+    delete[] ptr;
+
+    return size;
+}
+
 }
 
 
