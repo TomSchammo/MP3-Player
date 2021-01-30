@@ -26,7 +26,8 @@
  *  m_artist:      The name of the artist
  *  m_genre:       The name of the genre that the song belongs to
  *  m_release:     The year of when the song was released
- *  m_duration:    The song duration
+ *  m_duration:    The song duration in milliseconds
+ *  m_delay:       The amount of silence that should be put in front of the track (in ms)
  *  m_path:        The path to the MP3 file
  *  m_audio_start: An offset to the start of the actual audio data
  */
@@ -41,6 +42,7 @@ public:
 
     std::uint16_t m_audio_start = 0;
     std::uint16_t m_duration = 0;
+    std::uint16_t m_delay = 0;
 
     std::string m_path;
 
