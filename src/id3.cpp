@@ -1,4 +1,5 @@
 #include <id3.hpp>
+#include <iostream>
 
 
 bool detectID3(Filehandler &handler) {
@@ -51,6 +52,51 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 
     return size;
 }
+
+
+void parseFrameData(char* data, std::string frameID, Song &song) {
+
+    if (frameID.compare("TIT2") == 0) {
+        // TODO log verbose
+        std::cout << "Found a TIT2 frame, setting song title to: " << data << std::endl;
+
+        song.m_title = data;
+
+    } else if (frameID.compare("TALB") == 0) {
+        // TODO log verbose
+        std::cout << "Found a TALB frame, setting song title to: " << data << std::endl;
+
+        song.m_album = data;
+
+    } else if (frameID.compare("TPE1") == 0) {
+        // TODO log verbose
+        std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
+
+        song.m_artist = data;
+
+    } else if (frameID.compare("TLEN") == 0) {
+        // TODO log verbose
+        std::cout << "Found a TLEN frame, setting track length to: " << *data << std::endl;
+
+        song.m_duration = static_cast<std::uint16_t>(*data);
+
+    } else if (frameID.compare("TDLY") == 0) {
+        // TODO log verbose
+        std::cout << "Found a TDLY frame, setting delay to: " << *data << "ms" << std::endl;
+
+        song.m_delay = static_cast<std::uint16_t>(*data);
+
+    } else {
+        // TODO log warn
+        std::cout << "frameID not supported yet";
+    }
+
+    // TODO TFLT (audio type, default is MPEG)
+    // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
+    // TODO APIC (Album art (section 4.14))
+    // TODO PCNT (Player counter (4.16), should be incremented)
+}
+
 
 }
 
