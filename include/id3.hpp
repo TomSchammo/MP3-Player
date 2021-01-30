@@ -89,7 +89,12 @@ void readFrame(Filehandler &handler, std::uint16_t position);
 void parseFrameData(char* data, std::string frameID, Song &song);
 
 
-void readID3(const char* name);
+/**
+ * Function to extract ID3 encapsulated metadata from an mp3 file.
+ *
+ * @param song is a reference to a song object that represents the mp3 file.
+ */
+void readID3(Song &song);
 
 
 #endif // ID3_HPP
