@@ -44,7 +44,7 @@ public:
     std::uint16_t m_duration = 0;
     std::uint16_t m_delay = 0;
 
-    std::string m_path;
+    const char* m_path;
 
 public:
     Song();
