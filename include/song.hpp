@@ -48,6 +48,8 @@ public:
 
 public:
     Song();
+
+    // TODO decrease play counter?
     virtual ~Song ();
 
 };
