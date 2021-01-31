@@ -2,6 +2,7 @@
 build
 compile_commands.json
 .vimrc
+.vimspecto.json
 .nvimrc
 .clangd
 .vim
