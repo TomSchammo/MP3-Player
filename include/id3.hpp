@@ -9,9 +9,9 @@
 
 #ifndef ID3_HPP
 #define ID3_HPP
+
 #include <filehandler.hpp>
 #include <song.hpp>
-#include <cstdint>
 
 // constants
 constexpr std::uint8_t LOCATION_START = 0;
@@ -31,7 +31,7 @@ constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 /**
  * Checks whether ID3 metadata prepended to the file.
  *
- * @param handler A Filehandler object to read from the file
+ * @param handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
 bool dectectID3(Filehandler &handler);
@@ -40,7 +40,7 @@ bool dectectID3(Filehandler &handler);
 /**
  * Checks whether ID3 metadata appended to the file.
  *
- * @param handler A Filehandler object to read from the file
+ * @param handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
 bool detectID3Footer(Filehandler &handler);
@@ -49,7 +49,7 @@ bool detectID3Footer(Filehandler &handler);
 /**
  * Reads the byte that contains the version of the ID3 Tag
  *
- * @param handler A Filehandler object to read from the file
+ * @param handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the ID3 major version
  */
 std::uint8_t getVersion(Filehandler &handler);
@@ -58,7 +58,7 @@ std::uint8_t getVersion(Filehandler &handler);
 /**
  * Reads the byte that contains the flags in the ID3 header, and returns it
  *
- * @param handler A Filehandler object to read from the file
+ * @param handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the flags of the ID3 header.
  */
 std::uint8_t getFlags(Filehandler &handler);
@@ -67,13 +67,23 @@ std::uint8_t getFlags(Filehandler &handler);
 /**
  * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
  *
- * @param handler A Filehandler object to read from the file
+ * @param handler A reference to a Filehandler object to read from the file
  * @return 4 bytes that contain the size of the ID3 tag or the extended header.
  */
 std::uint16_t getSize(Filehandler &handler, const bool extended);
 
 
-void readFrame(Filehandler &handler, std::uint16_t position);
+/**
+ * Reads the content of a frame and returns the data (the whole frame minus the header)
+ * so that it can be parsed by another function.
+ *
+ * @param handler  A reference to a Filehandler object to read from the file
+ * @param position The starting position of the frame in the file
+ * @param frame_id A reference to a string that will be set to the frame id
+ *
+ * @return A pointer to a array of data (with each element containing 1 byte)
+ */
+char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id);
 
 
 /**
