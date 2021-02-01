@@ -64,7 +64,7 @@ void parseFrameData(char* data, std::string frameID, Song &song) {
 
     } else if (frameID.compare("TALB") == 0) {
         // TODO log verbose
-        std::cout << "Found a TALB frame, setting song title to: " << data << std::endl;
+        std::cout << "Found a TALB frame, setting album title to: " << data << std::endl;
 
         song.m_album = data;
 
@@ -73,6 +73,19 @@ void parseFrameData(char* data, std::string frameID, Song &song) {
         std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
 
         song.m_artist = data;
+
+    } else if (frameID.compare("TDRL") == 0) {
+
+        char year[4];
+        year[0] = data[0];
+        year[1] = data[1];
+        year[2] = data[2];
+        year[3] = data[3];
+
+        // TODO log verbose
+        std::cout << "Found a TDRL frame setting release year to: " << *year << std::endl;
+
+        song.m_release = static_cast<std::uint16_t>(*year);
 
     } else if (frameID.compare("TLEN") == 0) {
         // TODO log verbose
