@@ -47,7 +47,8 @@ public:
     std::string m_path;
 
 public:
-    Song();
+    Song(std::string &path);
+
 
     // TODO decrease play counter?
     virtual ~Song ();

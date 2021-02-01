@@ -21,7 +21,7 @@ namespace Playlist {
      * @param filename The name of the playlist
      * @param songlist A vector that is to be filled with the content of the playlist
      */
-    void readM3U(const char* filename, std::vector<song> &songlist);
+    void readM3U(const char* filename, std::vector<Song> &songlist);
 
 
     /**
@@ -30,7 +30,7 @@ namespace Playlist {
      *
      * @param playlist The playlist that is supposed to be shuffled
      */
-    void shuffle(std::vector<song> &playlist);
+    void shuffle(std::vector<Song> &playlist);
 }
 
 #endif /* ifndef PLAYLIST_HPP */

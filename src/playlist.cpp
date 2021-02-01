@@ -2,7 +2,7 @@
 #include <playlist.hpp>
 #include <filehandler.hpp>
 
-void Playlist::readM3U(const char *filename, std::vector<song> &songlist) {
+void Playlist::readM3U(const char *filename, std::vector<Song> &songlist) {
 
     Filehandler filehandler(filename);
 
@@ -11,8 +11,7 @@ void Playlist::readM3U(const char *filename, std::vector<song> &songlist) {
         auto paths = filehandler.read();
 
         for (auto path : *paths) {
-            song song;
-            song.path = path;
+            Song song(path);
             songlist.push_back(song);;
         }
 
@@ -21,7 +20,7 @@ void Playlist::readM3U(const char *filename, std::vector<song> &songlist) {
 }
 
 
-void Playlist::shuffle(std::vector<song> &playlist) {
+void Playlist::shuffle(std::vector<Song> &playlist) {
 
     srand(time(nullptr));
 
