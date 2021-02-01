@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
 CXX	 := -gcc
-CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
+CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror -std=c++17
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD	:= ./build
 OBJ_DIR  := $(BUILD)/objects
