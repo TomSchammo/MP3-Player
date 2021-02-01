@@ -3,7 +3,7 @@
 #include <vector>
 
 
-Filehandler::Filehandler(const char* filename) {
+Filehandler::Filehandler(std::string filename) {
     this->filename = filename;
 
     if (exists()) {

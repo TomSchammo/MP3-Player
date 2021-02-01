@@ -15,6 +15,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <filesystem>
 
 class Filehandler {
 
@@ -26,7 +27,7 @@ class Filehandler {
          *
          * @param filename name of the file
          */
-        Filehandler(const char* filename);
+        Filehandler(std::string filename);
 
 
         /**
@@ -35,8 +36,8 @@ class Filehandler {
          * @return true if the file exists, false otherwise.
          */
         inline bool exists() {
-            struct stat buffer;
-            return (stat (filename, &buffer) == 0);
+            std::filesystem::path f(filename);
+            return std::filesystem::exists(f);
         }
 
 
@@ -74,7 +75,7 @@ class Filehandler {
 
 
     private:
-        const char* filename;
+        std::string filename;
         std::ifstream stream;
 
 
