@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <song.hpp>
+#include <id3.hpp>
 
 int main()
 {
@@ -8,6 +10,12 @@ int main()
     std::string filename;
 
     std::cin >> filename;
+
+    Song song(filename);
+
+    readID3(song);
+
+    song.print();
 
 
     return 0;
