@@ -49,6 +49,10 @@ public:
 public:
     Song(std::string &path);
 
+    /**
+     * Print information contained in song object to standard out.
+     */
+    void print();
 
     // TODO decrease play counter?
     virtual ~Song ();
