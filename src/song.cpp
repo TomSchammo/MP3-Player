@@ -12,7 +12,7 @@ void Song::print() {
     std::cout << "Artist: " << m_artist << std::endl;
     std::cout << "Genre: " << m_genre << std::endl;
     std::cout << "Release Year: " << m_release << std::endl;
-    std::cout << "Song duration" << m_duration << std::endl;
+    std::cout << "Song duration: " << m_duration << std::endl;
     std::cout << "Filepath: " << m_path << std::endl;
     std::cout << "\n----- Audio information -----\n" << std::endl;
     std::cout << "Audio start: " << m_audio_start << std::endl;
