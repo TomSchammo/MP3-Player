@@ -40,6 +40,7 @@ public:
     std::string m_genre = "Unknown Genre";
     std::string m_release = "";
 
+    // TODO consider making these strings as well
     std::uint16_t m_audio_start = 0;
     std::uint16_t m_duration = 0;
     std::uint16_t m_delay = 0;

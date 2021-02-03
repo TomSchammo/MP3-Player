@@ -114,12 +114,14 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
 
         // TODO track length not necessarily included, nice if it is, but should not depend
 
+        // TODO need to check if this works
         song.m_duration = static_cast<std::uint16_t>(*data);
 
     } else if (frameID.compare("TDLY") == 0) {
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << data << "ms" << std::endl;
 
+        // TODO need to check if this works
         song.m_delay = static_cast<std::uint16_t>(*data);
 
     } else {
