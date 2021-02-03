@@ -12,8 +12,8 @@ Filehandler::Filehandler(std::string filename) {
 }
 
 
-char* Filehandler::read(const std::uint16_t position, const unsigned char bytes) {
-    char *buffer = new char[bytes];
+char* Filehandler::readBytes(const std::uint16_t position, const unsigned char bytes) {
+    char* buffer = new char[bytes];
 
     stream.seekg(position, std::ios::beg);
     stream.read(buffer, bytes);
@@ -22,11 +22,59 @@ char* Filehandler::read(const std::uint16_t position, const unsigned char bytes)
 }
 
 
-char* Filehandler::read(const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
-    char *buffer = new char[bytes];
+char* Filehandler::readBytes(const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+    char* buffer = new char[bytes];
 
     stream.seekg(position, way);
     stream.read(buffer, bytes);
+
+    return buffer;
+}
+
+
+char* Filehandler::readString(const std::uint16_t position, const unsigned char bytes) {
+    char* buffer = new char[bytes];
+
+    stream.seekg(position, std::ios::beg);
+    stream.read(buffer, bytes);
+
+    // if the string read is not null terminated its contents are copied into a new
+    // buffer that is one byte longer, and a '\0' byte is added at the end
+    if (buffer[bytes - 1] != '\0') {
+        char* newBuffer = new char[bytes + 1];
+        for (int i = 0; i < bytes; ++i) {
+           newBuffer[i] = buffer[i];
+        }
+
+        newBuffer[bytes] = '\0';
+
+        delete [] buffer;
+        buffer = newBuffer;
+    }
+
+    return buffer;
+}
+
+
+char* Filehandler::readString(const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+    char* buffer = new char[bytes];
+
+    stream.seekg(position, way);
+    stream.read(buffer, bytes);
+
+    // if the string read is not null terminated its contents are copied into a new
+    // buffer that is one byte longer, and a '\0' byte is added at the end
+    if (buffer[bytes - 1] != '\0') {
+        char* newBuffer = new char[bytes + 1];
+        for (int i = 0; i < bytes; ++i) {
+           newBuffer[i] = buffer[i];
+        }
+
+        newBuffer[bytes] = '\0';
+
+        delete [] buffer;
+        buffer = newBuffer;
+    }
 
     return buffer;
 }

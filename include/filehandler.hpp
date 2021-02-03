@@ -48,17 +48,39 @@ class Filehandler {
          * @param bytes     The number of bytes that should be read
          * @return a pointer to the first byte of a char array containing the requested bytes
          */
-        char* read(const std::uint16_t position, const unsigned char bytes);
+        char* readBytes(const std::uint16_t position, const unsigned char bytes);
 
 
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position".
          *
          * @param position  The starting position of the pointer
+         * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          * @return a pointer to the first byte of a char array containing the requested bytes
          */
-        char* read(const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+        char* readBytes(const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+
+
+        /**
+         * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
+         *
+         * @param position  The starting position of the pointer
+         * @param bytes     The number of bytes that should be read
+         * @return a pointer to the first byte of a char array containing the requested bytes
+         */
+        char* readString(const std::uint16_t position, const unsigned char bytes);
+
+
+        /**
+         * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
+         *
+         * @param position  The starting position of the pointer
+         * @param way       The point of the file that the position is relative  to (eg. start, or end)
+         * @param bytes     The number of bytes that should be read
+         * @return a pointer to the first byte of a char array containing the requested bytes
+         */
+        char* readString(const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
 
 
         /**
