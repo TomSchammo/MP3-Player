@@ -18,9 +18,12 @@ constexpr std::uint8_t LOCATION_START = 0;
 constexpr std::uint8_t LOCATION_VERSION = 3;
 constexpr std::uint8_t LOCATION_FLAGS = 5;
 constexpr std::uint8_t LOCATION_SIZE = 6;
-constexpr std::uint8_t LOCATION_EXTENDED_HEADER = 10;
 constexpr std::uint8_t SIZE_OF_FLAGS = 1;
+constexpr std::uint8_t SIZE_OF_HEADER = 10;
+
+// TODO Only reading major, don't care about revision just now
 constexpr std::uint8_t SIZE_OF_VERSION = 1;
+
 constexpr std::uint8_t SIZE_OF_SIZE = 4;
 constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 
@@ -83,7 +86,7 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
  *
  * @return A pointer to a array of data (with each element containing 1 byte)
  */
-char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id);
+std::string* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read);
 
 
 /**
