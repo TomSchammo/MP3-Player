@@ -38,7 +38,7 @@ public:
     std::string m_album = "Unknown Album";
     std::string m_artist = "Unknown Artist";
     std::string m_genre = "Unknown Genre";
-    std::uint16_t m_release = 0;
+    std::string m_release = "";
 
     std::uint16_t m_audio_start = 0;
     std::uint16_t m_duration = 0;
