@@ -86,7 +86,7 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
  *
  * @return A pointer to a array of data (with each element containing 1 byte)
  */
-std::string* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read);
+const char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read);
 
 
 /**

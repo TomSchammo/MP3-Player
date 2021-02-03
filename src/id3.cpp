@@ -4,9 +4,9 @@
 
 bool detectID3(Filehandler &handler) {
 
-    auto ptr = handler.read(LOCATION_START, 3);
+    auto ptr = handler.readString(LOCATION_START, 3);
 
-    auto returnValue = std::string(ptr, 3).compare("ID3") == 0;
+    auto returnValue = std::string(ptr).compare("ID3") == 0;
 
     delete[] ptr;
     return returnValue;
@@ -15,10 +15,10 @@ bool detectID3(Filehandler &handler) {
 
 bool detectID3Footer(Filehandler &handler) {
 
-    auto ptr = handler.read(LOCATION_START, std::ios::end, 3);
+    auto ptr = handler.readString(LOCATION_START, std::ios::end, 3);
 
 
-    auto returnValue = std::string(ptr, 3).compare("3DI") == 0;
+    auto returnValue = std::string(ptr).compare("3DI") == 0;
 
     delete[] ptr;
     return returnValue;
@@ -26,7 +26,7 @@ bool detectID3Footer(Filehandler &handler) {
 
 
 std::uint8_t getVersion(Filehandler &handler) {
-    auto ptr = handler.read(LOCATION_VERSION, SIZE_OF_VERSION);
+    auto ptr = handler.readBytes(LOCATION_VERSION, SIZE_OF_VERSION);
     auto version = *ptr;
     delete[] ptr;
 
@@ -35,7 +35,7 @@ std::uint8_t getVersion(Filehandler &handler) {
 
 
 std::uint8_t getFlags(Filehandler &handler) {
-    auto ptr = handler.read(LOCATION_FLAGS, SIZE_OF_FLAGS);
+    auto ptr = handler.readBytes(LOCATION_FLAGS, SIZE_OF_FLAGS);
     auto flags = *ptr;
     delete[] ptr;
 
@@ -44,7 +44,7 @@ std::uint8_t getFlags(Filehandler &handler) {
 
 
 std::uint16_t getSize(Filehandler &handler, const bool extended) {
-    auto ptr = handler.read(extended ? SIZE_OF_HEADER : LOCATION_SIZE, SIZE_OF_SIZE);
+    auto ptr = handler.readBytes(extended ? SIZE_OF_HEADER : LOCATION_SIZE, SIZE_OF_SIZE);
     std::uint16_t size = 0;
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
@@ -57,37 +57,37 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 }
 
 
-void parseFrameData(std::string* data, std::string frameID, Song &song) {
+void parseFrameData(const char* data, std::string frameID, Song &song) {
 
     if (frameID.compare("TIT2") == 0) {
 
         // TODO log verbose
-        std::cout << "Found a TIT2 frame, setting song title to: " << *data << std::endl;
+        std::cout << "Found a TIT2 frame, setting song title to: " << data << std::endl;
 
-        song.m_title = *data;
+        song.m_title = data;
 
     } else if (frameID.compare("TALB") == 0) {
 
 
         // TODO log verbose
-        std::cout << "Found a TALB frame, setting album title to: " << *data << std::endl;
+        std::cout << "Found a TALB frame, setting album title to: " << data << std::endl;
 
-        song.m_album = *data;
+        song.m_album = data;
 
     } else if (frameID.compare("TPE1") == 0) {
 
         // TODO log verbose
-        std::cout << "Found a TPE1 frame, setting artist to: " << *data << std::endl;
+        std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
 
-        song.m_artist = *data;
+        song.m_artist = data;
 
     } else if (frameID.compare("TDRL") == 0) {
 
         // TODO log verbose
-        std::cout << "Found a TDRL frame setting release year to: " << *data << std::endl;
+        std::cout << "Found a TDRL frame setting release year to: " << data << std::endl;
 
         // starting from 0, five characters (4 + '\0')
-        song.m_release = (*data).substr(0, 5);
+        song.m_release = std::string(data).substr(0, 5);
 
     } else if (frameID.compare("TDRC") == 0) {
 
@@ -96,11 +96,10 @@ void parseFrameData(std::string* data, std::string frameID, Song &song) {
         if (song.m_release.compare("") == 0) {
 
             // TODO log verbose
-            std::cout << "Found a TDRC frame setting release year to: " << *data << std::endl;
-            std::cout << (*data).size() << std::endl;
+            std::cout << "Found a TDRC frame setting release year to: " << data << std::endl;
 
             // starting from 0, five characters (4 + '\0')
-            song.m_release = (*data).substr(0, 5);
+            song.m_release = std::string(data).substr(0, 5);
         }
 
         else {
@@ -111,17 +110,17 @@ void parseFrameData(std::string* data, std::string frameID, Song &song) {
 
     } else if (frameID.compare("TLEN") == 0) {
         // TODO log verbose
-        std::cout << "Found a TLEN frame, setting track length to: " << *data << std::endl;
+        std::cout << "Found a TLEN frame, setting track length to: " << data << std::endl;
 
         // TODO track length not necessarily included, nice if it is, but should not depend
 
-        // song.m_duration = static_cast<std::uint16_t>(*data);
+        song.m_duration = static_cast<std::uint16_t>(*data);
 
     } else if (frameID.compare("TDLY") == 0) {
         // TODO log verbose
-        std::cout << "Found a TDLY frame, setting delay to: " << *data << "ms" << std::endl;
+        std::cout << "Found a TDLY frame, setting delay to: " << data << "ms" << std::endl;
 
-        // song.m_delay = static_cast<std::uint16_t>(*data);
+        song.m_delay = static_cast<std::uint16_t>(*data);
 
     } else {
         // TODO log warn
@@ -135,21 +134,20 @@ void parseFrameData(std::string* data, std::string frameID, Song &song) {
     // TODO TRCK (Track number)
     // TODO TDRC (Record time (if TDRL is not available))
     // TODO TCON (content type, technically genre?) used when genre is not available, match with list
+
+    delete [] data;
 }
 
 
-std::string* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read) {
+const char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read) {
 
-
-    auto ptr = handler.read(position, SIZE_OF_FRAME_ID);
+    auto ptr = handler.readString(position, SIZE_OF_FRAME_ID);
 
     frame_id = std::string(ptr, SIZE_OF_FRAME_ID);
 
     position += SIZE_OF_FRAME_ID;
 
-    ptr = handler.read(position, SIZE_OF_SIZE);
-
-    // std::uint16_t size = 0;
+    ptr = handler.readBytes(position, SIZE_OF_SIZE);
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
         bytes_read += static_cast<std::uint16_t>(ptr[i]);
@@ -157,7 +155,7 @@ std::string* readFrame(Filehandler &handler, std::uint16_t position, std::string
 
     position += SIZE_OF_SIZE;
 
-    ptr = handler.read(position, 2);
+    ptr = handler.readBytes(position, 2);
 
     std::uint8_t status_flags = ptr[0];
 
@@ -210,15 +208,12 @@ std::string* readFrame(Filehandler &handler, std::uint16_t position, std::string
     position += 2;
 
     // reading the data of the frame
-    ptr = handler.read(position, bytes_read);
-
-    std::string* string = new std::string(ptr, bytes_read);
+    // TODO why do I need this + 1, it doesn't make sense...
+    ptr = handler.readString(position+1, bytes_read);
 
     bytes_read += 10;
 
-    delete[] ptr;
-
-    return string;
+    return ptr;
     // TODO parse data of frame
     // TODO either need to pass reference to song object
     // TODO or return the pointer at function call and then call parser from different function
@@ -289,9 +284,7 @@ void readID3(Song &song) {
                 std::string frame_id = "";
 
                 std::uint16_t size_read = 0;
-                std::string* ptr = readFrame(handler, position, frame_id, size_read);
-
-                std::cout << size_read << std::endl;
+                const char* ptr = readFrame(handler, position, frame_id, size_read);
 
                 // TODO size is weird sometimes
                 size_remaining -= size_read;
