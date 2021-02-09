@@ -1,5 +1,6 @@
 #include <id3.hpp>
 #include <iostream>
+#include <vector>
 
 
 bool detectID3(Filehandler &handler) {
@@ -54,6 +55,31 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
     delete[] ptr;
 
     return size;
+}
+
+
+void synchronize(unsigned char* data, std::uint16_t size) {
+
+    std::vector<unsigned char> bytes;
+
+    bool sync = true;
+
+    for (std::uint16_t i = 0; i < size; ++i) {
+        if (sync) {
+            bytes.push_back(data[i]);
+            sync = (data[i] != 0xff);
+        }
+
+        else {
+            if (data[i] != 0x00)
+                bytes.push_back(data[i]);
+
+            sync = true;
+        }
+
+    }
+
+    data = bytes.data();
 }
 
 

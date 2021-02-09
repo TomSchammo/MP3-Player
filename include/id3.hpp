@@ -75,6 +75,13 @@ std::uint8_t getFlags(Filehandler &handler);
  */
 std::uint16_t getSize(Filehandler &handler, const bool extended);
 
+/**
+ * Synchronizes unsynchronized Data
+ *
+ * @param  data The data that is supposed to be synchronized
+ * @return A pointer to the data that has been synchronized
+ */
+void synchronize(char* data, std::uint16_t size);
 
 /**
  * Reads the content of a frame and returns the data (the whole frame minus the header)
