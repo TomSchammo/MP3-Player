@@ -117,7 +117,7 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
 
     } else if (frameID.compare("TDRC") == 0) {
 
-        // if release year has precedence over recording year but if
+        // release year has precedence over recording year but if
         // there is no TDRL frame, this frame will be used for the date instead
         if (song.m_release.compare("") == 0) {
 
@@ -150,6 +150,22 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
         // TODO need to check if this works
         song.m_delay = static_cast<std::uint16_t>(*data);
 
+    } else if (frameID.compare("TCON") == 0) {
+
+        // custom genres have precedence over content type but if
+        // there is no custom genre set, this frame will be used for the genre instead
+        // TODO this is different for older tag versions
+        if (song.m_genre.compare("Unknown Genre") == 0) {
+
+            // TODO log verbose
+            std::cout << "Found a TCON frame, setting genre to: " << data << std::endl;
+
+            // TODO not sure if this is always fine (as there can also be numbers apparently)
+            //      so maybe this is not the correct way to "parse" the data, but I'll gave to
+            //      check with more files.
+            song.m_genre = data;
+        }
+
     } else {
         // TODO log warn
         std::cout << "frameID: " << frameID << " is not supported yet" << std::endl;
@@ -160,8 +176,6 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
     // TODO APIC (Album art (section 4.14))
     // TODO PCNT (Player counter (4.16), should be incremented)
     // TODO TRCK (Track number)
-    // TODO TDRC (Record time (if TDRL is not available))
-    // TODO TCON (content type, technically genre?) used when genre is not available, match with list
 
     delete [] data;
 }
