@@ -279,9 +279,8 @@ void readID3(Song &song) {
         // TODO proceed with extracting metadata
         auto flags = getFlags(handler);
 
-        // TODO is that +10 necessary here?
-        // TODO since the header is already read when it matters, it should be fine without it
-        auto size = getSize(handler, false) + 10;
+        // TODO size is without 10 bytes of header
+        auto size = getSize(handler, false);
 
         std::uint16_t extended_size = 0;
 
