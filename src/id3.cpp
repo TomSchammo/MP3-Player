@@ -286,8 +286,8 @@ void readID3(Song &song) {
         std::uint16_t extended_size = 0;
 
         // Not supported ID3 version, skipping the tag
-        // TODO check if lower versions are supported
-        if (version > 4) {
+        // TODO Implement ID3v2.2 and below
+        if (version != 4 && version != 3) {
             // TODO log error
             std::cout << "This software does not support ID3 version ID3v2." << version << std::endl;
 
