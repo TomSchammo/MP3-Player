@@ -251,7 +251,9 @@ const char* readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
     // reading the data of the frame
     // TODO why do I need this + 1, it doesn't make sense...
-    ptr = handler.readString(position+1, bytes_read);
+    // TODO apparently size assumes null terminated string, but apparently
+    //      not every string in a frame is null terminated, so that can fuck things up
+    ptr = handler.readString(position+1, bytes_read-1);
 
     bytes_read += 10;
 
