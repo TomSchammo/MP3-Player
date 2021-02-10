@@ -102,11 +102,11 @@ const char* readFrame(Filehandler &handler, std::uint16_t position, std::string 
  *
  * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
  *
- * @param data    The data of the ID3 frame
- * @param frameID The frameID of the frame
- * @param song    A reference to a {@class Song} object
+ * @param data     The data of the ID3 frame
+ * @param frame_id The frameID of the frame
+ * @param song     A reference to a {@class Song} object
  */
-void parseFrameData(char* data, std::string frameID, Song &song);
+void parseFrameData(char* data, std::string frame_id, Song &song);
 
 
 /**

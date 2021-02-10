@@ -83,16 +83,16 @@ void synchronize(unsigned char* data, std::uint16_t size) {
 }
 
 
-void parseFrameData(const char* data, std::string frameID, Song &song) {
+void parseFrameData(const char* data, std::string frame_id, Song &song) {
 
-    if (frameID.compare("TIT2") == 0) {
+    if (frame_id.compare("TIT2") == 0) {
 
         // TODO log verbose
         std::cout << "Found a TIT2 frame, setting song title to: " << data << std::endl;
 
         song.m_title = data;
 
-    } else if (frameID.compare("TALB") == 0) {
+    } else if (frame_id.compare("TALB") == 0) {
 
 
         // TODO log verbose
@@ -100,14 +100,14 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
 
         song.m_album = data;
 
-    } else if (frameID.compare("TPE1") == 0) {
+    } else if (frame_id.compare("TPE1") == 0) {
 
         // TODO log verbose
         std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
 
         song.m_artist = data;
 
-    } else if (frameID.compare("TDRL") == 0) {
+    } else if (frame_id.compare("TDRL") == 0) {
 
         // TODO log verbose
         std::cout << "Found a TDRL frame setting release year to: " << data << std::endl;
@@ -115,7 +115,7 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
         // starting from 0, five characters (4 + '\0')
         song.m_release = std::string(data).substr(0, 5);
 
-    } else if (frameID.compare("TDRC") == 0) {
+    } else if (frame_id.compare("TDRC") == 0) {
 
         // release year has precedence over recording year but if
         // there is no TDRL frame, this frame will be used for the date instead
@@ -134,7 +134,7 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
             std::cout << "Found a TDRC frame, but release year has already been set. Skipping..." << std::endl;
         }
 
-    } else if (frameID.compare("TLEN") == 0) {
+    } else if (frame_id.compare("TLEN") == 0) {
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << data << std::endl;
 
@@ -143,14 +143,14 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
         // TODO need to check if this works
         song.m_duration = static_cast<std::uint16_t>(*data);
 
-    } else if (frameID.compare("TDLY") == 0) {
+    } else if (frame_id.compare("TDLY") == 0) {
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << data << "ms" << std::endl;
 
         // TODO need to check if this works
         song.m_delay = static_cast<std::uint16_t>(*data);
 
-    } else if (frameID.compare("TCON") == 0) {
+    } else if (frame_id.compare("TCON") == 0) {
 
         // custom genres have precedence over content type but if
         // there is no custom genre set, this frame will be used for the genre instead
@@ -168,7 +168,7 @@ void parseFrameData(const char* data, std::string frameID, Song &song) {
 
     } else {
         // TODO log warn
-        std::cout << "frameID: " << frameID << " is not supported yet" << std::endl;
+        std::cout << "frame id: " << frame_id << " is not supported yet" << std::endl;
     }
 
     // TODO TFLT (audio type, default is MPEG)
