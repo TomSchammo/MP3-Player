@@ -45,22 +45,22 @@ class Filehandler {
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position".
          *
-         * @param buffer    A reference to a char array, that the bytes will be written into
+         * @param buffer    A char array, that the bytes will be written into
          * @param position  The starting position of the pointer
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char (&buffer)[], const std::uint16_t position, const unsigned char bytes);
+        void readBytes(char buffer[], const std::uint16_t position, const unsigned char bytes);
 
 
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position".
          *
-         * @param buffer    A reference to a char array, that the bytes will be written into
+         * @param buffer    A char array, that the bytes will be written into
          * @param position  The starting position of the pointer
          * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char (&buffer)[], const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+        void readBytes(char buffer[], const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
 
 
         /**
