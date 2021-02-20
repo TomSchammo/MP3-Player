@@ -4,39 +4,36 @@
 
 
 Filehandler::Filehandler(std::string filename) {
-    this->filename = filename;
+    this->m_filename = filename;
 
     if (exists()) {
-        this->stream.open(filename, std::ios::binary | std::ios::in);
+        this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
 }
 
 
-char* Filehandler::readBytes(const std::uint16_t position, const unsigned char bytes) {
-    char* buffer = new char[bytes];
+void Filehandler::readBytes(char (&buffer)[], const std::uint16_t position, const unsigned char bytes) {
 
-    stream.seekg(position, std::ios::beg);
-    stream.read(buffer, bytes);
+    m_stream.seekg(position, std::ios::beg);
+    m_stream.read(buffer, bytes);
 
-    return buffer;
 }
 
 
-char* Filehandler::readBytes(const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
-    char* buffer = new char[bytes];
+void Filehandler::readBytes(char (&buffer)[], const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
 
-    stream.seekg(position, way);
-    stream.read(buffer, bytes);
+    m_stream.seekg(position, way);
+    m_stream.read(buffer, bytes);
 
-    return buffer;
 }
 
 
-char* Filehandler::readString(const std::uint16_t position, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint16_t position, const unsigned char bytes) {
+
     char* buffer = new char[bytes];
 
-    stream.seekg(position, std::ios::beg);
-    stream.read(buffer, bytes);
+    m_stream.seekg(position, std::ios::beg);
+    m_stream.read(buffer, bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
@@ -48,19 +45,21 @@ char* Filehandler::readString(const std::uint16_t position, const unsigned char 
 
         newBuffer[bytes] = '\0';
 
-        delete [] buffer;
         buffer = newBuffer;
+        delete [] newBuffer;
     }
 
-    return buffer;
+    s = buffer;
+    delete []  buffer;
 }
 
 
-char* Filehandler::readString(const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+
     char* buffer = new char[bytes];
 
-    stream.seekg(position, way);
-    stream.read(buffer, bytes);
+    m_stream.seekg(position, way);
+    m_stream.read(buffer, bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
@@ -72,11 +71,12 @@ char* Filehandler::readString(const std::uint16_t position, enum std::_Ios_Seekd
 
         newBuffer[bytes] = '\0';
 
-        delete [] buffer;
         buffer = newBuffer;
+        delete [] newBuffer;
     }
 
-    return buffer;
+    s = buffer;
+    delete [] buffer;
 }
 
 
@@ -84,19 +84,19 @@ std::shared_ptr<std::vector<std::string>> Filehandler::read() {
 
     char* data = new char[1];
 
-    stream.seekg(0, std::ios::beg);
+    m_stream.seekg(0, std::ios::beg);
 
     auto lines = std::make_shared<std::vector<std::string>>();
 
-    while (!stream.eof()) {
+    while (!m_stream.eof()) {
 
-        stream.read(data, 1);
+        m_stream.read(data, 1);
         std::string line = "";
 
         // while char read not equal "\n"
         while (data[0] != 10) {
             line += data[0];
-            stream.read(data, 1);
+            m_stream.read(data, 1);
         }
 
         lines->push_back(line);
@@ -107,6 +107,6 @@ std::shared_ptr<std::vector<std::string>> Filehandler::read() {
 }
 
 Filehandler::~Filehandler() {
-    if(stream.is_open())
-        stream.close();
+    if(m_stream.is_open())
+        m_stream.close();
 }
