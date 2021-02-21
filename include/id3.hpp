@@ -62,7 +62,7 @@ std::uint8_t getVersion(Filehandler &handler);
  * Reads the byte that contains the flags in the ID3 header, and returns it
  *
  * @param handler A reference to a Filehandler object to read from the file
- * @return a byte that contains the flags of the ID3 header.
+ * @return a byte that contains the flags of the ID3 header
  */
 std::uint8_t getFlags(Filehandler &handler);
 
@@ -71,9 +71,10 @@ std::uint8_t getFlags(Filehandler &handler);
  * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
  *
  * @param handler A reference to a Filehandler object to read from the file
- * @return 4 bytes that contain the size of the ID3 tag or the extended header.
+ * @return 4 bytes that contain the size of the ID3 tag or the extended header
  */
 std::uint16_t getSize(Filehandler &handler, const bool extended);
+
 
 /**
  * Synchronizes unsynchronized Data
@@ -82,6 +83,18 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
  * @return A pointer to the data that has been synchronized
  */
 void synchronize(char* data, std::uint16_t size);
+
+
+/**
+ * Increments the play counter.
+ *
+ * Reads the content of a PCNT frame and increases it by 1.
+ *
+ * @param handler  A reference to a Filehandler object to read/write to the file
+ * @param position is the offset of the start of the frame relative to the start of the file
+ */
+void increment_pc(Filehandler &handler, std::uint16_t position);
+
 
 /**
  * Reads the content of a frame and returns the data (the whole frame minus the header)
