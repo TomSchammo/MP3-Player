@@ -93,7 +93,7 @@ void synchronize(char* data, std::uint16_t size);
  *
  * @return A pointer to a array of data (with each element containing 1 byte)
  */
-const char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read);
+std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read);
 
 
 /**
@@ -106,7 +106,7 @@ const char* readFrame(Filehandler &handler, std::uint16_t position, std::string 
  * @param frame_id The frameID of the frame
  * @param song     A reference to a {@class Song} object
  */
-void parseFrameData(char* data, std::string frame_id, Song &song);
+void parseFrameData(std::string data, std::string frame_id, Song &song);
 
 
 /**

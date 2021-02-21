@@ -5,54 +5,56 @@
 
 bool detectID3(Filehandler &handler) {
 
-    auto ptr = handler.readString(LOCATION_START, 3);
+    std::string s;
+    handler.readString(s, LOCATION_START, 3);
 
-    auto returnValue = std::string(ptr).compare("ID3") == 0;
-
-    delete[] ptr;
-    return returnValue;
+    return s.compare("ID3") == 0;
 }
 
 
 bool detectID3Footer(Filehandler &handler) {
 
-    auto ptr = handler.readString(LOCATION_START, std::ios::end, 3);
+    std::string s;
+    handler.readString(s, LOCATION_START, std::ios::end, 3);
 
 
-    auto returnValue = std::string(ptr).compare("3DI") == 0;
-
-    delete[] ptr;
-    return returnValue;
+    return s.compare("3DI") == 0;
 }
 
 
 std::uint8_t getVersion(Filehandler &handler) {
-    auto ptr = handler.readBytes(LOCATION_VERSION, SIZE_OF_VERSION);
-    auto version = *ptr;
-    delete[] ptr;
 
-    return static_cast<std::uint8_t>(version);
+    char buffer[SIZE_OF_VERSION];
+
+    handler.readBytes(buffer, LOCATION_VERSION, SIZE_OF_VERSION);
+
+    return static_cast<std::uint8_t>(*buffer);
 }
 
 
 std::uint8_t getFlags(Filehandler &handler) {
-    auto ptr = handler.readBytes(LOCATION_FLAGS, SIZE_OF_FLAGS);
-    auto flags = *ptr;
-    delete[] ptr;
+    char buffer[SIZE_OF_FLAGS];
 
-    return static_cast<std::uint8_t>(flags);
+    handler.readBytes(buffer, LOCATION_FLAGS, SIZE_OF_FLAGS);
+
+    return static_cast<std::uint8_t>(*buffer);
 }
 
 
 std::uint16_t getSize(Filehandler &handler, const bool extended) {
-    auto ptr = handler.readBytes(extended ? SIZE_OF_HEADER : LOCATION_SIZE, SIZE_OF_SIZE);
+
+    const unsigned char BUFFER_SIZE = extended ? SIZE_OF_HEADER : LOCATION_SIZE;
+
+    // Have to do this, since C++ doesn't support variable length arrays
+    std::vector<char> buffer(BUFFER_SIZE);
+
+    handler.readBytes(buffer.data(), BUFFER_SIZE, SIZE_OF_SIZE);
+
     std::uint16_t size = 0;
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
-        size += static_cast<std::uint16_t>(ptr[i]);
+        size += static_cast<std::uint16_t>(buffer[i]);
     }
-
-    delete[] ptr;
 
     return size;
 }
@@ -141,14 +143,16 @@ void parseFrameData(const char* data, std::string frame_id, Song &song) {
         // TODO track length not necessarily included, nice if it is, but should not depend
 
         // TODO need to check if this works
-        song.m_duration = static_cast<std::uint16_t>(*data);
+        // TODO is this a string or bytes???
+        // song.m_duration = static_cast<std::uint16_t>(*data);
 
     } else if (frame_id.compare("TDLY") == 0) {
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << data << "ms" << std::endl;
 
         // TODO need to check if this works
-        song.m_delay = static_cast<std::uint16_t>(*data);
+        // TODO is this a string or bytes???
+        // song.m_delay = static_cast<std::uint16_t>(*data);
 
     } else if (frame_id.compare("TCON") == 0) {
 
@@ -181,25 +185,32 @@ void parseFrameData(const char* data, std::string frame_id, Song &song) {
 }
 
 
-const char* readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read) {
+std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read) {
 
-    auto ptr = handler.readString(position, SIZE_OF_FRAME_ID);
+    handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
-    frame_id = std::string(ptr, SIZE_OF_FRAME_ID);
+    // std::uint16_t start_of_frame = position;
+    // TODO if frame_id == PCNT, set song.m_counter_offset = position;
+    // if (frame_id.compare("PCNT") == 0)
+        // return (char*)(static_cast<std::uint64_t>(start_of_frame));
 
     position += SIZE_OF_FRAME_ID;
 
-    ptr = handler.readBytes(position, SIZE_OF_SIZE);
+    char size_buffer[SIZE_OF_SIZE];
+
+    handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
-        bytes_read += static_cast<std::uint16_t>(ptr[i]);
+        bytes_read += static_cast<std::uint16_t>(size_buffer[i]);
     }
 
     position += SIZE_OF_SIZE;
 
-    ptr = handler.readBytes(position, 2);
+    char flags_buffer[2];
 
-    std::uint8_t status_flags = ptr[0];
+    handler.readBytes(flags_buffer, position, 2);
+
+    std::uint8_t status_flags = flags_buffer[0];
 
     if (status_flags & (1 << 5)) {
         // TODO frame should be discarded (bit == 1) if frame is unknown and tag is altered
@@ -214,7 +225,7 @@ const char* readFrame(Filehandler &handler, std::uint16_t position, std::string 
     }
 
     // TODO relevant bits: 6, 3, 2, 1, 0 (all)
-    std::uint8_t format_flags = ptr[1];
+    std::uint8_t format_flags = flags_buffer[1];
 
     if (format_flags & 1) {
         // TODO Data length indicator has been added
@@ -249,18 +260,19 @@ const char* readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
     position += 2;
 
+    std::cout << "reading " << bytes_read << " bytes of frame with id " << frame_id << std::endl;
     // reading the data of the frame
     // TODO why do I need this + 1, it doesn't make sense...
     // TODO apparently size assumes null terminated string, but apparently
     //      not every string in a frame is null terminated, so that can fuck things up
-    ptr = handler.readString(position+1, bytes_read-1);
+    // TODO is the size wrong then?
+    // also TODO pls fix
+    std::string s;
+    handler.readString(s, position+1, bytes_read-1);
 
     bytes_read += 10;
 
-    return ptr;
-    // TODO parse data of frame
-    // TODO either need to pass reference to song object
-    // TODO or return the pointer at function call and then call parser from different function
+    return s;
     // TODO subtract size + 10 from size left in readID3
 
 }
@@ -327,18 +339,23 @@ void readID3(Song &song) {
                 std::string frame_id = "";
 
                 std::uint16_t size_read = 0;
-                const char* ptr = readFrame(handler, position, frame_id, size_read);
+                std::string frame_content = readFrame(handler, position, frame_id, size_read);
 
-                // TODO size is weird sometimes
+                // TODO size is weird sometimes (by weird I mean 0 >)
+                std::cout << "Size: " << size_remaining << " - " << size_read << " = ";
                 size_remaining -= size_read;
+                std::cout << size_remaining << std::endl;
+
+                std::cout << "Position: " << position << " + " << size_read << " = ";
                 position += size_read;
+                std::cout << position << std::endl;
 
                 // frame_id has been set properly
                 if (frame_id.compare("") == 0)
                     // TODO log error
                     std::cout << "frame_id has not been set properly" << std::endl;
 
-                parseFrameData(ptr, frame_id, song);
+                parseFrameData(frame_content, frame_id, song);
             }
 
 
