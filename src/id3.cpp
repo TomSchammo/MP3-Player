@@ -100,7 +100,7 @@ void synchronize(unsigned char* data, std::uint16_t size) {
 }
 
 
-void parseFrameData(const char* data, std::string frame_id, Song &song) {
+void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
     if (frame_id.compare("TIT2") == 0) {
 

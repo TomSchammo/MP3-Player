@@ -1,5 +1,4 @@
 #include <filehandler.hpp>
-#include <memory>
 #include <vector>
 #include <iostream>
 
@@ -114,10 +113,10 @@ void Filehandler::readString(std::string &s, const std::uint16_t position, enum 
 
 std::shared_ptr<std::vector<std::string>> Filehandler::read() {
 
-    char* data = new char[1];
     // TODO log info
     std::cout << "Reading file: " << m_filename << std::endl;
 
+    char data[1];
 
     m_stream.seekg(0, std::ios::beg);
 
