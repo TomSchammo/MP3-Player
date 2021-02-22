@@ -11,7 +11,7 @@ bool detectID3(Filehandler &handler) {
     bool result = s.compare("ID3") == 0;
 
     // TODO log debug
-    std::cout << (result ? "Found ID3 Tag!" : "Didn't find ID3 tag...") << std::endl;
+    std::cout << (result ? "Found ID3 header!" : "No ID3 header present in file") << std::endl;
 
     return result;
 }
@@ -23,7 +23,12 @@ bool detectID3Footer(Filehandler &handler) {
     handler.readString(s, LOCATION_START, std::ios::end, 3);
 
 
-    return s.compare("3DI") == 0;
+    bool result = s.compare("3DI") == 0;
+
+    // TODO log debug
+    std::cout << (result ? "Found ID3 footer!" : "No ID3 footer present in file") << std::endl;
+
+    return result;
 }
 
 
@@ -33,7 +38,12 @@ std::uint8_t getVersion(Filehandler &handler) {
 
     handler.readBytes(buffer, LOCATION_VERSION, SIZE_OF_VERSION);
 
-    return static_cast<std::uint8_t>(*buffer);
+    std::uint8_t version = static_cast<std::uint8_t>(*buffer);
+
+    // TODO log debug
+    std::cout << "ID3 file has version: 2." << int(version) << std::endl;
+
+    return version;
 }
 
 
@@ -284,9 +294,6 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
 void readID3(Song &song) {
 
-
-    // TODO log debug
-    std::cout << "Creating file handler object for song: " << song.m_path << std::endl;
 
     Filehandler handler(song.m_path);
 
