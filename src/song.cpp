@@ -3,6 +3,8 @@
 
 
 Song::Song(std::string &path) {
+    // TODO log debug (or info?)
+    std::cout << "Created song object for file: " << path << std::endl;
     m_path = path;
 }
 
@@ -20,5 +22,5 @@ void Song::print() {
 }
 
 Song::~Song() {
-    std::cout << "Destroying song" << std::endl;
+    std::cout << "Destroying song with path: " << m_path << std::endl;
 }

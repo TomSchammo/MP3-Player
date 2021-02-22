@@ -12,7 +12,7 @@ Filehandler::Filehandler(std::string filename) {
 }
 
 
-void Filehandler::readBytes(char (&buffer)[], const std::uint16_t position, const unsigned char bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint16_t position, const unsigned char bytes) {
 
     m_stream.seekg(position, std::ios::beg);
     m_stream.read(buffer, bytes);
@@ -20,7 +20,7 @@ void Filehandler::readBytes(char (&buffer)[], const std::uint16_t position, cons
 }
 
 
-void Filehandler::readBytes(char (&buffer)[], const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
 
     m_stream.seekg(position, way);
     m_stream.read(buffer, bytes);

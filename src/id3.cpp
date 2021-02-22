@@ -8,7 +8,12 @@ bool detectID3(Filehandler &handler) {
     std::string s;
     handler.readString(s, LOCATION_START, 3);
 
-    return s.compare("ID3") == 0;
+    bool result = s.compare("ID3") == 0;
+
+    // TODO log debug
+    std::cout << (result ? "Found ID3 Tag!" : "Didn't find ID3 tag...") << std::endl;
+
+    return result;
 }
 
 
@@ -181,7 +186,6 @@ void parseFrameData(const char* data, std::string frame_id, Song &song) {
     // TODO PCNT (Player counter (4.16), should be incremented)
     // TODO TRCK (Track number)
 
-    delete [] data;
 }
 
 
@@ -280,6 +284,10 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
 void readID3(Song &song) {
 
+
+    // TODO log debug
+    std::cout << "Creating file handler object for song: " << song.m_path << std::endl;
+
     Filehandler handler(song.m_path);
 
     if (detectID3(handler)) {
@@ -303,7 +311,7 @@ void readID3(Song &song) {
             std::cout << "This software does not support ID3 version ID3v2." << version << std::endl;
 
             // TODO set filepointer to after tag?
-            // TODO if I'd do that, I'd have to know whether it contains extended headers though
+            // TODO if I'd do that, I'd have to know whether it contains extended headers though (for complete size)
         }
 
         else {
