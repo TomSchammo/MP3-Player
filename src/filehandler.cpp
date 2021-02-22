@@ -45,8 +45,8 @@ void Filehandler::readString(std::string &s, const std::uint16_t position, const
 
         newBuffer[bytes] = '\0';
 
+        delete [] buffer;
         buffer = newBuffer;
-        delete [] newBuffer;
     }
 
     s = buffer;
@@ -71,8 +71,8 @@ void Filehandler::readString(std::string &s, const std::uint16_t position, enum 
 
         newBuffer[bytes] = '\0';
 
+        delete [] buffer;
         buffer = newBuffer;
-        delete [] newBuffer;
     }
 
     s = buffer;
