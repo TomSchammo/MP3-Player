@@ -45,6 +45,24 @@ void Filehandler::readBytes(char buffer[], const std::uint16_t position, enum st
 }
 
 
+void Filehandler::writeBytes(const std::uint16_t position, const char* bytes, std::uint16_t size) {
+
+    std::ofstream stream;
+
+    // open stream in binary write mode
+    stream.open(m_filename, std::ios::binary | std::ios::out);
+
+    // place position at specified offset
+    stream.seekp(position, std::ios::beg);
+
+    // write bytes to the file
+    stream.write(bytes, size);
+
+
+    stream.close();
+}
+
+
 void Filehandler::readString(std::string &s, const std::uint16_t position, const unsigned char bytes) {
 
     // TODO log debug

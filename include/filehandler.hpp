@@ -64,6 +64,17 @@ class Filehandler {
 
 
         /**
+         * Writes "bytes" to a file at offset "position" relative to the start of the file.
+         * The bytes are appended at said position.
+         *
+         * @param position is the offset relative to the start of the file where the data should be written to
+         * @param bytes    are the bytes that should be written to the file
+         * @param size     contains how many bytes should be written to the file
+         */
+        void writeBytes(const std::uint16_t position, const char bytes[], std::uint16_t size);
+
+
+        /**
          * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
          *
          * @param s         A reference to a string that will contain the data after reading it from the file
