@@ -1,4 +1,6 @@
+#include <cstdio>
 #include <filehandler.hpp>
+#include <fstream>
 #include <vector>
 #include <iostream>
 
@@ -60,6 +62,94 @@ void Filehandler::writeBytes(const std::uint16_t position, const char* bytes, st
 
 
     stream.close();
+}
+
+void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
+
+    // TODO assert that all read/write operations were successful before deleting file at the end
+
+    // opening a temporary file to write the content of the original file to
+    std::ofstream stream;
+    stream.open(m_filename + ".tmp", std::ios::binary | std::ios::out);
+
+
+    // retrieving end of file, this will be important later
+    stream.seekp(0, std::ios::end);
+    const std::uint16_t _EOF = stream.tellp();
+
+
+    // creating buffer to read/write from/to
+    const std::uint16_t SIZE_OF_BUFFER = 1024;
+    char buffer[SIZE_OF_BUFFER];
+
+
+    // putting the pointer of both files at the start
+    stream.seekp(0, std::ios::beg);
+    m_stream.seekg(0, std::ios::beg);
+
+
+    // while bytes left > size of buffer
+    while (static_cast<std::uint16_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
+        m_stream.read(buffer, SIZE_OF_BUFFER);
+        stream.write(buffer, SIZE_OF_BUFFER);
+    }
+
+    // dynamically creating buffer to get the last portion of the file
+    char* pbuffer = new char[position % SIZE_OF_BUFFER];
+
+
+    m_stream.read(pbuffer, position % SIZE_OF_BUFFER);
+    stream.write(pbuffer, position % SIZE_OF_BUFFER);
+
+    delete [] pbuffer;
+
+    // skipping the bytes that are supposed to be deleted
+    m_stream.seekg(bytes, std::ios::cur);
+    auto current = m_stream.tellg();
+    auto size_remaining = _EOF - current;
+
+
+    // if the last byte has been removed there is no point in looking further
+    if (size_remaining > 0) {
+        m_stream.seekg(bytes, std::ios::cur);
+
+        // copying the rest of the file
+        while (size_remaining >= SIZE_OF_BUFFER) {
+            m_stream.read(buffer, SIZE_OF_BUFFER);
+            stream.write(buffer, SIZE_OF_BUFFER);
+            size_remaining = _EOF - m_stream.tellg();
+        }
+
+        pbuffer = new char[size_remaining];
+
+        m_stream.read(pbuffer, size_remaining);
+        stream.write(pbuffer, size_remaining);
+
+        delete [] pbuffer;
+
+    }
+
+    // copying is done, closing streams
+    m_stream.close();
+    stream.close();
+
+    // replacing old file with new one
+    if (std::remove(m_filename.c_str()) == 0) {
+        if (std::rename((m_filename + ".tmp").c_str(), m_filename.c_str()) != 0) {
+            // TODO log error
+            std::cout << "Could not rename " << m_filename << ".tmp to " << m_filename << std::endl;
+        }
+
+        else {
+            // TODO log info
+            std::cout << "Successfully renamed " << m_filename << ".tmp to " << m_filename << std::endl;
+        }
+    }
+
+    else {
+        // TODO log error
+        std::cout << "Could not remove " << m_filename << std::endl;
+    }
 }
 
 

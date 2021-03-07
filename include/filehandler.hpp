@@ -75,6 +75,21 @@ class Filehandler {
 
 
         /**
+         * Deletes 'bytes' bytes from a file.
+         *
+         * Basically copies all the bytes from the file to a temporary file, except the
+         * bytes are supposed to be deleted. Those are skipped.
+         *
+         * After successfully copying everything over, the old file is then deleted, and
+         * the temporary file is renamed to the name of the original file.
+         *
+         * @param position  The relative offset to the start of the file of the first byte
+         * @param bytes     The amount of bytes that should be deleted
+         */
+        void deleteBytes(std::uint16_t position, std::uint16_t bytes);
+
+
+        /**
          * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
          *
          * @param s         A reference to a string that will contain the data after reading it from the file
