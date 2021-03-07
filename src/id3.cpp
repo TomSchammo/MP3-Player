@@ -305,7 +305,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 }
 
 
-std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &bytes_read) {
+std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -321,7 +321,7 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
     handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
-        bytes_read += static_cast<std::uint16_t>(size_buffer[i]);
+        frame_data_size += static_cast<std::uint16_t>(size_buffer[i]);
     }
 
     position += SIZE_OF_SIZE;
@@ -380,7 +380,7 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
     position += 2;
 
-    std::cout << "reading " << bytes_read << " bytes of frame with id " << frame_id << std::endl;
+    std::cout << "reading " << frame_data_size << " bytes of frame with id " << frame_id << std::endl;
     // reading the data of the frame
     // TODO why do I need this + 1, it doesn't make sense...
     // TODO apparently size assumes null terminated string, but apparently
