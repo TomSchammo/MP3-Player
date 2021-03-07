@@ -309,11 +309,6 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
-    // std::uint16_t start_of_frame = position;
-    // TODO if frame_id == PCNT, set song.m_counter_offset = position;
-    // if (frame_id.compare("PCNT") == 0)
-        // return (char*)(static_cast<std::uint64_t>(start_of_frame));
-
     position += SIZE_OF_FRAME_ID;
 
     char size_buffer[SIZE_OF_SIZE];
@@ -478,6 +473,12 @@ void readID3(Song &song) {
 
                 std::uint16_t size_read = 0;
                 std::string frame_content = readFrame(handler, position, frame_id, size_read);
+
+                if (frame_id.compare("PCNT") == 0) {
+                    // setting posistion of start of play counter frame
+                    // wich is the current posistion - 4 (frame id) - 4 (size bytes) - 2 (flag bytes)
+                    song.m_counter_offset = position - SIZE_OF_FRAME_ID - SIZE_OF_SIZE - 2;
+                }
 
                 // TODO size is weird sometimes (by weird I mean 0 >)
                 std::cout << "Size: " << size_remaining << " - " << size_read << " = ";

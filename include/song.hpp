@@ -45,6 +45,9 @@ public:
     std::uint16_t m_duration = 0;
     std::uint16_t m_delay = 0;
 
+    // offset of the player counter
+    std::uint16_t m_counter_offset = 0;
+
     std::string m_path;
 
 public:
