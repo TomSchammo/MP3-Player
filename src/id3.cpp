@@ -352,13 +352,6 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
         // TODO idk what this is even for
     }
 
-    if (format_flags & (1 << 1)) {
-        // TODO frame is unsynchronised (end of header to end of frame)
-        // TODO %11111111 111xxxxx should be replaced with %11111111 00000000 111xxxxx
-        // TODO So $FF 00 should be replaced with $FF 00 00 (?)
-        // TODO
-    }
-
     if (format_flags & (1 << 2)) {
         // TODO frame is encrypted
         // TODO 1 byte with encryption method is added
@@ -388,9 +381,33 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
     // TODO is the size wrong then?
     // also TODO pls fix
     std::string s;
-    handler.readString(s, position+1, bytes_read-1);
+    handler.readString(s, position+1, frame_data_size-1);
 
-    bytes_read += 10;
+    frame_data_size += 10;
+
+    // synchronizing frame data
+    if (format_flags & (1 << 1)) {
+
+        unsigned char* buffer = new unsigned char[s.size()];
+
+        const char* cstr = s.c_str();
+
+        for (std::uint16_t i = 0; i < s.size(); ++i) {
+            buffer[i] = *(cstr + i);
+        }
+
+        synchronize(buffer, s.size());
+
+        std::string str = "";
+
+        for (std::uint16_t i = 0; i < s.size(); ++i) {
+            str.append(std::string{static_cast<char>(buffer[i])});
+        }
+
+        delete [] buffer;
+
+        s = str;
+    }
 
     return s;
     // TODO subtract size + 10 from size left in readID3
