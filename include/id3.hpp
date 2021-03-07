@@ -77,12 +77,19 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
 
 
 /**
- * Synchronizes unsynchronized Data
+ * Synchronizes unsynchronized data.
+ *
+ * When applying unsynchronization, a 0x00 is inserted after every 0xff byte.
+ * This function reverses that scheme, so if there is a 0x00 byte after a 0xff,
+ * it is removed.
+ *
+ *
+ * See https://id3.org/id3v2.4.0-structure section 6.1 for more information.
  *
  * @param  data The data that is supposed to be synchronized
  * @return A pointer to the data that has been synchronized
  */
-void synchronize(char* data, std::uint16_t size);
+void synchronize(const unsigned char* data, std::uint16_t size);
 
 
 /**
