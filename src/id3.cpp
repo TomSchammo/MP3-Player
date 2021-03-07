@@ -1,5 +1,6 @@
 #include <id3.hpp>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 
@@ -75,7 +76,29 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 }
 
 
-void synchronize(unsigned char* data, std::uint16_t size) {
+/**
+ * Converts an integer into 4 separate bytes with the msb beeing a 0.
+ *
+ * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b11111111
+ * for example.
+ *
+ * @param size is the integer that will be converted
+ * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
+ */
+inline void convert_size(std::uint16_t size, std::uint8_t arr[4]) {
+
+    int i = 0;
+    while (size > 127) {
+        arr[i] = 127;
+        size -= 127;
+        ++i;
+    }
+
+    arr[i+1] = size;
+}
+
+
+void synchronize(const unsigned char* data, std::uint16_t size) {
 
     std::vector<unsigned char> bytes;
 
@@ -97,6 +120,89 @@ void synchronize(unsigned char* data, std::uint16_t size) {
     }
 
     data = bytes.data();
+}
+
+
+void increment_pc(Filehandler &handler, std::uint16_t position) {
+
+    // TODO this needs some testing and fixing
+
+    // saving the position of the start of the header, as I will need this later
+    std::uint16_t original_position = position;
+
+    std::string frame_id;
+    std::uint16_t size;
+
+    std::string data = readFrame(handler, position, frame_id, size);
+
+    std::uint16_t counter = std::stoul(data, nullptr, 16);
+
+    counter += 1;
+
+    std::stringstream stream;
+
+    stream << std::hex << counter;
+
+    data = stream.str();
+
+
+    bool f = true;
+    for (auto c : data) {
+        if (c != 'f') {
+            // TODO log debug
+            std::cout << data << " is does not only contain 0xff bytes, " << c << " != f" << std::endl;
+            f = false;
+        }
+    }
+
+    std::uint16_t data_size = size;
+
+    // if the data only consists of 0xff bytes, a 0x00 byte will be prepended
+    if (f) {
+        // prepending 0x00 byte
+        data = "00" + data;
+
+        // increasing size by 1
+        data_size += 1;
+
+    }
+
+    // TODO log debug
+    std::cout << "Increased play counter" << std::endl;
+    std::cout << "Writing play counter: " << data << " and size: " << size << " back to file" << std::endl;
+
+    std::string size_str = "";
+    std::uint8_t arr[4];
+
+    convert_size(size, arr);
+
+    // TODO this will create a string representation, which then will be written to the file
+    // TODO not the actual bytes
+    // TODO pls fix
+    for (auto byte : arr) {
+        stream << std::hex << byte;
+        size_str += stream.str();
+    }
+
+    // TODO log debug
+    std::cout << "Converted " << size << " to " << size_str << std::endl;
+
+    // TODO size str should contain hex representation of 4 bytes (or string len == 8 (without \0 at the end))
+
+    // TODO I need to optimize this writing data, since this will make me copy the file twice
+    // TODO I could also just retrieve the flags as well, and just write them back as they were
+
+    // position (start of frame) + 4 (frame id)
+    std::uint16_t offset_size = original_position + 4;
+
+    handler.deleteBytes(offset_size, 4);
+    handler.writeBytes(offset_size, size_str.c_str(), 1);
+
+    // position (start of frame) + 4 (frame id) + 4 (size) + 2 (flags)
+    std::uint16_t offset_data = original_position + 4 + 4 + 2;
+
+    handler.deleteBytes(offset_data, size);
+    handler.writeBytes(offset_data, data.c_str(), data_size);
 }
 
 
