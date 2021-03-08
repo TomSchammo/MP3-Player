@@ -72,83 +72,153 @@ void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
     std::ofstream stream;
     stream.open(m_filename + ".tmp", std::ios::binary | std::ios::out);
 
+    if (stream.is_open() && m_stream.is_open()) {
 
-    // retrieving end of file, this will be important later
-    stream.seekp(0, std::ios::end);
-    const std::uint16_t _EOF = stream.tellp();
-
-
-    // creating buffer to read/write from/to
-    const std::uint16_t SIZE_OF_BUFFER = 1024;
-    char buffer[SIZE_OF_BUFFER];
+        // retrieving end of file, this will be important later
+        stream.seekp(0, std::ios::end);
+        const std::uint16_t _EOF = stream.tellp();
 
 
-    // putting the pointer of both files at the start
-    stream.seekp(0, std::ios::beg);
-    m_stream.seekg(0, std::ios::beg);
+        // creating buffer to read/write from/to
+        const std::uint16_t SIZE_OF_BUFFER = 1024;
+        char buffer[SIZE_OF_BUFFER];
 
 
-    // while bytes left > size of buffer
-    while (static_cast<std::uint16_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
-        m_stream.read(buffer, SIZE_OF_BUFFER);
-        stream.write(buffer, SIZE_OF_BUFFER);
-    }
-
-    // dynamically creating buffer to get the last portion of the file
-    char* pbuffer = new char[position % SIZE_OF_BUFFER];
+        // putting the pointer of both files at the start
+        stream.seekp(0, std::ios::beg);
+        m_stream.seekg(0, std::ios::beg);
 
 
-    m_stream.read(pbuffer, position % SIZE_OF_BUFFER);
-    stream.write(pbuffer, position % SIZE_OF_BUFFER);
-
-    delete [] pbuffer;
-
-    // skipping the bytes that are supposed to be deleted
-    m_stream.seekg(bytes, std::ios::cur);
-    auto current = m_stream.tellg();
-    auto size_remaining = _EOF - current;
-
-
-    // if the last byte has been removed there is no point in looking further
-    if (size_remaining > 0) {
-        m_stream.seekg(bytes, std::ios::cur);
-
-        // copying the rest of the file
-        while (size_remaining >= SIZE_OF_BUFFER) {
+        // while bytes left > size of buffer
+        while (static_cast<std::uint16_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
             m_stream.read(buffer, SIZE_OF_BUFFER);
             stream.write(buffer, SIZE_OF_BUFFER);
-            size_remaining = _EOF - m_stream.tellg();
         }
 
-        pbuffer = new char[size_remaining];
+        // dynamically creating buffer to get the last portion of the file
+        char* pbuffer = new char[position % SIZE_OF_BUFFER];
 
-        m_stream.read(pbuffer, size_remaining);
-        stream.write(pbuffer, size_remaining);
+        m_stream.read(pbuffer, position % SIZE_OF_BUFFER);
+        stream.write(pbuffer, position % SIZE_OF_BUFFER);
 
         delete [] pbuffer;
 
-    }
+        // skipping the bytes that are supposed to be deleted
+        m_stream.seekg(bytes, std::ios::cur);
+        auto current = m_stream.tellg();
+        auto size_remaining = _EOF - current;
 
-    // copying is done, closing streams
-    m_stream.close();
-    stream.close();
 
-    // replacing old file with new one
-    if (std::remove(m_filename.c_str()) == 0) {
-        if (std::rename((m_filename + ".tmp").c_str(), m_filename.c_str()) != 0) {
+        // if the last byte(s) have been removed there is no point in continueing
+        if (size_remaining > 0) {
+            m_stream.seekg(bytes, std::ios::cur);
+
+            // copying the rest of the file
+            while (size_remaining >= SIZE_OF_BUFFER) {
+                m_stream.read(buffer, SIZE_OF_BUFFER);
+                stream.write(buffer, SIZE_OF_BUFFER);
+                size_remaining = _EOF - m_stream.tellg();
+            }
+
+            pbuffer = new char[size_remaining];
+
+            m_stream.read(pbuffer, size_remaining);
+            stream.write(pbuffer, size_remaining);
+
+            delete [] pbuffer;
+
+        }
+
+        // copying is done, closing streams
+        m_stream.close();
+        stream.close();
+
+        bool error = false;
+
+        if (m_stream.is_open()) {
             // TODO log error
-            std::cout << "Could not rename " << m_filename << ".tmp to " << m_filename << std::endl;
+            std::cout << "Error when closing streams" << std::endl;
+            std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
+            error = true;
+
         }
 
+        if (stream.is_open()) {
+            // TODO log error
+            std::cout << "Error when closing streams" << std::endl;
+            std::cout << "stream (" << &stream << ") is expected to be closed, but is open" << std::endl;
+            error = true;
+
+        }
+
+        if (!error) {
+
+            // replacing old file with new one
+            if (std::remove(m_filename.c_str()) == 0) {
+                if (std::rename((m_filename + ".tmp").c_str(), m_filename.c_str()) != 0) {
+                    // TODO log error
+                    std::cout << "Could not rename " << m_filename << ".tmp to " << m_filename << std::endl;
+                }
+
+                else {
+                    // TODO log info
+                    std::cout << "Successfully renamed " << m_filename << ".tmp to " << m_filename << std::endl;
+
+                    // reopening stream
+                    m_stream.open(m_filename, std::ios::binary | std::ios::in);
+
+                    if (m_stream.is_open()) {
+                        // TODO log info
+                        std::cout << "Successfully re-opened filestream for file " << m_filename << std::endl;
+                    }
+
+                    else {
+                        // TODO log error
+                        std::cout << "Failure when re-opening filestream for file " << m_filename << std::endl;
+                    }
+
+                }
+            }
+
+            else {
+                // TODO log error
+                std::cout << "Could not remove " << m_filename << std::endl;
+            }
+        }
+
+        // error when closing streams after copying
         else {
-            // TODO log info
-            std::cout << "Successfully renamed " << m_filename << ".tmp to " << m_filename << std::endl;
+            // TODO how to proceed??
+            // TODO could use number instead of bool and set bits for different streams
+            // TODO then check which stream is open and try to close??
+            // TODO if m_stream is open but stream is closed, could just return error?
+            // TODO stream has to be closed though
         }
     }
 
+    // one file could not be opened
     else {
-        // TODO log error
-        std::cout << "Could not remove " << m_filename << std::endl;
+
+        if (!stream.is_open()) {
+
+            // TODO log error
+            std::cout << "Could not open " << m_filename << ".tmp" << std::endl;
+            std::cout << "Cleaning up..." << std::endl;
+
+            if (std::remove((m_filename + ".tmp").c_str()) == 0) {
+                // TODO log info
+                std::cout << "Successfully deleted " << m_filename << ".tmp" << std::endl;
+
+            } else {
+                // TODO log error
+                std::cout << "Could not remove " << m_filename << ".tmp" << std::endl;
+            }
+        }
+
+        if (!m_stream.is_open()) {
+            // TODO log error
+            std::cout << "Expected opened filestream for file " << m_filename << " but stream was closed..."<< std::endl;
+        }
     }
 }
 
