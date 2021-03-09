@@ -79,13 +79,13 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 /**
  * Converts an integer into 4 separate bytes with the msb beeing a 0.
  *
- * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b11111111
+ * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b01111111
  * for example.
  *
  * @param size is the integer that will be converted
  * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
  */
-inline void convert_size(std::uint16_t size, std::uint8_t arr[4]) {
+inline void convert_size(std::uint16_t size, char arr[4]) {
 
     int i = 0;
     while (size > 127) {
@@ -172,22 +172,9 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     std::cout << "Writing play counter: " << data << " and size: " << size << " back to file" << std::endl;
 
     std::string size_str = "";
-    std::uint8_t arr[4];
+    char size_bytes[4];
 
-    convert_size(size, arr);
-
-    // TODO this will create a string representation, which then will be written to the file
-    // TODO not the actual bytes
-    // TODO pls fix
-    for (auto byte : arr) {
-        stream << std::hex << byte;
-        size_str += stream.str();
-    }
-
-    // TODO log debug
-    std::cout << "Converted " << size << " to " << size_str << std::endl;
-
-    // TODO size str should contain hex representation of 4 bytes (or string len == 8 (without \0 at the end))
+    convert_size(size, size_bytes);
 
     // TODO I need to optimize this writing data, since this will make me copy the file twice
     // TODO I could also just retrieve the flags as well, and just write them back as they were
@@ -196,7 +183,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     std::uint16_t offset_size = original_position + 4;
 
     handler.deleteBytes(offset_size, 4);
-    handler.writeBytes(offset_size, size_str.c_str(), 1);
+    handler.writeBytes(offset_size, size_bytes, 1);
 
     // position (start of frame) + 4 (frame id) + 4 (size) + 2 (flags)
     std::uint16_t offset_data = original_position + 4 + 4 + 2;
