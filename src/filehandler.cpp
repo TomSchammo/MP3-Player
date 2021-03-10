@@ -26,7 +26,7 @@ Filehandler::Filehandler(std::string filename) {
 void Filehandler::readBytes(char buffer[], const std::uint16_t position, const unsigned char bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
+    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
 
     m_stream.seekg(position, std::ios::beg);
     m_stream.read(buffer, bytes);
@@ -37,7 +37,7 @@ void Filehandler::readBytes(char buffer[], const std::uint16_t position, const u
 void Filehandler::readBytes(char buffer[], const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position
+    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position
         << " relative to the " << (way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
@@ -226,7 +226,7 @@ void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
 void Filehandler::readString(std::string &s, const std::uint16_t position, const unsigned char bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position << " from the file: " << m_filename << std::endl;
+    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from the file: " << m_filename << std::endl;
 
     char* buffer = new char[bytes];
 
@@ -258,7 +258,7 @@ void Filehandler::readString(std::string &s, const std::uint16_t position, const
 void Filehandler::readString(std::string &s, const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position
+    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position
         << " relative to the " << (way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
