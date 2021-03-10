@@ -133,63 +133,86 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     std::string frame_id;
     std::uint16_t size;
 
-    std::string data = readFrame(handler, position, frame_id, size);
-
-    std::uint16_t counter = std::stoul(data, nullptr, 16);
+    // read counter and convert it from a null terminated hex string to a number
+    std::uint16_t counter = std::stoul(readFrame(handler, position, frame_id, size), nullptr, 16);
 
     counter += 1;
 
-    std::stringstream stream;
-
-    stream << std::hex << counter;
-
-    data = stream.str();
-
-
-    bool f = true;
-    for (auto c : data) {
-        if (c != 'f') {
-            // TODO log debug
-            std::cout << data << " is does not only contain 0xff bytes, " << c << " != f" << std::endl;
-            f = false;
-        }
-    }
+    // this evaluates to true, if counter only consists of 0xff bytes
+    bool f = (counter + 1) % 16 == 0;
 
     std::uint16_t data_size = size;
 
     // if the data only consists of 0xff bytes, a 0x00 byte will be prepended
-    if (f) {
-        // prepending 0x00 byte
-        data = "00" + data;
-
-        // increasing size by 1
+    // and therefore the size needs to be increased by 1
+    if (f)
         data_size += 1;
-
-    }
 
     // TODO log debug
     std::cout << "Increased play counter" << std::endl;
-    std::cout << "Writing play counter: " << data << " and size: " << size << " back to file" << std::endl;
+    std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
 
-    std::string size_str = "";
     char size_bytes[4];
 
     convert_size(size, size_bytes);
 
-    // TODO I need to optimize this writing data, since this will make me copy the file twice
-    // TODO I could also just retrieve the flags as well, and just write them back as they were
+    // create buffer with enough room for size (4), flags (2) and data (data_size)
+    char* payload = new char[4 + 2 + data_size];
 
-    // position (start of frame) + 4 (frame id)
-    std::uint16_t offset_size = original_position + 4;
+    int i = 0;
 
-    handler.deleteBytes(offset_size, 4);
-    handler.writeBytes(offset_size, size_bytes, 1);
+    // copy all the size bytes into 1 buffer
+    for (char byte : size_bytes) {
+        payload[i] = byte;
+        ++i;
+    }
 
-    // position (start of frame) + 4 (frame id) + 4 (size) + 2 (flags)
-    std::uint16_t offset_data = original_position + 4 + 4 + 2;
+    std::uint16_t offset = original_position + 4;
 
-    handler.deleteBytes(offset_data, size);
-    handler.writeBytes(offset_data, data.c_str(), data_size);
+    char buffer_flags[2];
+
+    // read flags
+    handler.readBytes(buffer_flags, offset + 4, 2);
+
+    // copy flags over to that buffer as well
+    for (char byte : buffer_flags) {
+        payload[i] = byte;
+        ++i;
+    }
+
+    // prepending 1 zero byte if the counter only
+    // consists of 0xff bytes
+    if (f) {
+        payload[i] = 0x00;
+        ++i;
+    }
+
+    // copy data to buffer
+    while (counter > 0xff) {
+        payload[i] = 0xff;
+        counter -= 0xff;
+        ++i;
+    }
+
+    // counter+1 % 16 != 0, so there is a rest left
+    if (!f) {
+        payload[i] = counter;
+    }
+
+    // TODO log debug
+    std::cout << "Writing bytes:\n";
+    for (int cnt = 0; cnt < data_size; ++cnt) {
+        std::cout <<  std::hex << payload[cnt] << " ";
+    }
+    std::cout << "\n to file."<< std::endl;
+
+
+    // TODO data not null terminated, is it supposed to be?
+    // TODO currently it's a string, we might not want this
+    handler.deleteBytes(offset, 4 + 2 + size);
+    handler.writeBytes(offset, payload, 4 + 2 + data_size);
+
+    delete [] payload;
 }
 
 
