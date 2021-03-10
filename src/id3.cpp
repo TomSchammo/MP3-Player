@@ -1,6 +1,5 @@
 #include <id3.hpp>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 
@@ -192,7 +191,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
 
     // copy data to buffer
     while (counter > 0xff) {
-        payload[i] = 0xff;
+        payload[i] = char(0xff);
         counter -= 0xff;
         ++i;
     }
