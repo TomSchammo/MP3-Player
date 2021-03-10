@@ -134,6 +134,9 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     std::uint16_t size;
 
     // read counter and convert it from a null terminated hex string to a number
+    // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
+    //      and the conversion will fail (since I'll expect a string of hex numbers)
+    // TODO I need to fix readFrame and then get back to this
     std::uint16_t counter = std::stoul(readFrame(handler, position, frame_id, size), nullptr, 16);
 
     counter += 1;
@@ -385,6 +388,10 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
     //      not every string in a frame is null terminated, so that can fuck things up
     // TODO is the size wrong then?
     // also TODO pls fix
+
+    // TODO not every frame contains string data
+    // TODO need to have some way of distinguishing between the 2
+
     std::string s;
     handler.readString(s, position+1, frame_data_size-1);
 
