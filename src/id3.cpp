@@ -136,85 +136,90 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
     // TODO I need to fix readFrame and then get back to this
-    std::uint16_t counter = std::stoul(readFrame(handler, position, frame_id, size), nullptr, 16);
+    if (auto str = readFrame(handler, position, frame_id, size)) {
 
-    counter += 1;
+        std::uint16_t counter = std::stoul(str.value(), nullptr, 16);
 
-    // this evaluates to true, if counter only consists of 0xff bytes
-    bool f = (counter + 1) % 16 == 0;
 
-    std::uint16_t data_size = size;
+        counter += 1;
 
-    // if the data only consists of 0xff bytes, a 0x00 byte will be prepended
-    // and therefore the size needs to be increased by 1
-    if (f)
-        data_size += 1;
+        // this evaluates to true, if counter only consists of 0xff bytes
+        bool f = (counter + 1) % 16 == 0;
 
-    // TODO log debug
-    std::cout << "Increased play counter" << std::endl;
-    std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
+        std::uint16_t data_size = size;
 
-    char size_bytes[4];
+        // if the data only consists of 0xff bytes, a 0x00 byte will be prepended
+        // and therefore the size needs to be increased by 1
+        if (f)
+            data_size += 1;
 
-    convert_size(size, size_bytes);
+        // TODO log debug
+        std::cout << "Increased play counter" << std::endl;
+        std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
 
-    // create buffer with enough room for size (4), flags (2) and data (data_size)
-    char* payload = new char[4 + 2 + data_size];
+        char size_bytes[4];
 
-    int i = 0;
+        convert_size(size, size_bytes);
 
-    // copy all the size bytes into 1 buffer
-    for (char byte : size_bytes) {
-        payload[i] = byte;
-        ++i;
+        // create buffer with enough room for size (4), flags (2) and data (data_size)
+        char* payload = new char[4 + 2 + data_size];
+
+        int i = 0;
+
+        // copy all the size bytes into 1 buffer
+        for (char byte : size_bytes) {
+            payload[i] = byte;
+            ++i;
+        }
+
+        std::uint16_t offset = original_position + 4;
+
+        char buffer_flags[2];
+
+        // read flags
+        handler.readBytes(buffer_flags, offset + 4, 2);
+
+        // copy flags over to that buffer as well
+        for (char byte : buffer_flags) {
+            payload[i] = byte;
+            ++i;
+        }
+
+        // prepending 1 zero byte if the counter only
+        // consists of 0xff bytes
+        if (f) {
+            payload[i] = 0x00;
+            ++i;
+        }
+
+        // copy data to buffer
+        while (counter > 0xff) {
+            payload[i] = char(0xff);
+            counter -= 0xff;
+            ++i;
+        }
+
+        // counter+1 % 16 != 0, so there is a rest left
+        if (!f) {
+            payload[i] = counter;
+        }
+
+        // TODO log debug
+        std::cout << "Writing bytes:\n";
+        for (int cnt = 0; cnt < data_size; ++cnt) {
+            std::cout <<  std::hex << payload[cnt] << " ";
+        }
+        std::cout << "\n to file."<< std::endl;
+
+
+        // TODO data not null terminated, is it supposed to be?
+        // TODO currently it's a string, we might not want this
+        handler.deleteBytes(offset, 4 + 2 + size);
+        handler.writeBytes(offset, payload, 4 + 2 + data_size);
+
+        delete [] payload;
     }
 
-    std::uint16_t offset = original_position + 4;
-
-    char buffer_flags[2];
-
-    // read flags
-    handler.readBytes(buffer_flags, offset + 4, 2);
-
-    // copy flags over to that buffer as well
-    for (char byte : buffer_flags) {
-        payload[i] = byte;
-        ++i;
-    }
-
-    // prepending 1 zero byte if the counter only
-    // consists of 0xff bytes
-    if (f) {
-        payload[i] = 0x00;
-        ++i;
-    }
-
-    // copy data to buffer
-    while (counter > 0xff) {
-        payload[i] = char(0xff);
-        counter -= 0xff;
-        ++i;
-    }
-
-    // counter+1 % 16 != 0, so there is a rest left
-    if (!f) {
-        payload[i] = counter;
-    }
-
-    // TODO log debug
-    std::cout << "Writing bytes:\n";
-    for (int cnt = 0; cnt < data_size; ++cnt) {
-        std::cout <<  std::hex << payload[cnt] << " ";
-    }
-    std::cout << "\n to file."<< std::endl;
-
-
-    // TODO data not null terminated, is it supposed to be?
-    // TODO currently it's a string, we might not want this
-    handler.deleteBytes(offset, 4 + 2 + size);
-    handler.writeBytes(offset, payload, 4 + 2 + data_size);
-
-    delete [] payload;
 }
 
 
@@ -317,9 +322,17 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 }
 
 
-std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
+std::optional<std::string> readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
+
+    if (frame_id[0] == 0x00) {
+        // TODO log debug
+        std::cout << "Encountered a frame id starting with 0x00 which is probably due to padding...\n"
+                  <<  "Skipping to the end of the tag." << std::endl;
+
+        return {};
+    }
 
     position += SIZE_OF_FRAME_ID;
 
@@ -374,9 +387,6 @@ std::string readFrame(Filehandler &handler, std::uint16_t position, std::string 
         // TODO read group identifier
         // TODO put data of group frames together
     }
-
-    // TODO remove, this is just to avoid errors
-    status_flags = format_flags = 0;
 
     position += 2;
 
@@ -443,6 +453,9 @@ void readID3(Song &song) {
         // TODO size is without 10 bytes of header
         auto size = getSize(handler, false);
 
+        // TODO log info
+        std::cout << "Size of ID3 tag: " << size << std::endl;
+
         std::uint16_t extended_size = 0;
 
         // Not supported ID3 version, skipping the tag
@@ -484,36 +497,51 @@ void readID3(Song &song) {
 
             std::uint16_t position = SIZE_OF_HEADER + extended_size;
 
+            // TODO log debug
+            std::cout << "Starting to read frames at position " << position << std::endl;
+
             while (size_remaining > 0) {
+                std::cout << size_remaining << " bytes remaining..." << std::endl;
+                std::cout << size_remaining << " > 0" << std::endl;
                 std::string frame_id = "";
 
                 std::uint16_t size_read = 0;
-                std::string frame_content = readFrame(handler, position, frame_id, size_read);
+                auto result = readFrame(handler, position, frame_id, size_read);
 
-                if (frame_id.compare("PCNT") == 0) {
-                    // setting posistion of start of play counter frame
-                    // wich is the current posistion - 4 (frame id) - 4 (size bytes) - 2 (flag bytes)
-                    song.m_counter_offset = position - SIZE_OF_FRAME_ID - SIZE_OF_SIZE - 2;
+                // There are no frames left, the rest is padding
+                if (!result.has_value()) {
+                    position = size_remaining;
+                    size_remaining = 0;
                 }
 
-                // TODO size is weird sometimes (by weird I mean 0 >)
-                std::cout << "Size: " << size_remaining << " - " << size_read << " = ";
-                size_remaining -= size_read;
-                std::cout << size_remaining << std::endl;
+                else {
+                    std::string frame_content = result.value();
 
-                std::cout << "Position: " << position << " + " << size_read << " = ";
-                position += size_read;
-                std::cout << position << std::endl;
+                    if (frame_id.compare("PCNT") == 0) {
+                        // setting posistion of start of play counter frame
+                        // wich is the current posistion - 4 (frame id) - 4 (size bytes) - 2 (flag bytes)
+                        song.m_counter_offset = position - SIZE_OF_FRAME_ID - SIZE_OF_SIZE - 2;
+                    }
 
-                // frame_id has been set properly
-                if (frame_id.compare("") == 0)
-                    // TODO log error
-                    std::cout << "frame_id has not been set properly" << std::endl;
+                    // TODO size is weird sometimes (by weird I mean 0 >)
+                    //      one reason for that occurrence was padding at the end, which has been fixed
+                    //      but I still get it with welcome home
+                    std::cout << "Size remaining: " << size_remaining << " - " << size_read << " = ";
+                    size_remaining -= size_read;
+                    std::cout << size_remaining << std::endl;
 
-                parseFrameData(frame_content, frame_id, song);
+                    std::cout << "Continuing to read at position: " << position << " + " << size_read << " = ";
+                    position += size_read;
+                    std::cout << position << std::endl;
+
+                    // frame_id has been set properly
+                    if (frame_id.compare("") == 0)
+                        // TODO log error
+                        std::cout << "frame_id has not been set properly" << std::endl;
+
+                    parseFrameData(frame_content, frame_id, song);
+                }
             }
-
-
 
         }
 

@@ -10,6 +10,7 @@
 #ifndef ID3_HPP
 #define ID3_HPP
 
+#include <optional>
 #include <filehandler.hpp>
 #include <song.hpp>
 
@@ -114,7 +115,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position);
  *
  * @return The data of the frame
  */
-std::string readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size);
+std::optional<std::string> readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size);
 
 
 /**
