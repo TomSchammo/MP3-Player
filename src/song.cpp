@@ -11,6 +11,7 @@ Song::Song(std::string &path) {
 void Song::print() {
     std::cout << "Title: " << m_title << std::endl;
     std::cout << "Album: " << m_album << std::endl;
+    std::cout << "Track number: " << m_track_number << std::endl;
     std::cout << "Artist: " << m_artist << std::endl;
     std::cout << "Genre: " << m_genre << std::endl;
     std::cout << "Release Year: " << m_release << std::endl;

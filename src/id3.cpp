@@ -308,6 +308,27 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
             song.m_genre = data;
         }
 
+    } else if (frame_id.compare("TRCK") == 0) {
+
+        // TODO log info
+        std::cout << "Found a TRCK frame, setting track number to: ";
+
+        std::string track_number = "";
+
+        for (char c : data) {
+            if (c == '/')
+                break;
+            else
+                track_number += c;
+        }
+
+        // TODO log info
+        std::cout << track_number << std::endl;
+
+        // TRCK frame can contain a / with the total amount of tracks
+        // after the track number. I don't care about that
+        song.m_track_number = track_number;
+
     } else {
         // TODO log warn
         std::cout << "frame id: " << frame_id << " is not supported yet" << std::endl;
@@ -317,7 +338,6 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
     // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
     // TODO APIC (Album art (section 4.14))
     // TODO PCNT (Player counter (4.16), should be incremented)
-    // TODO TRCK (Track number)
 
 }
 
@@ -438,8 +458,7 @@ std::optional<std::string> readFrame(Filehandler &handler, std::uint16_t positio
 
 void readID3(Song &song) {
 
-
-    Filehandler handler(song.m_path);
+    Filehandler handler = Filehandler(song.m_path);
 
     if (detectID3(handler)) {
         auto version = getVersion(handler);

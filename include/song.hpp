@@ -21,15 +21,16 @@
  * a filepath, an offset to the start of the audio data, etc.
  *
  * Member variables:
- *  m_title:       The song title
- *  m_album:       The name of the album
- *  m_artist:      The name of the artist
- *  m_genre:       The name of the genre that the song belongs to
- *  m_release:     The year of when the song was released
- *  m_duration:    The song duration in milliseconds
- *  m_delay:       The amount of silence that should be put in front of the track (in ms)
- *  m_path:        The path to the MP3 file
- *  m_audio_start: An offset to the start of the actual audio data
+ *  m_title:         The song title
+ *  m_album:         The name of the album
+ *  m_artist:        The name of the artist
+ *  m_genre:         The name of the genre that the song belongs to
+ *  m_release:       The year of when the song was released
+ *  m_track_number:  The number of this track in the album
+ *  m_duration:      The song duration in milliseconds
+ *  m_delay:         The amount of silence that should be put in front of the track (in ms)
+ *  m_path:          The path to the MP3 file
+ *  m_audio_start:   An offset to the start of the actual audio data
  */
 class Song
 {
@@ -39,6 +40,7 @@ public:
     std::string m_artist = "Unknown Artist";
     std::string m_genre = "Unknown Genre";
     std::string m_release = "";
+    std::string m_track_number = "";
 
     // TODO consider making these strings as well
     std::uint16_t m_audio_start = 0;
@@ -48,9 +50,10 @@ public:
     // offset of the player counter
     std::uint16_t m_counter_offset = 0;
 
-    std::string m_path;
+    std::string m_path = "";
 
 public:
+    Song() = delete;
     Song(std::string &path);
 
     /**
@@ -59,7 +62,7 @@ public:
     void print();
 
     // TODO decrease play counter?
-    virtual ~Song ();
+    virtual ~Song();
 
 };
 
