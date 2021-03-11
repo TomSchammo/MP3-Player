@@ -75,28 +75,6 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 }
 
 
-/**
- * Converts an integer into 4 separate bytes with the msb beeing a 0.
- *
- * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b01111111
- * for example.
- *
- * @param size is the integer that will be converted
- * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
- */
-inline void convert_size(std::uint16_t size, char arr[4]) {
-
-    int i = 0;
-    while (size > 127) {
-        arr[i] = 127;
-        size -= 127;
-        ++i;
-    }
-
-    arr[i+1] = size;
-}
-
-
 void synchronize(const unsigned char* data, std::uint16_t size) {
 
     std::vector<unsigned char> bytes;
@@ -451,7 +429,6 @@ std::optional<std::string> readFrame(Filehandler &handler, std::uint16_t positio
     }
 
     return s;
-    // TODO subtract size + 10 from size left in readID3
 
 }
 
@@ -553,12 +530,16 @@ void readID3(Song &song) {
                     position += size_read;
                     std::cout << position << std::endl;
 
-                    // frame_id has been set properly
-                    if (frame_id.compare("") == 0)
+                    // frame_id has been not been set properly,
+                    // still parsing the frame as I can't skip it
+                    // without knowing it's size
+                    if (frame_id.compare("") == 0) {
                         // TODO log error
                         std::cout << "frame_id has not been set properly" << std::endl;
+                    }
 
                     parseFrameData(frame_content, frame_id, song);
+
                 }
             }
 
