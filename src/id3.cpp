@@ -170,15 +170,11 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
         }
 
         // copy data to buffer
-        while (counter > 0xff) {
-            payload[i] = char(0xff);
-            counter -= 0xff;
-            ++i;
-        }
+        auto counter_buffer = convert_dec(counter);
 
-        // counter+1 % 16 != 0, so there is a rest left
-        if (!f) {
-            payload[i] = counter;
+        for (char num : *counter_buffer) {
+            payload[i] = num;
+            ++i;
         }
 
         // TODO log debug
