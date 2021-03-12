@@ -116,6 +116,8 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     // TODO I need to fix readFrame and then get back to this
     if (auto data = readFrameBytes(handler, position, frame_id, size)) {
 
+        // read counter (and convert it from base 16 to base 10)
+        std::uint64_t counter = convert_bytes(data->get(), size);
 
         counter += 1;
 

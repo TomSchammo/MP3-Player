@@ -78,6 +78,58 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
 
 
 /**
+ * Converts data in a char buffer into a number that one can work with.
+ *
+ * So {0, 0, 1, 63} (coming from {0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
+ *
+ * @param buffer is a char array that contains the data
+ * @param size   is the size of the char array
+ *
+ * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
+ */
+inline std::uint64_t convert_bytes(char buffer[], std::uint16_t size) {
+
+    std::uint8_t factor = 1;
+
+    std::uint64_t number = 0;
+
+    // going from last to first assuming that lsb is in the back
+    for (std::uint16_t i = size - 1; i >= 0; ++i) {
+
+        number += buffer[i] * factor;
+
+        // increasing the factor by 2 each time
+        factor *= (16*16);
+    }
+
+    return number;
+}
+
+
+/**
+ * Splits a decimal number into byte sized chunks and puts them in a vector.
+ *
+ * A unique_ptr to that vector is then returned.
+ *
+ * @param number is the number that should be converted
+ * @return a std::unique_ptr to a std::vector that contains the bytes
+ */
+inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) {
+
+    std::unique_ptr<std::vector<char>> bytes = std::make_unique<std::vector<char>>();
+
+    while (number > (16*16)) {
+        std::uint8_t byte = number % (16*16);
+        bytes->insert(bytes->begin(), static_cast<char>(byte));
+
+        number = number >> 8;
+    }
+
+    return bytes;
+}
+
+
+/**
  * Converts an integer into 4 separate bytes with the msb beeing a 0.
  *
  * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b01111111
