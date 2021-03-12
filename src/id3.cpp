@@ -74,16 +74,16 @@ std::uint16_t getSize(Filehandler &handler, const bool extended) {
 }
 
 
-void synchronize(const unsigned char* data, std::uint16_t size) {
+void synchronize(const char* data, std::uint16_t size) {
 
-    std::vector<unsigned char> bytes;
+    std::vector<char> bytes;
 
     bool sync = true;
 
     for (std::uint16_t i = 0; i < size; ++i) {
         if (sync) {
             bytes.push_back(data[i]);
-            sync = (data[i] != 0xff);
+            sync = (static_cast<unsigned char>(data[i]) != 0xff);
         }
 
         else {
@@ -402,7 +402,7 @@ std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t posi
     // synchronizing frame data
     if (format_flags & (1 << 1)) {
 
-        unsigned char* buffer = new unsigned char[s.size()];
+        char* buffer = new char[s.size()];
 
         const char* cstr = s.c_str();
 
@@ -415,7 +415,7 @@ std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t posi
         std::string str = "";
 
         for (std::uint16_t i = 0; i < s.size(); ++i) {
-            str.append(std::string{static_cast<char>(buffer[i])});
+            str.append(std::string{buffer[i]});
         }
 
         delete [] buffer;
