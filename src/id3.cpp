@@ -114,9 +114,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
     // TODO I need to fix readFrame and then get back to this
-    if (auto str = readFrame(handler, position, frame_id, size)) {
-
-        std::uint16_t counter = std::stoul(str.value(), nullptr, 16);
+    if (auto data = readFrameBytes(handler, position, frame_id, size)) {
 
 
         counter += 1;
@@ -320,7 +318,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 }
 
 
-std::optional<std::string> readFrame(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
+std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -502,7 +500,7 @@ void readID3(Song &song) {
                 std::string frame_id = "";
 
                 std::uint16_t size_read = 0;
-                auto result = readFrame(handler, position, frame_id, size_read);
+                auto result = readFrameStr(handler, position, frame_id, size_read);
 
                 // There are no frames left, the rest is padding
                 if (!result.has_value()) {
