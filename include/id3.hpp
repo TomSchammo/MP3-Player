@@ -183,27 +183,12 @@ void increment_pc(Filehandler &handler, std::uint16_t position);
  * as a null terminated string, so that it can be parsed by another function.
  *
  * @param handler          A reference to a Filehandler object to read from the file
- * @param position         The starting position of the frame in the file
  * @param frame_id         A reference to a string that will be set to the frame id
- * @param frame_data_size  The size of the frame data
+ * @param position         The starting position of the frame in the file
  *
  * @return The data of the frame as a null terminated string
  */
-std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size);
-
-
-/**
- * Reads the content of a frame and returns the data (the whole frame minus the header),
- * as binary data (char array), so that it can be parsed by another function.
- *
- * @param handler          A reference to a Filehandler object to read from the file
- * @param position         The starting position of the frame in the file
- * @param frame_id         A reference to a string that will be set to the frame id
- * @param frame_data_size  The size of the frame data
- *
- * @return The data of the frame as a char array
- */
-std::optional<std::unique_ptr<char>> readFrameBytes(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size);
+std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t position);
 
 
 /**

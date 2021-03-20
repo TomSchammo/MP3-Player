@@ -107,16 +107,17 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     std::uint16_t original_position = position;
 
     std::string frame_id;
-    std::uint16_t size;
 
     // read counter and convert it from a null terminated hex string to a number
     // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
     // TODO I need to fix readFrame and then get back to this
-    if (auto data = readFrameBytes(handler, position, frame_id, size)) {
+    if (auto data = readFrame(handler, frame_id, position)) {
+
+        std::uint16_t size = data->size();
 
         // read counter (and convert it from base 16 to base 10)
-        std::uint64_t counter = convert_bytes(data->get(), size);
+        std::uint64_t counter = convert_bytes((data->data()), size);
 
         counter += 1;
 
@@ -248,22 +249,22 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
         }
 
     } else if (frame_id.compare("TLEN") == 0) {
+
+        auto len = convert_bytes(data.data(), data.size());
+
         // TODO log verbose
-        std::cout << "Found a TLEN frame, setting track length to: " << data << std::endl;
+        std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
 
-        // TODO track length not necessarily included, nice if it is, but should not depend
-
-        // TODO need to check if this works
-        // TODO is this a string or bytes???
-        // song.m_duration = static_cast<std::uint16_t>(*data);
+        song.m_duration = len;
 
     } else if (frame_id.compare("TDLY") == 0) {
-        // TODO log verbose
-        std::cout << "Found a TDLY frame, setting delay to: " << data << "ms" << std::endl;
 
-        // TODO need to check if this works
-        // TODO is this a string or bytes???
-        // song.m_delay = static_cast<std::uint16_t>(*data);
+        auto delay = convert_bytes(data.data(), data.size());
+
+        // TODO log verbose
+        std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
+
+        song.m_delay = delay;
 
     } else if (frame_id.compare("TCON") == 0) {
 
@@ -314,8 +315,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
 }
 
-
-std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t position, std::string &frame_id, std::uint16_t &frame_data_size) {
+std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t position) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -332,6 +332,7 @@ std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t posi
     char size_buffer[SIZE_OF_SIZE];
 
     handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
+    std::uint16_t frame_data_size = 0;
 
     for (int i = 0; i < SIZE_OF_SIZE; ++i) {
         frame_data_size += static_cast<std::uint16_t>(size_buffer[i]);
@@ -391,9 +392,6 @@ std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t posi
     // TODO is the size wrong then?
     // also TODO pls fix
 
-    // TODO not every frame contains string data
-    // TODO need to have some way of distinguishing between the 2
-
     std::string s;
     handler.readString(s, position+1, frame_data_size-1);
 
@@ -424,7 +422,6 @@ std::optional<std::string> readFrameStr(Filehandler &handler, std::uint16_t posi
     }
 
     return s;
-
 }
 
 
@@ -497,7 +494,7 @@ void readID3(Song &song) {
                 std::string frame_id = "";
 
                 std::uint16_t size_read = 0;
-                auto result = readFrameStr(handler, position, frame_id, size_read);
+                auto result = readFrame(handler, frame_id, position);
 
                 // There are no frames left, the rest is padding
                 if (!result.has_value()) {
