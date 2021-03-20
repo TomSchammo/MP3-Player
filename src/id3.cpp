@@ -315,7 +315,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
 }
 
-std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t position) {
+std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -395,7 +395,8 @@ std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id
     std::string s;
     handler.readString(s, position+1, frame_data_size-1);
 
-    frame_data_size += 10;
+    // taking frame data in account when updating position
+    position += frame_data_size;
 
     // synchronizing frame data
     if (format_flags & (1 << 1)) {
@@ -493,11 +494,15 @@ void readID3(Song &song) {
                 std::cout << size_remaining << " > 0" << std::endl;
                 std::string frame_id = "";
 
-                std::uint16_t size_read = 0;
+                // TODO I should probably choose less ambiguous names
+                std::uint16_t original_position_file = position;
                 auto result = readFrame(handler, frame_id, position);
 
                 // There are no frames left, the rest is padding
                 if (!result.has_value()) {
+                    // TODO log debug
+                    std::cout << "Result has no value, so read a frame_id starting with 0x00" << std::endl;
+
                     position = size_remaining;
                     size_remaining = 0;
                 }
@@ -514,13 +519,10 @@ void readID3(Song &song) {
                     // TODO size is weird sometimes (by weird I mean 0 >)
                     //      one reason for that occurrence was padding at the end, which has been fixed
                     //      but I still get it with welcome home
-                    std::cout << "Size remaining: " << size_remaining << " - " << size_read << " = ";
-                    size_remaining -= size_read;
-                    std::cout << size_remaining << std::endl;
+                    size_remaining -= (position - original_position_file);
+                    std::cout << "Size remaining: " << size_remaining << std::endl;
 
-                    std::cout << "Continuing to read at position: " << position << " + " << size_read << " = ";
-                    position += size_read;
-                    std::cout << position << std::endl;
+                    std::cout << "Continuing to read at position: " << position << std::endl;
 
                     // frame_id has been not been set properly,
                     // still parsing the frame as I can't skip it

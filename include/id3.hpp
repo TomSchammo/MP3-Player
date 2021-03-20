@@ -188,7 +188,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position);
  *
  * @return The data of the frame as a null terminated string
  */
-std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t position);
+std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position);
 
 
 /**
