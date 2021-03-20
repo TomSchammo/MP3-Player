@@ -94,7 +94,7 @@ inline std::uint64_t convert_bytes(char buffer[], std::uint16_t size) {
     std::uint64_t number = 0;
 
     // going from last to first assuming that lsb is in the back
-    for (std::uint16_t i = size - 1; i >= 0; ++i) {
+    for (std::int32_t i = size - 1; i >= 0; --i) {
 
         number += buffer[i] * factor;
 
