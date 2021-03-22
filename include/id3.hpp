@@ -78,6 +78,25 @@ std::uint16_t getSize(Filehandler &handler, const bool extended);
 
 
 /**
+ * Checks whether a bunch of data is null terminated, if not, a 0x00 byte is added
+ * in the end.
+ *
+ * Then the data is converted to a string and returned as a string object.
+ *
+ * @param data is the data that should be converted
+ * @return a std::string that is the string representation of that data
+ */
+inline std::string convert_to_string(std::shared_ptr<std::vector<char>> data) {
+
+    if (data->at(data->size()-1) != 0) {
+        data->push_back(0);
+    }
+
+    return std::string(data->data());
+}
+
+
+/**
  * Converts data in a char buffer into a number that one can work with.
  *
  * So {0, 0, 1, 63} (coming from {0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
@@ -180,15 +199,16 @@ void increment_pc(Filehandler &handler, std::uint16_t position);
 
 /**
  * Reads the content of a frame and returns the data (the whole frame minus the header),
- * as a null terminated string, so that it can be parsed by another function.
+ * as a shared pointer to a vector that contains the raw bytes,
+ * so that it can be parsed by another function.
  *
  * @param handler          A reference to a Filehandler object to read from the file
  * @param frame_id         A reference to a string that will be set to the frame id
  * @param position         The starting position of the frame in the file
  *
- * @return The data of the frame as a null terminated string
+ * @return a shared pointer to a vector that contains the data of the frame
  */
-std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position);
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position);
 
 
 /**
@@ -201,7 +221,7 @@ std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id
  * @param frame_id The frameID of the frame
  * @param song     A reference to a {@class Song} object
  */
-void parseFrameData(std::string data, std::string frame_id, Song &song);
+void parseFrameData(std::unique_ptr<std::vector<char>> data, std::string frame_id, Song &song);
 
 
 /**

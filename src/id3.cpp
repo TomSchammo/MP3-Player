@@ -114,10 +114,10 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     // TODO I need to fix readFrame and then get back to this
     if (auto data = readFrame(handler, frame_id, position)) {
 
-        std::uint16_t size = data->size();
+        std::uint16_t size = (*data)->size();
 
         // read counter (and convert it from base 16 to base 10)
-        std::uint64_t counter = convert_bytes((data->data()), size);
+        std::uint64_t counter = convert_bytes(((*data)->data()), size);
 
         counter += 1;
 
@@ -197,14 +197,14 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
 }
 
 
-void parseFrameData(std::string data, std::string frame_id, Song &song) {
+void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_id, Song &song) {
 
     if (frame_id.compare("TIT2") == 0) {
 
         // TODO log verbose
         std::cout << "Found a TIT2 frame, setting song title to: " << data << std::endl;
 
-        song.m_title = data;
+        song.m_title = convert_to_string(data);
 
     } else if (frame_id.compare("TALB") == 0) {
 
@@ -212,14 +212,14 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
         // TODO log verbose
         std::cout << "Found a TALB frame, setting album title to: " << data << std::endl;
 
-        song.m_album = data;
+        song.m_album = convert_to_string(data);
 
     } else if (frame_id.compare("TPE1") == 0) {
 
         // TODO log verbose
         std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
 
-        song.m_artist = data;
+        song.m_artist = convert_to_string(data);
 
     } else if (frame_id.compare("TDRL") == 0) {
 
@@ -227,7 +227,8 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
         std::cout << "Found a TDRL frame setting release year to: " << data << std::endl;
 
         // starting from 0, five characters (4 + '\0')
-        song.m_release = std::string(data).substr(0, 5);
+        // TODO is this right?
+        song.m_release = convert_to_string(data).substr(0, 5);
 
     } else if (frame_id.compare("TDRC") == 0) {
 
@@ -239,7 +240,8 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
             std::cout << "Found a TDRC frame setting release year to: " << data << std::endl;
 
             // starting from 0, five characters (4 + '\0')
-            song.m_release = std::string(data).substr(0, 5);
+            // TODO is this right?
+            song.m_release = convert_to_string(data).substr(0, 5);
         }
 
         else {
@@ -250,7 +252,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
     } else if (frame_id.compare("TLEN") == 0) {
 
-        auto len = convert_bytes(data.data(), data.size());
+        auto len = convert_bytes(data->data(), data->size());
 
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
@@ -259,7 +261,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
     } else if (frame_id.compare("TDLY") == 0) {
 
-        auto delay = convert_bytes(data.data(), data.size());
+        auto delay = convert_bytes(data->data(), data->size());
 
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
@@ -279,7 +281,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
             // TODO not sure if this is always fine (as there can also be numbers apparently)
             //      so maybe this is not the correct way to "parse" the data, but I'll gave to
             //      check with more files.
-            song.m_genre = data;
+            song.m_genre = convert_to_string(data);
         }
 
     } else if (frame_id.compare("TRCK") == 0) {
@@ -289,7 +291,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
         std::string track_number = "";
 
-        for (char c : data) {
+        for (char c : *data) {
             if (c == '/')
                 break;
             else
@@ -315,7 +317,7 @@ void parseFrameData(std::string data, std::string frame_id, Song &song) {
 
 }
 
-std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position) {
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -392,8 +394,8 @@ std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id
     // TODO is the size wrong then?
     // also TODO pls fix
 
-    std::string s;
-    handler.readString(s, position+1, frame_data_size-1);
+    auto frame_content = std::make_unique<std::vector<char>>(frame_data_size-1);
+    handler.readBytes(frame_content->data(), position+1, frame_data_size-1);
 
     // taking frame data in account when updating position
     position += frame_data_size;
@@ -401,28 +403,11 @@ std::optional<std::string> readFrame(Filehandler &handler, std::string &frame_id
     // synchronizing frame data
     if (format_flags & (1 << 1)) {
 
-        char* buffer = new char[s.size()];
+        synchronize(frame_content->data(), frame_content->size());
 
-        const char* cstr = s.c_str();
-
-        for (std::uint16_t i = 0; i < s.size(); ++i) {
-            buffer[i] = *(cstr + i);
-        }
-
-        synchronize(buffer, s.size());
-
-        std::string str = "";
-
-        for (std::uint16_t i = 0; i < s.size(); ++i) {
-            str.append(std::string{buffer[i]});
-        }
-
-        delete [] buffer;
-
-        s = str;
     }
 
-    return s;
+    return frame_content;
 }
 
 
@@ -508,7 +493,7 @@ void readID3(Song &song) {
                 }
 
                 else {
-                    std::string frame_content = result.value();
+                    auto frame_content = result.value();
 
                     if (frame_id.compare("PCNT") == 0) {
                         // setting posistion of start of play counter frame
