@@ -512,8 +512,8 @@ void readID3(Song &song) {
 
                     if (frame_id.compare("PCNT") == 0) {
                         // setting posistion of start of play counter frame
-                        // wich is the current posistion - 4 (frame id) - 4 (size bytes) - 2 (flag bytes)
-                        song.m_counter_offset = position - SIZE_OF_FRAME_ID - SIZE_OF_SIZE - 2;
+                        song.m_counter_offset = original_position_file;
+
                     }
 
                     // TODO size is weird sometimes (by weird I mean 0 >)
