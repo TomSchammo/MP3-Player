@@ -13,6 +13,7 @@
 #include <optional>
 #include <filehandler.hpp>
 #include <song.hpp>
+#include <iostream>
 
 // constants
 constexpr std::uint8_t LOCATION_START = 0;
@@ -93,6 +94,139 @@ inline std::string convert_to_string(std::shared_ptr<std::vector<char>> data) {
     }
 
     return std::string(data->data());
+}
+
+
+/**
+ * Decodes text according to the specified encoding and returns
+ * a string containing said text.
+ *
+ * The method used to encode the text is supplied to the function
+ * as a parameter as 1 byte.
+ *
+ * That byte can have the following values:
+ *
+ * 0x00:
+ *  The ISO-8859-1 standard is used to encode the text, and
+ *  the string is terminated by one 0x00 byte.
+ *
+ * 0x01:
+ *  The text contains UTF-16 encoded Unicode with BOM.
+ *  If the BOM bytes are ff ff, the byte order is big endian.
+ *  If the BOM bytes are ff fe, the byte order is little endian.
+ *
+ *  The string is null terminated by 00 00 bytes.
+ *
+ * 0x02:
+ *  The text contains UTF-16B encoded Unicode without BOM and
+ *  the string is null terminated by 00 00 bytes.
+ *
+ * 0x03:
+ *  The text contains UTF-8 encoded Unicode and is terminated
+ *  by one 0x00 byte.
+ *
+ *
+ * @param text_encoding The method that is used to encode the text
+ * @param text          A pointer to a std::vector containing the text
+ * @param position      The start of the text in the vector
+ *
+ * @return a string containing the decoded text
+ */
+inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t &position) {
+
+    char c = data->at(position);
+
+    std::string text = "";
+
+    // Text is encoded using ISO-8859-1 standard
+    // and using null terminated by 0x00,
+    // (1 'zero' byte).
+    if (text_encoding == 0x00) {
+
+        // TODO log debug
+        std::cout << "Decoding ISO-8859-1 encoded text" << std::endl;
+
+        while (c != 0x00) {
+            text += c;
+            c = data->at(++position);
+        }
+    }
+
+    // Text is UTF-16 endcoded Unicode with BOM.
+    // TODO sure that BOM is at the beginning, not the end?
+    // The first text byte is 0xff followed by either
+    // another 0xff byte or one 0xfe byte.
+    //
+    // If the second byte is 0xff the byte order is
+    // big endian.
+    // If the second byte is 0xfe the byte order is
+    // big endian.
+    //
+    // The text is null terminated by 0x0000
+    // (2 'zero' bytes).
+    else if (text_encoding == 0x01) {
+
+        // TODO log debug
+        std::cout << "Decoding UTF-16 encoded Unicode" << std::endl;
+
+        std::cout << "[Error] UTF-16 has not been implemented yet" << std::endl;
+
+        char terminated = 0;
+
+        // iterating until 2 consecutive 0x00 bytes
+        // are found
+        while (terminated < 2) {
+
+            terminated = c == 0x00 ? terminated + 1 : 0;
+
+            c = data->at(++position);
+        }
+    }
+
+    // The text UTF-16B encoded Unicode without BOM.
+    // It is null terminated by 0x0000 (2 'zero' bytes)
+    else if (text_encoding == 0x02) {
+
+        // TODO log debug
+        std::cout << "Decoding UTF-16B encoded Unicode" << std::endl;
+
+        std::cout << "[Error] UTF-16B has not been implemented yet" << std::endl;
+
+        char terminated = 0;
+
+        // iterating until 2 consecutive 0x00 bytes
+        // are found
+        while (terminated < 2) {
+
+            terminated = c == 0x00 ? terminated + 1 : 0;
+
+            c = data->at(++position);
+        }
+    }
+
+    // The text is UTF-8 encoded Unicode.
+    // It is terminated by 0x00 (1 'zero' byte)
+    else if (text_encoding == 0x03) {
+
+        // TODO log debug
+        std::cout << "Decoding UTF-8 encoded Unicode" << std::endl;
+
+        while (c != 0x00) {
+            text += c;
+            c = data->at(++position);
+        }
+    }
+
+    // Value of text_encoding is not valid
+    else {
+
+        // TODO log error
+        std::cout << "'0x" << text_encoding << "' is not a valid value for text_encoding" << std::endl;
+
+    }
+
+    return text;
+
 }
 
 

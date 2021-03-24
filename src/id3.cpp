@@ -1,5 +1,4 @@
 #include <id3.hpp>
-#include <iostream>
 
 
 bool detectID3(Filehandler &handler) {
