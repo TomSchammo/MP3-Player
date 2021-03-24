@@ -201,34 +201,41 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     if (frame_id.compare("TIT2") == 0) {
 
-        // TODO log verbose
-        std::cout << "Found a TIT2 frame, setting song title to: " << data << std::endl;
+        std::string content = convert_to_string(data);
 
-        song.m_title = convert_to_string(data);
+        // TODO log verbose
+        std::cout << "Found a TIT2 frame, setting song title to: " << content << std::endl;
+
+        song.m_title = content;
 
     } else if (frame_id.compare("TALB") == 0) {
 
+        std::string content = convert_to_string(data);
 
         // TODO log verbose
-        std::cout << "Found a TALB frame, setting album title to: " << data << std::endl;
+        std::cout << "Found a TALB frame, setting album title to: " << content << std::endl;
 
-        song.m_album = convert_to_string(data);
+        song.m_album = content;
 
     } else if (frame_id.compare("TPE1") == 0) {
 
-        // TODO log verbose
-        std::cout << "Found a TPE1 frame, setting artist to: " << data << std::endl;
+        std::string content = convert_to_string(data);
 
-        song.m_artist = convert_to_string(data);
+        // TODO log verbose
+        std::cout << "Found a TPE1 frame, setting artist to: " << content << std::endl;
+
+        song.m_artist = content;
 
     } else if (frame_id.compare("TDRL") == 0) {
 
-        // TODO log verbose
-        std::cout << "Found a TDRL frame setting release year to: " << data << std::endl;
-
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
-        song.m_release = convert_to_string(data).substr(0, 5);
+        std::string content = convert_to_string(data).substr(0, 5);
+
+        // TODO log verbose
+        std::cout << "Found a TDRL frame setting release year to: " << content << std::endl;
+
+        song.m_release = content;
 
     } else if (frame_id.compare("TDRC") == 0) {
 
@@ -236,12 +243,14 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // there is no TDRL frame, this frame will be used for the date instead
         if (song.m_release.compare("") == 0) {
 
-            // TODO log verbose
-            std::cout << "Found a TDRC frame setting release year to: " << data << std::endl;
-
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
-            song.m_release = convert_to_string(data).substr(0, 5);
+            std::string content = convert_to_string(data).substr(0, 5);
+
+            // TODO log verbose
+            std::cout << "Found a TDRC frame setting release year to: " << content << std::endl;
+
+            song.m_release = content;
         }
 
         else {
@@ -275,13 +284,15 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // TODO this is different for older tag versions
         if (song.m_genre.compare("Unknown Genre") == 0) {
 
+            std::string content = convert_to_string(data);
+
             // TODO log verbose
-            std::cout << "Found a TCON frame, setting genre to: " << data << std::endl;
+            std::cout << "Found a TCON frame, setting genre to: " << content << std::endl;
 
             // TODO not sure if this is always fine (as there can also be numbers apparently)
-            //      so maybe this is not the correct way to "parse" the data, but I'll gave to
+            //      so maybe this is not the correct way to "parse" the data, but I'll have to
             //      check with more files.
-            song.m_genre = convert_to_string(data);
+            song.m_genre = content;
         }
 
     } else if (frame_id.compare("TRCK") == 0) {
