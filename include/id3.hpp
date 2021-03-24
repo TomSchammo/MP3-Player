@@ -221,7 +221,7 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
     else {
 
         // TODO log error
-        std::cout << "'0x" << text_encoding << "' is not a valid value for text_encoding" << std::endl;
+        std::cout << "'0x" << std::hex << int(text_encoding) << "' is not a valid value for text_encoding" << std::endl;
 
     }
 
