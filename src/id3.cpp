@@ -107,7 +107,6 @@ void increment_pc(Filehandler &handler, std::uint32_t position) {
     // read counter and convert it from a null terminated hex string to a number
     // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
-    // TODO I need to fix readFrame and then get back to this
     if (auto data = readFrame(handler, frame_id, position)) {
 
         std::uint32_t size = (*data)->size();
@@ -298,6 +297,8 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
         std::string track_number = "";
 
+        // TRCK frame can contain a / with the total amount of tracks
+        // after the track number. I don't care about that
         for (char c : *data) {
             if (c == '/')
                 break;
@@ -308,8 +309,6 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // TODO log info
         std::cout << track_number << std::endl;
 
-        // TRCK frame can contain a / with the total amount of tracks
-        // after the track number. I don't care about that
         song.m_track_number = track_number;
 
     } else {
@@ -505,12 +504,12 @@ void readID3(Song &song) {
 
                     }
 
-                    // TODO size is weird sometimes (by weird I mean 0 >)
-                    //      one reason for that occurrence was padding at the end, which has been fixed
-                    //      but I still get it with welcome home
                     size_remaining -= (position - original_position_file);
+
+                    // TODO log info
                     std::cout << "Size remaining: " << size_remaining << std::endl;
 
+                    // TODO log info
                     std::cout << "Continuing to read at position: " << position << std::endl;
 
                     // frame_id has been not been set properly,
