@@ -23,10 +23,10 @@ Filehandler::Filehandler(std::string filename) {
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint16_t position, const unsigned char bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
+    std::cout << "Reading " << bytes << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
 
     m_stream.seekg(position, std::ios::beg);
     m_stream.read(buffer, bytes);
@@ -34,10 +34,10 @@ void Filehandler::readBytes(char buffer[], const std::uint16_t position, const u
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint32_t position, enum std::_Ios_Seekdir way, const std::uint32_t bytes) {
 
     // TODO log debug
-    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position
+    std::cout << "Reading " << bytes << " bytes starting at offset " << position
         << " relative to the " << (way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
@@ -47,7 +47,7 @@ void Filehandler::readBytes(char buffer[], const std::uint16_t position, enum st
 }
 
 
-void Filehandler::writeBytes(const std::uint16_t position, const char* bytes, std::uint16_t size) {
+void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, std::uint32_t size) {
 
     std::ofstream stream;
 
@@ -64,7 +64,7 @@ void Filehandler::writeBytes(const std::uint16_t position, const char* bytes, st
     stream.close();
 }
 
-void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
+void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) {
 
     // TODO assert that all read/write operations were successful before deleting file at the end
 
@@ -76,11 +76,11 @@ void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
 
         // retrieving end of file, this will be important later
         stream.seekp(0, std::ios::end);
-        const std::uint16_t _EOF = stream.tellp();
+        const std::uint32_t _EOF = stream.tellp();
 
 
         // creating buffer to read/write from/to
-        const std::uint16_t SIZE_OF_BUFFER = 1024;
+        const std::uint32_t SIZE_OF_BUFFER = 1024;
         char buffer[SIZE_OF_BUFFER];
 
 
@@ -90,7 +90,7 @@ void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
 
 
         // while bytes left > size of buffer
-        while (static_cast<std::uint16_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
+        while (static_cast<std::uint32_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
             m_stream.read(buffer, SIZE_OF_BUFFER);
             stream.write(buffer, SIZE_OF_BUFFER);
         }
@@ -223,7 +223,7 @@ void Filehandler::deleteBytes(std::uint16_t position, std::uint16_t bytes) {
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint16_t position, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint32_t position, const unsigned char bytes) {
 
     // TODO log debug
     std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from the file: " << m_filename << std::endl;
@@ -255,7 +255,7 @@ void Filehandler::readString(std::string &s, const std::uint16_t position, const
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint16_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint32_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
 
     // TODO log debug
     std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position

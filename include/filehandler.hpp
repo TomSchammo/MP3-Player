@@ -49,7 +49,7 @@ class Filehandler {
          * @param position  The starting position of the pointer
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint16_t position, const unsigned char bytes);
+        void readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes);
 
 
         /**
@@ -60,7 +60,7 @@ class Filehandler {
          * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+        void readBytes(char buffer[], const std::uint32_t position, std::_Ios_Seekdir way, const std::uint32_t bytes);
 
 
         /**
@@ -71,7 +71,7 @@ class Filehandler {
          * @param bytes    are the bytes that should be written to the file
          * @param size     contains how many bytes should be written to the file
          */
-        void writeBytes(const std::uint16_t position, const char bytes[], std::uint16_t size);
+        void writeBytes(const std::uint32_t position, const char bytes[], std::uint32_t size);
 
 
         /**
@@ -86,7 +86,7 @@ class Filehandler {
          * @param position  The relative offset to the start of the file of the first byte
          * @param bytes     The amount of bytes that should be deleted
          */
-        void deleteBytes(std::uint16_t position, std::uint16_t bytes);
+        void deleteBytes(std::uint32_t position, std::uint32_t bytes);
 
 
         /**
@@ -96,7 +96,7 @@ class Filehandler {
          * @param position  The starting position of the pointer
          * @param bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint16_t position, const unsigned char bytes);
+        void readString(std::string &s, const std::uint32_t position, const unsigned char bytes);
 
 
         /**
@@ -107,7 +107,7 @@ class Filehandler {
          * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint16_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+        void readString(std::string &s, const std::uint32_t position, std::_Ios_Seekdir way, const unsigned char bytes);
 
 
         /**

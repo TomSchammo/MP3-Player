@@ -75,7 +75,7 @@ std::uint8_t getFlags(Filehandler &handler);
  * @param handler A reference to a Filehandler object to read from the file
  * @return 4 bytes that contain the size of the ID3 tag or the extended header
  */
-std::uint16_t getSize(Filehandler &handler, const bool extended);
+std::uint32_t getSize(Filehandler &handler, const bool extended);
 
 
 /**
@@ -231,28 +231,34 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
 
 
 /**
- * Converts data in a char buffer into a number that one can work with.
+ * Converts data in a char buffer into a base 10 number that can be worked with.
  *
  * So {0, 0, 1, 63} (coming from {0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
  *
- * @param buffer is a char array that contains the data
- * @param size   is the size of the char array
+ * @param buffer   is a char array that contains the data
+ * @param size     is the size of the char array
+ * @param syncsafe is true if the data should be converted into a syncsafe integer
  *
  * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
  */
-inline std::uint64_t convert_bytes(char buffer[], std::uint16_t size) {
+constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, bool syncsafe) {
 
-    std::uint8_t factor = 1;
+    std::uint64_t factor = 0;
 
     std::uint64_t number = 0;
 
     // going from last to first assuming that lsb is in the back
     for (std::int32_t i = size - 1; i >= 0; --i) {
 
-        number += buffer[i] * factor;
+        auto n = buffer[i] << factor;
+
+        if (syncsafe)
+            n = (n & (0x7f << (factor >> 0))) >> (factor >> 3);
+
+        number |= n;
 
         // increasing the factor by 2 each time
-        factor *= (16*16);
+        factor += 8;
     }
 
     return number;
@@ -291,7 +297,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) {
  * @param size is the integer that will be converted
  * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
  */
-inline void convert_size(std::uint16_t size, char arr[4]) {
+inline void convert_size(std::uint32_t size, char arr[4]) {
 
     int i = 0;
     while (size > 127) {
@@ -317,7 +323,7 @@ inline void convert_size(std::uint16_t size, char arr[4]) {
  * @param  data The data that is supposed to be synchronized
  * @return A pointer to the data that has been synchronized
  */
-void synchronize(const unsigned char* data, std::uint16_t size);
+void synchronize(const unsigned char* data, std::uint32_t size);
 
 
 /**
@@ -328,7 +334,7 @@ void synchronize(const unsigned char* data, std::uint16_t size);
  * @param handler  A reference to a Filehandler object to read/write to the file
  * @param position is the offset of the start of the frame relative to the start of the file
  */
-void increment_pc(Filehandler &handler, std::uint16_t position);
+void increment_pc(Filehandler &handler, std::uint32_t position);
 
 
 /**
@@ -342,7 +348,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position);
  *
  * @return a shared pointer to a vector that contains the data of the frame
  */
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position);
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position);
 
 
 /**

@@ -54,32 +54,29 @@ std::uint8_t getFlags(Filehandler &handler) {
 }
 
 
-std::uint16_t getSize(Filehandler &handler, const bool extended) {
+std::uint32_t getSize(Filehandler &handler, const bool extended) {
 
-    const unsigned char BUFFER_SIZE = extended ? SIZE_OF_HEADER : LOCATION_SIZE;
+    const unsigned char BUFFER_LOCATION = extended ? SIZE_OF_HEADER : LOCATION_SIZE;
 
     // Have to do this, since C++ doesn't support variable length arrays
-    std::vector<char> buffer(BUFFER_SIZE);
+    std::vector<char> buffer(SIZE_OF_SIZE);
 
-    handler.readBytes(buffer.data(), BUFFER_SIZE, SIZE_OF_SIZE);
+    handler.readBytes(buffer.data(), BUFFER_LOCATION, SIZE_OF_SIZE);
 
-    std::uint16_t size = 0;
 
-    for (int i = 0; i < SIZE_OF_SIZE; ++i) {
-        size += static_cast<std::uint16_t>(buffer[i]);
-    }
+    std::uint32_t size = convert_bytes(buffer.data(), SIZE_OF_SIZE, true);
 
     return size;
 }
 
 
-void synchronize(const char* data, std::uint16_t size) {
+void synchronize(const char* data, std::uint32_t size) {
 
     std::vector<char> bytes;
 
     bool sync = true;
 
-    for (std::uint16_t i = 0; i < size; ++i) {
+    for (std::uint32_t i = 0; i < size; ++i) {
         if (sync) {
             bytes.push_back(data[i]);
             sync = (static_cast<unsigned char>(data[i]) != 0xff);
@@ -98,12 +95,12 @@ void synchronize(const char* data, std::uint16_t size) {
 }
 
 
-void increment_pc(Filehandler &handler, std::uint16_t position) {
+void increment_pc(Filehandler &handler, std::uint32_t position) {
 
     // TODO this needs some testing and fixing
 
     // saving the position of the start of the header, as I will need this later
-    std::uint16_t original_position = position;
+    std::uint32_t original_position = position;
 
     std::string frame_id;
 
@@ -113,17 +110,17 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
     // TODO I need to fix readFrame and then get back to this
     if (auto data = readFrame(handler, frame_id, position)) {
 
-        std::uint16_t size = (*data)->size();
+        std::uint32_t size = (*data)->size();
 
         // read counter (and convert it from base 16 to base 10)
-        std::uint64_t counter = convert_bytes(((*data)->data()), size);
+        std::uint64_t counter = convert_bytes(((*data)->data()), size, false);
 
         counter += 1;
 
         // this evaluates to true, if counter only consists of 0xff bytes
         bool f = (counter + 1) % 16 == 0;
 
-        std::uint16_t data_size = size;
+        std::uint32_t data_size = size;
 
         // if the data only consists of 0xff bytes, a 0x00 byte will be prepended
         // and therefore the size needs to be increased by 1
@@ -149,7 +146,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
             ++i;
         }
 
-        std::uint16_t offset = original_position + 4;
+        std::uint32_t offset = original_position + 4;
 
         char buffer_flags[2];
 
@@ -179,7 +176,7 @@ void increment_pc(Filehandler &handler, std::uint16_t position) {
 
         // TODO log debug
         std::cout << "Writing bytes:\n";
-        for (int cnt = 0; cnt < data_size; ++cnt) {
+        for (std::uint32_t cnt = 0; cnt < data_size; ++cnt) {
             std::cout <<  std::hex << payload[cnt] << " ";
         }
         std::cout << "\n to file."<< std::endl;
@@ -260,7 +257,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TLEN") == 0) {
 
-        auto len = convert_bytes(data->data(), data->size());
+        auto len = convert_bytes(data->data(), data->size(), false);
 
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
@@ -269,7 +266,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TDLY") == 0) {
 
-        auto delay = convert_bytes(data->data(), data->size());
+        auto delay = convert_bytes(data->data(), data->size(), false);
 
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
@@ -327,7 +324,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
 }
 
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint16_t &position) {
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -344,11 +341,8 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
     char size_buffer[SIZE_OF_SIZE];
 
     handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
-    std::uint16_t frame_data_size = 0;
 
-    for (int i = 0; i < SIZE_OF_SIZE; ++i) {
-        frame_data_size += static_cast<std::uint16_t>(size_buffer[i]);
-    }
+    std::uint64_t frame_data_size = convert_bytes(size_buffer, SIZE_OF_SIZE, true);
 
     position += SIZE_OF_SIZE;
 
@@ -440,7 +434,7 @@ void readID3(Song &song) {
         // TODO log info
         std::cout << "Size of ID3 tag: " << size << std::endl;
 
-        std::uint16_t extended_size = 0;
+        std::uint32_t extended_size = 0;
 
         // Not supported ID3 version, skipping the tag
         // TODO Implement ID3v2.2 and below
@@ -477,9 +471,9 @@ void readID3(Song &song) {
             }
 
 
-            auto size_remaining = size + extended_size;
+            std::int64_t size_remaining = size + extended_size;
 
-            std::uint16_t position = SIZE_OF_HEADER + extended_size;
+            std::uint32_t position = SIZE_OF_HEADER + extended_size;
 
             // TODO log debug
             std::cout << "Starting to read frames at position " << position << std::endl;
@@ -490,7 +484,7 @@ void readID3(Song &song) {
                 std::string frame_id = "";
 
                 // TODO I should probably choose less ambiguous names
-                std::uint16_t original_position_file = position;
+                std::uint32_t original_position_file = position;
                 auto result = readFrame(handler, frame_id, position);
 
                 // There are no frames left, the rest is padding
