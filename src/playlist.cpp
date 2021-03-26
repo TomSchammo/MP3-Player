@@ -26,7 +26,7 @@ void Playlist::shuffle(std::vector<Song> &playlist) {
 
     for (int i = playlist.size(); i > 1; --i) {
 
-        auto j = rand() % (i+1);   
+        auto j = rand() % (i+1);
 
         auto temp = playlist[i];
         playlist[i] = playlist[j];
