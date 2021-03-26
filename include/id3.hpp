@@ -88,25 +88,6 @@ std::uint32_t getSize(Filehandler &handler, const bool extended);
 
 
 /**
- * Checks whether a bunch of data is null terminated, if not, a 0x00 byte is added
- * in the end.
- *
- * Then the data is converted to a string and returned as a string object.
- *
- * @param data is the data that should be converted
- * @return a std::string that is the string representation of that data
- */
-inline std::string convert_to_string(std::shared_ptr<std::vector<char>> data) {
-
-    if (data->at(data->size()-1) != 0) {
-        data->push_back(0);
-    }
-
-    return std::string(data->data());
-}
-
-
-/**
  * Decodes text according to the specified encoding and returns
  * a string containing said text.
  *
