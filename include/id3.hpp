@@ -32,6 +32,15 @@ constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 // TODO reconsider readID3 return type
 // TODO consider wrapping everything in namespace
 
+struct TextAndPositionContainer {
+
+    std::string text = "";
+    std::uint32_t position = 0;
+
+};
+
+
+static struct TextAndPositionContainer container{};
 
 /**
  * Checks whether ID3 metadata prepended to the file.
@@ -128,11 +137,11 @@ inline std::string convert_to_string(std::shared_ptr<std::vector<char>> data) {
  *
  * @param text_encoding The method that is used to encode the text
  * @param text          A pointer to a std::vector containing the text
- * @param position      The start of the text in the vector
+ * @param position      An unsigned 32 bit integer indicating the start of the string
  *
  * @return a string containing the decoded text
  */
-inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t &position) {
+inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
 
     char c = data->at(position);
 
@@ -153,7 +162,6 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
     }
 
     // Text is UTF-16 endcoded Unicode with BOM.
-    // TODO sure that BOM is at the beginning, not the end?
     // The first text byte is 0xff followed by either
     // another 0xff byte or one 0xfe byte.
     //
@@ -179,7 +187,7 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
 
             terminated = c == 0x00 ? terminated + 1 : 0;
 
-            c = data->at(++position);
+            c = data->at(position++);
         }
     }
 
@@ -200,7 +208,7 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
 
             terminated = c == 0x00 ? terminated + 1 : 0;
 
-            c = data->at(++position);
+            c = data->at(position++);
         }
     }
 
@@ -213,7 +221,7 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
 
         while (c != 0x00) {
             text += c;
-            c = data->at(++position);
+            c = data->at(position++);
         }
     }
 
@@ -225,8 +233,16 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
 
     }
 
-    return text;
+    container.text = text;
+    container.position = position;
 
+    return container;
+
+}
+
+
+inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
+    return decode_text_retain_position(text_encoding, data, position).text;
 }
 
 
