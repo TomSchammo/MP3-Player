@@ -196,7 +196,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     if (frame_id.compare("TIT2") == 0) {
 
-        std::string content = convert_to_string(data);
+        std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
         std::cout << "Found a TIT2 frame, setting song title to: " << content << std::endl;
@@ -205,7 +205,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TALB") == 0) {
 
-        std::string content = convert_to_string(data);
+        std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
         std::cout << "Found a TALB frame, setting album title to: " << content << std::endl;
@@ -214,7 +214,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TPE1") == 0) {
 
-        std::string content = convert_to_string(data);
+        std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
         std::cout << "Found a TPE1 frame, setting artist to: " << content << std::endl;
@@ -225,7 +225,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
-        std::string content = convert_to_string(data).substr(0, 5);
+        std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
 
         // TODO log verbose
         std::cout << "Found a TDRL frame setting release year to: " << content << std::endl;
@@ -240,7 +240,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
-            std::string content = convert_to_string(data).substr(0, 5);
+            std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
 
             // TODO log verbose
             std::cout << "Found a TDRC frame setting release year to: " << content << std::endl;
@@ -279,7 +279,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // TODO this is different for older tag versions
         if (song.m_genre.compare("Unknown Genre") == 0) {
 
-            std::string content = convert_to_string(data);
+            std::string content = decode_text(data->at(0), data, 1);
 
             // TODO log verbose
             std::cout << "Found a TCON frame, setting genre to: " << content << std::endl;
@@ -390,15 +390,10 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
     position += 2;
 
     std::cout << "reading " << frame_data_size << " bytes of frame with id " << frame_id << std::endl;
-    // reading the data of the frame
-    // TODO why do I need this + 1, it doesn't make sense...
-    // TODO apparently size assumes null terminated string, but apparently
-    //      not every string in a frame is null terminated, so that can fuck things up
-    // TODO is the size wrong then?
-    // also TODO pls fix
 
-    auto frame_content = std::make_unique<std::vector<char>>(frame_data_size-1);
-    handler.readBytes(frame_content->data(), position+1, frame_data_size-1);
+    auto frame_content = std::make_unique<std::vector<char>>(frame_data_size);
+
+    handler.readBytes(frame_content->data(), position, frame_data_size);
 
     // taking frame data in account when updating position
     position += frame_data_size;
