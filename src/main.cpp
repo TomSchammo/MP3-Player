@@ -3,19 +3,25 @@
 #include <song.hpp>
 #include <id3.hpp>
 
-int main()
+
+int main(int arc, char *agrv[])
 {
-    std::cout << "Please enter the directory of the file that should be played" << std::endl;
 
-    std::string filename;
+    if (arc > 1) {
 
-    std::cin >> filename;
+        std::string filename = agrv[1];
 
-    Song song(filename);
+        Song song(filename);
 
-    readID3(song);
+        readID3(song);
 
-    song.print();
+        song.print();
+
+    }
+
+    else {
+        std::cerr << "You need to provide a filename!" << std::endl;
+    }
 
 
     return 0;
