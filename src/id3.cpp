@@ -1,4 +1,5 @@
 #include <id3.hpp>
+#include <picture.hpp>
 
 
 bool detectID3(Filehandler &handler) {
@@ -317,6 +318,59 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
         song.m_track_number = track_number;
 
+    } else if (frame_id.compare("APIC") == 0) {
+
+        std::uint32_t iterator = 0;
+
+        // byte indicating text encoding
+        std::uint8_t text_encoding = data->at(iterator++);
+
+        std::string mime_type = "";
+
+        char c = data->at(iterator);
+
+        while (c != 0) {
+            mime_type += c;
+            c = data->at(++iterator);
+        }
+
+        // TODO log debug
+        std::cout << "Found picture with MIME type: " << mime_type << std::endl;
+
+        ID3::PictureType pic_type = static_cast<ID3::PictureType>(data->at(iterator++));
+
+        auto container = decode_text_retain_position(text_encoding, data, iterator);
+
+        if (!container.error) {
+
+            std::string description = container.text;
+
+            iterator = container.position;
+
+            auto pic_data = std::make_shared<std::vector<char>>();
+
+
+            // extracting picture data
+            while (iterator < data->size()) {
+                pic_data->push_back(data->at(iterator++));
+            }
+
+
+            ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
+
+            // TODO not sure if a copy is the best idea here, but I'll leave
+            //      it like this for now
+            song.m_art.push_back(art);
+
+        }
+
+        else {
+            // TODO deal with error
+
+            // TODO log error
+            std::cout << container.text << std::endl;
+        }
+
     } else {
         // TODO log warn
         std::cout << "frame id: " << frame_id << " is not supported yet" << std::endl;
@@ -324,7 +378,6 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     // TODO TFLT (audio type, default is MPEG)
     // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
-    // TODO APIC (Album art (section 4.14))
     // TODO PCNT (Player counter (4.16), should be incremented)
 
 }
