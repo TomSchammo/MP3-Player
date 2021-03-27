@@ -10,8 +10,8 @@
 #ifndef SONG_HPP
 #define SONG_HPP
 
-#include <cstdint>
-#include <string>
+#include <picture.hpp>
+#include <utility>
 
 
 /**
@@ -51,6 +51,8 @@ public:
     std::uint32_t m_counter_offset = 0;
 
     std::string m_path = "";
+
+    std::vector<ID3::Picture> m_art{};
 
 public:
     Song() = delete;
