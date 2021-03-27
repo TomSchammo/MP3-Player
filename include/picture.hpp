@@ -40,14 +40,15 @@ namespace ID3 {
     public:
         Picture(std::shared_ptr<std::vector<char>> data, std::string mime_type, ID3::PictureType pic_type);
 
+        // picture data
         std::shared_ptr<std::vector<char>> m_data;
+
+        // MIME type
         std::string m_mime_type;
+
+        // type of picture (see PictureType)
         ID3::PictureType m_pic_type;
 
-        virtual ~Picture ();
-
-    private:
-        /* data */
     };
 }
 
