@@ -196,6 +196,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     if (frame_id.compare("TIT2") == 0) {
 
+        // TODO deal with possibility of having an error
         std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
@@ -205,6 +206,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TALB") == 0) {
 
+        // TODO deal with possibility of having an error
         std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
@@ -214,6 +216,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TPE1") == 0) {
 
+        // TODO deal with possibility of having an error
         std::string content = decode_text(data->at(0), data, 1);
 
         // TODO log verbose
@@ -225,6 +228,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
+        // TODO deal with possibility of having an error
         std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
 
         // TODO log verbose
@@ -240,6 +244,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
+            // TODO deal with possibility of having an error
             std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
 
             // TODO log verbose
@@ -279,6 +284,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // TODO this is different for older tag versions
         if (song.m_genre.compare("Unknown Genre") == 0) {
 
+            // TODO deal with possibility of having an error
             std::string content = decode_text(data->at(0), data, 1);
 
             // TODO log verbose
