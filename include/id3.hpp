@@ -129,7 +129,7 @@ std::uint32_t getSize(Filehandler &handler, const bool extended);
  */
 inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
 
-    char c = data->at(position);
+    char c = data->at(position++);
 
     std::string text = "";
 
@@ -143,7 +143,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
         while (c != 0x00) {
             text += c;
-            c = data->at(++position);
+            c = data->at(position++);
         }
     }
 
