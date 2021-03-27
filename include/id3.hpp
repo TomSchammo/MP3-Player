@@ -14,6 +14,7 @@
 #include <filehandler.hpp>
 #include <song.hpp>
 #include <iostream>
+#include <string>
 
 // constants
 constexpr std::uint8_t LOCATION_START = 0;
@@ -36,6 +37,7 @@ struct TextAndPositionContainer {
 
     std::string text;
     std::uint32_t position;
+    bool error;
 };
 
 
@@ -114,11 +116,16 @@ std::uint32_t getSize(Filehandler &handler, const bool extended);
  *  by one 0x00 byte.
  *
  *
+ * If the value of that byte is not valid (meaning none of the above)
+ * a flag indicating an error will be set to true along with an error
+ * message instead of the decoded text and a posistion of 0.
+ *
  * @param text_encoding The method that is used to encode the text
  * @param text          A pointer to a std::vector containing the text
  * @param position      An unsigned 32 bit integer indicating the start of the string
  *
- * @return a string containing the decoded text
+ * @return a container struct that contains the decoded text and the updated value of
+ *         the position argument as well as an error flag that should be false.
  */
 inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
 
@@ -160,8 +167,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
         char terminated = 0;
 
-        // iterating until 2 consecutive 0x00 bytes
-        // are found
+        // iterating until 2 consecutive 0x00 bytes are found
         while (terminated < 2) {
 
             terminated = c == 0x00 ? terminated + 1 : 0;
@@ -181,8 +187,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
         char terminated = 0;
 
-        // iterating until 2 consecutive 0x00 bytes
-        // are found
+        // iterating until 2 consecutive 0x00 bytes are found
         while (terminated < 2) {
 
             terminated = c == 0x00 ? terminated + 1 : 0;
@@ -210,15 +215,24 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
         // TODO log error
         std::cout << "'0x" << std::hex << int(text_encoding) << "' is not a valid value for text_encoding" << std::endl;
 
+        return {"0x" + std::to_string(int(text_encoding)) + " is not a valid encoding method", 0, true};
     }
 
-    return {text, position};
+    return {text, position, false};
 
 }
 
 
 inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
-    return decode_text_retain_position(text_encoding, data, position).text;
+
+    auto result = decode_text_retain_position(text_encoding, data, position);
+
+    if (!result.error)
+        return result.text;
+
+    // TODO deal with error
+    else
+        return nullptr;
 }
 
 
