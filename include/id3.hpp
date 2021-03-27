@@ -34,13 +34,11 @@ constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 
 struct TextAndPositionContainer {
 
-    std::string text = "";
-    std::uint32_t position = 0;
-
+    std::string text;
+    std::uint32_t position;
 };
 
 
-static struct TextAndPositionContainer container{};
 
 /**
  * Checks whether ID3 metadata prepended to the file.
@@ -214,10 +212,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
     }
 
-    container.text = text;
-    container.position = position;
-
-    return container;
+    return {text, position};
 
 }
 
