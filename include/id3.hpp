@@ -154,7 +154,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
     // If the second byte is 0xff the byte order is
     // big endian.
     // If the second byte is 0xfe the byte order is
-    // big endian.
+    // little endian.
     //
     // The text is null terminated by 0x0000
     // (2 'zero' bytes).
