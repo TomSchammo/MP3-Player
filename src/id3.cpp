@@ -320,6 +320,9 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("APIC") == 0) {
 
+        // TODO log info
+        std::cout << "Found an APIC frame" << std::endl;
+
         std::uint32_t iterator = 0;
 
         // byte indicating text encoding
@@ -371,6 +374,15 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
             std::cout << container.text << std::endl;
         }
 
+    } else if (frame_id.compare("PCNT") == 0) {
+
+        std::uint64_t play_counter = convert_bytes(data->data(), data->size(), false);
+
+        // TODO log info
+        std::cout << "Found an PCNT frame, setting play counter to: " << play_counter << std::endl;
+
+        song.m_play_counter = play_counter;
+
     } else {
         // TODO log warn
         std::cout << "frame id: " << frame_id << " is not supported yet" << std::endl;
@@ -378,7 +390,6 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     // TODO TFLT (audio type, default is MPEG)
     // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
-    // TODO PCNT (Player counter (4.16), should be incremented)
 
 }
 
@@ -553,6 +564,7 @@ void readID3(Song &song) {
                     auto frame_content = result.value();
 
                     if (frame_id.compare("PCNT") == 0) {
+
                         // setting posistion of start of play counter frame
                         song.m_counter_offset = original_position_file;
 

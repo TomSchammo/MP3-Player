@@ -11,7 +11,6 @@
 #define SONG_HPP
 
 #include <picture.hpp>
-#include <utility>
 
 
 /**
@@ -46,6 +45,8 @@ public:
     std::uint32_t m_audio_start = 0;
     std::uint32_t m_duration = 0;
     std::uint32_t m_delay = 0;
+
+    std::uint64_t m_play_counter = 0;
 
     // offset of the player counter
     std::uint32_t m_counter_offset = 0;
