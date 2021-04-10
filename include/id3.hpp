@@ -312,7 +312,7 @@ inline void convert_size(std::uint32_t size, char arr[4]) {
         ++i;
     }
 
-    arr[i+1] = size;
+    arr[i+1] = static_cast<char>(size);
 }
 
 

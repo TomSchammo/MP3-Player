@@ -65,7 +65,8 @@ std::uint32_t getSize(Filehandler &handler, const bool extended) {
     handler.readBytes(buffer.data(), BUFFER_LOCATION, SIZE_OF_SIZE);
 
 
-    std::uint32_t size = convert_bytes(buffer.data(), SIZE_OF_SIZE, true);
+    // TODO max size of tag (update this as well as position)
+    std::uint32_t size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE, true));
 
     return size;
 }
@@ -110,7 +111,8 @@ void increment_pc(Filehandler &handler, std::uint32_t position) {
     //      and the conversion will fail (since I'll expect a string of hex numbers)
     if (auto data = readFrame(handler, frame_id, position)) {
 
-        std::uint32_t size = (*data)->size();
+        // frame data is never more than std::uint32_t
+        std::uint32_t size = static_cast<std::uint32_t>((*data)->size());
 
         // read counter (and convert it from base 16 to base 10)
         std::uint64_t counter = convert_bytes(((*data)->data()), size, false);
@@ -262,7 +264,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TLEN") == 0) {
 
-        auto len = convert_bytes(data->data(), data->size(), false);
+        auto len = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
 
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
@@ -271,7 +273,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("TDLY") == 0) {
 
-        auto delay = convert_bytes(data->data(), data->size(), false);
+        auto delay = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
 
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
@@ -376,7 +378,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
     } else if (frame_id.compare("PCNT") == 0) {
 
-        std::uint64_t play_counter = convert_bytes(data->data(), data->size(), false);
+        std::uint64_t play_counter = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
 
         // TODO log info
         std::cout << "Found an PCNT frame, setting play counter to: " << play_counter << std::endl;
@@ -411,7 +413,7 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
 
     handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
 
-    std::uint64_t frame_data_size = convert_bytes(size_buffer, SIZE_OF_SIZE, true);
+    std::uint32_t frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE, true));
 
     position += SIZE_OF_SIZE;
 
@@ -471,7 +473,7 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
     // synchronizing frame data
     if (format_flags & (1 << 1)) {
 
-        synchronize(frame_content->data(), frame_content->size());
+        synchronize(frame_content->data(), static_cast<std::uint32_t>(frame_content->size()));
 
     }
 
@@ -535,7 +537,8 @@ void readID3(Song &song) {
             }
 
 
-            std::int64_t size_remaining = size + extended_size;
+            // TODO are 32 bits enough, if not, need to up position and this to uint64
+            std::int32_t size_remaining = size + extended_size;
 
             std::uint32_t position = SIZE_OF_HEADER + extended_size;
 
