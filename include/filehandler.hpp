@@ -28,15 +28,17 @@ class Filehandler {
          *
          * @param filename name of the file
          */
-        Filehandler(std::string filename);
+        Filehandler(std::string filename) noexcept;
 
+        // Enabling move operations
+        Filehandler(Filehandler &&) = default;
 
         /**
          * Checks whether a file exists or not.
          *
          * @return true if the file exists, false otherwise.
          */
-        inline bool exists() {
+        inline bool exists() const noexcept {
             std::filesystem::path f(m_filename);
             return std::filesystem::exists(f);
         }
@@ -49,7 +51,7 @@ class Filehandler {
          * @param position  The starting position of the pointer
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes);
+        void readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) const noexcept;
 
 
         /**
@@ -60,7 +62,7 @@ class Filehandler {
          * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint32_t position, std::_Ios_Seekdir way, const std::uint32_t bytes);
+        void readBytes(char buffer[], const std::uint32_t position, std::_Ios_Seekdir way, const std::uint32_t bytes) const noexcept;
 
 
         /**
@@ -71,7 +73,7 @@ class Filehandler {
          * @param bytes    are the bytes that should be written to the file
          * @param size     contains how many bytes should be written to the file
          */
-        void writeBytes(const std::uint32_t position, const char bytes[], std::uint32_t size);
+        void writeBytes(const std::uint32_t position, const char bytes[], std::uint32_t size) const noexcept;
 
 
         /**
@@ -86,7 +88,7 @@ class Filehandler {
          * @param position  The relative offset to the start of the file of the first byte
          * @param bytes     The amount of bytes that should be deleted
          */
-        void deleteBytes(std::uint32_t position, std::uint32_t bytes);
+        void deleteBytes(std::uint32_t position, std::uint32_t bytes) const noexcept;
 
 
         /**
@@ -96,7 +98,7 @@ class Filehandler {
          * @param position  The starting position of the pointer
          * @param bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint32_t position, const unsigned char bytes);
+        void readString(std::string &s, const std::uint32_t position, const unsigned char bytes) const noexcept;
 
 
         /**
@@ -107,25 +109,25 @@ class Filehandler {
          * @param way       The point of the file that the position is relative  to (eg. start, or end)
          * @param bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint32_t position, std::_Ios_Seekdir way, const unsigned char bytes);
+        void readString(std::string &s, const std::uint32_t position, std::_Ios_Seekdir way, const unsigned char bytes) const noexcept;
 
 
         /**
          * Reads the whole (text) file and puts every line into a vector of strings.
          * Then a shared_ptr to that vector is returned.
          */
-        std::shared_ptr<std::vector<std::string>> read();
+        std::shared_ptr<std::vector<std::string>> read() const noexcept;
 
 
         /**
          * Class destructor, closes the filestream if open.
          */
-        ~Filehandler();
+        ~Filehandler() noexcept;
 
 
     private:
         std::string m_filename;
-        std::ifstream m_stream;
+        mutable std::ifstream m_stream;
 
 
 };

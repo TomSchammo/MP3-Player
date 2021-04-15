@@ -48,7 +48,7 @@ struct TextAndPositionContainer {
  * @param handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
-bool dectectID3(Filehandler &handler);
+bool dectectID3(Filehandler &handler) noexcept;
 
 
 /**
@@ -57,7 +57,7 @@ bool dectectID3(Filehandler &handler);
  * @param handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
-bool detectID3Footer(Filehandler &handler);
+bool detectID3Footer(Filehandler &handler) noexcept;
 
 
 /**
@@ -66,7 +66,7 @@ bool detectID3Footer(Filehandler &handler);
  * @param handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the ID3 major version
  */
-std::uint8_t getVersion(Filehandler &handler);
+std::uint8_t getVersion(Filehandler &handler) noexcept;
 
 
 /**
@@ -75,7 +75,7 @@ std::uint8_t getVersion(Filehandler &handler);
  * @param handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the flags of the ID3 header
  */
-std::uint8_t getFlags(Filehandler &handler);
+std::uint8_t getFlags(Filehandler &handler) noexcept;
 
 
 /**
@@ -84,7 +84,7 @@ std::uint8_t getFlags(Filehandler &handler);
  * @param handler A reference to a Filehandler object to read from the file
  * @return 4 bytes that contain the size of the ID3 tag or the extended header
  */
-std::uint32_t getSize(Filehandler &handler, const bool extended);
+std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept;
 
 
 /**
@@ -121,13 +121,13 @@ std::uint32_t getSize(Filehandler &handler, const bool extended);
  * message instead of the decoded text and a posistion of 0.
  *
  * @param text_encoding The method that is used to encode the text
- * @param text          A pointer to a std::vector containing the text
+ * @param text          A shared pointer to a std::vector containing the text
  * @param position      An unsigned 32 bit integer indicating the start of the string
  *
  * @return a container struct that contains the decoded text and the updated value of
  *         the position argument as well as an error flag that should be false.
  */
-inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
+inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) noexcept {
 
     char c = data->at(position++);
 
@@ -223,7 +223,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 }
 
 
-inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) {
+inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) noexcept {
 
     auto result = decode_text_retain_position(text_encoding, data, position);
 
@@ -247,7 +247,7 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
  *
  * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
  */
-constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, bool syncsafe) {
+constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, bool syncsafe) noexcept {
 
     std::uint64_t factor = 0;
 
@@ -279,7 +279,7 @@ constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, 
  * @param number is the number that should be converted
  * @return a std::unique_ptr to a std::vector that contains the bytes
  */
-inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) {
+inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) noexcept {
 
     std::unique_ptr<std::vector<char>> bytes = std::make_unique<std::vector<char>>();
 
@@ -303,7 +303,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) {
  * @param size is the integer that will be converted
  * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
  */
-inline void convert_size(std::uint32_t size, char arr[4]) {
+inline void convert_size(std::uint32_t size, char arr[4]) noexcept {
 
     int i = 0;
     while (size > 127) {
@@ -329,7 +329,7 @@ inline void convert_size(std::uint32_t size, char arr[4]) {
  * @param  data The data that is supposed to be synchronized
  * @return A pointer to the data that has been synchronized
  */
-void synchronize(const unsigned char* data, std::uint32_t size);
+void synchronize(const unsigned char* data, std::uint32_t size) noexcept;
 
 
 /**
@@ -340,7 +340,7 @@ void synchronize(const unsigned char* data, std::uint32_t size);
  * @param handler  A reference to a Filehandler object to read/write to the file
  * @param position is the offset of the start of the frame relative to the start of the file
  */
-void increment_pc(Filehandler &handler, std::uint32_t position);
+void increment_pc(Filehandler &handler, std::uint32_t position) noexcept;
 
 
 /**
@@ -354,7 +354,7 @@ void increment_pc(Filehandler &handler, std::uint32_t position);
  *
  * @return a shared pointer to a vector that contains the data of the frame
  */
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position);
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) noexcept;
 
 
 /**
@@ -367,7 +367,7 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
  * @param frame_id The frameID of the frame
  * @param song     A reference to a {@class Song} object
  */
-void parseFrameData(std::unique_ptr<std::vector<char>> data, std::string frame_id, Song &song);
+void parseFrameData(std::unique_ptr<std::vector<char>> data, std::string frame_id, Song &song) noexcept;
 
 
 /**
@@ -375,7 +375,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> data, std::string frame_i
  *
  * @param song is a reference to a song object that represents the mp3 file.
  */
-void readID3(Song &song);
+void readID3(Song &song) noexcept;
 
 
 #endif // ID3_HPP

@@ -2,7 +2,7 @@
 #include <picture.hpp>
 
 
-bool detectID3(Filehandler &handler) {
+bool detectID3(Filehandler &handler) noexcept {
 
     std::string s;
     handler.readString(s, LOCATION_START, 3);
@@ -16,7 +16,7 @@ bool detectID3(Filehandler &handler) {
 }
 
 
-bool detectID3Footer(Filehandler &handler) {
+bool detectID3Footer(Filehandler &handler) noexcept {
 
     std::string s;
     handler.readString(s, LOCATION_START, std::ios::end, 3);
@@ -31,7 +31,7 @@ bool detectID3Footer(Filehandler &handler) {
 }
 
 
-std::uint8_t getVersion(Filehandler &handler) {
+std::uint8_t getVersion(Filehandler &handler) noexcept {
 
     char buffer[SIZE_OF_VERSION];
 
@@ -46,7 +46,7 @@ std::uint8_t getVersion(Filehandler &handler) {
 }
 
 
-std::uint8_t getFlags(Filehandler &handler) {
+std::uint8_t getFlags(Filehandler &handler) noexcept {
     char buffer[SIZE_OF_FLAGS];
 
     handler.readBytes(buffer, LOCATION_FLAGS, SIZE_OF_FLAGS);
@@ -55,7 +55,7 @@ std::uint8_t getFlags(Filehandler &handler) {
 }
 
 
-std::uint32_t getSize(Filehandler &handler, const bool extended) {
+std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept {
 
     const unsigned char BUFFER_LOCATION = extended ? SIZE_OF_HEADER : LOCATION_SIZE;
 
@@ -72,7 +72,7 @@ std::uint32_t getSize(Filehandler &handler, const bool extended) {
 }
 
 
-void synchronize(const char* data, std::uint32_t size) {
+void synchronize(const char* data, std::uint32_t size) noexcept {
 
     std::vector<char> bytes;
 
@@ -97,7 +97,7 @@ void synchronize(const char* data, std::uint32_t size) {
 }
 
 
-void increment_pc(Filehandler &handler, std::uint32_t position) {
+void increment_pc(Filehandler &handler, std::uint32_t position) noexcept {
 
     // TODO this needs some testing and fixing
 
@@ -195,7 +195,7 @@ void increment_pc(Filehandler &handler, std::uint32_t position) {
 }
 
 
-void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_id, Song &song) {
+void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_id, Song &song) noexcept {
 
     if (frame_id.compare("TIT2") == 0) {
 
@@ -395,7 +395,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
 }
 
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) {
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) noexcept {
 
     handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
 
@@ -481,7 +481,7 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
 }
 
 
-void readID3(Song &song) {
+void readID3(Song &song) noexcept {
 
     Filehandler handler = Filehandler(song.m_path);
 

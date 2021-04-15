@@ -1,11 +1,9 @@
-#include <cstdio>
 #include <filehandler.hpp>
 #include <fstream>
-#include <vector>
 #include <iostream>
 
 
-Filehandler::Filehandler(std::string filename) {
+Filehandler::Filehandler(std::string filename) noexcept {
     this->m_filename = filename;
 
     if (exists()) {
@@ -23,7 +21,7 @@ Filehandler::Filehandler(std::string filename) {
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) const noexcept {
 
     // TODO log debug
     std::cout << "Reading " << bytes << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
@@ -34,7 +32,7 @@ void Filehandler::readBytes(char buffer[], const std::uint32_t position, const s
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint32_t position, enum std::_Ios_Seekdir way, const std::uint32_t bytes) {
+void Filehandler::readBytes(char buffer[], const std::uint32_t position, enum std::_Ios_Seekdir way, const std::uint32_t bytes) const noexcept {
 
     // TODO log debug
     std::cout << "Reading " << bytes << " bytes starting at offset " << position
@@ -47,7 +45,7 @@ void Filehandler::readBytes(char buffer[], const std::uint32_t position, enum st
 }
 
 
-void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, std::uint32_t size) {
+void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, std::uint32_t size) const noexcept {
 
     std::ofstream stream;
 
@@ -64,7 +62,7 @@ void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, st
     stream.close();
 }
 
-void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) {
+void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) const noexcept {
 
     // TODO assert that all read/write operations were successful before deleting file at the end
 
@@ -234,7 +232,7 @@ void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) {
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint32_t position, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint32_t position, const unsigned char bytes) const noexcept {
 
     // TODO log debug
     std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from the file: " << m_filename << std::endl;
@@ -266,7 +264,7 @@ void Filehandler::readString(std::string &s, const std::uint32_t position, const
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint32_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) {
+void Filehandler::readString(std::string &s, const std::uint32_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) const noexcept {
 
     // TODO log debug
     std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position
@@ -331,7 +329,9 @@ std::shared_ptr<std::vector<std::string>> Filehandler::read() {
     return lines;
 }
 
-Filehandler::~Filehandler() {
+
+Filehandler::~Filehandler() noexcept {
+
     if(m_stream.is_open()) {
         std::cout << "Closing stream of " << m_filename << std::endl;
         m_stream.close();
