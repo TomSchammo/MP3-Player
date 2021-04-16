@@ -255,12 +255,12 @@ constexpr inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_si
     std::uint64_t number = 0;
 
     // going from last to first assuming that lsb is in the back
-    for (std::int32_t i = t_size - 1; i >= 0; --i) {
+    for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-        auto n = t_buffer[i] << factor;
+        std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i] << factor);
 
         if (t_syncsafe)
-            n = (n & (0x7f << (factor >> 0))) >> (factor >> 3);
+            n = (n & static_cast<std::uint64_t>(0x7f << (factor >> 0))) >> (factor >> 3);
 
         number |= n;
 
@@ -285,7 +285,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
     std::unique_ptr<std::vector<char>> bytes = std::make_unique<std::vector<char>>();
 
     while (t_number > (16*16)) {
-        std::uint8_t byte = t_number % (16*16);
+        std::uint8_t byte = static_cast<std::uint8_t>(t_number % (16*16));
         bytes->insert(bytes->begin(), static_cast<char>(byte));
 
         t_number = t_number >> 8;

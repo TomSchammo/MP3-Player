@@ -21,11 +21,11 @@ void Playlist::readM3U(const char* t_filename, std::vector<Song>& t_songlist) {
 
 void Playlist::shuffle(std::vector<Song>& t_playlist) {
 
-    srand(time(nullptr));
+    srand(static_cast<unsigned int>(time(nullptr)));
 
     for (auto i = t_playlist.size(); i > 1; --i) {
 
-        auto j = rand() % (i+1);
+        auto j = static_cast<unsigned long>(rand()) % (i+1);
 
         auto temp = t_playlist[i];
         t_playlist[i] = t_playlist[j];
