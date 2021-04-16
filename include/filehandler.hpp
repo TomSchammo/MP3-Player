@@ -26,9 +26,9 @@ class Filehandler {
          * Class constructor, initializes filename and opens a read only stream
          * for the file.
          *
-         * @param filename name of the file
+         * @param t_filename name of the file
          */
-        Filehandler(std::string filename) noexcept;
+        Filehandler(std::string t_filename) noexcept;
 
         // Enabling move operations
         Filehandler(Filehandler &&) = default;
@@ -39,7 +39,9 @@ class Filehandler {
          * @return true if the file exists, false otherwise.
          */
         inline bool exists() const noexcept {
+
             std::filesystem::path f(m_filename);
+
             return std::filesystem::exists(f);
         }
 
@@ -47,33 +49,33 @@ class Filehandler {
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position".
          *
-         * @param buffer    A char array, that the bytes will be written into
-         * @param position  The starting position of the pointer
-         * @param bytes     The number of bytes that should be read
+         * @param t_buffer    A char array, that the bytes will be written into
+         * @param t_position  The starting position of the pointer
+         * @param t_bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) const noexcept;
+        void readBytes(char t_buffer[], const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept;
 
 
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position".
          *
-         * @param buffer    A char array, that the bytes will be written into
-         * @param position  The starting position of the pointer
-         * @param way       The point of the file that the position is relative  to (eg. start, or end)
-         * @param bytes     The number of bytes that should be read
+         * @param t_buffer    A char array, that the bytes will be written into
+         * @param t_position  The starting position of the pointer
+         * @param t_way       The point of the file that the position is relative  to (eg. start, or end)
+         * @param t_bytes     The number of bytes that should be read
          */
-        void readBytes(char buffer[], const std::uint32_t position, std::_Ios_Seekdir way, const std::uint32_t bytes) const noexcept;
+        void readBytes(char t_buffer[], const std::uint32_t t_position, std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept;
 
 
         /**
          * Writes "bytes" to a file at offset "position" relative to the start of the file.
          * The bytes are appended at said position.
          *
-         * @param position is the offset relative to the start of the file where the data should be written to
-         * @param bytes    are the bytes that should be written to the file
-         * @param size     contains how many bytes should be written to the file
+         * @param t_position is the offset relative to the start of the file where the data should be written to
+         * @param t_bytes    are the bytes that should be written to the file
+         * @param t_size     contains how many bytes should be written to the file
          */
-        void writeBytes(const std::uint32_t position, const char bytes[], std::uint32_t size) const noexcept;
+        void writeBytes(const std::uint32_t t_position, const char t_bytes[], std::uint32_t t_size) const noexcept;
 
 
         /**
@@ -85,31 +87,31 @@ class Filehandler {
          * After successfully copying everything over, the old file is then deleted, and
          * the temporary file is renamed to the name of the original file.
          *
-         * @param position  The relative offset to the start of the file of the first byte
-         * @param bytes     The amount of bytes that should be deleted
+         * @param t_position  The relative offset to the start of the file of the first byte
+         * @param t_bytes     The amount of bytes that should be deleted
          */
-        void deleteBytes(std::uint32_t position, std::uint32_t bytes) const noexcept;
+        void deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) const noexcept;
 
 
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
          *
-         * @param s         A reference to a string that will contain the data after reading it from the file
-         * @param position  The starting position of the pointer
-         * @param bytes     The number of bytes that should be read
+         * @param t_string    A reference to a string that will contain the data after reading it from the file
+         * @param t_position  The starting position of the pointer
+         * @param t_bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint32_t position, const unsigned char bytes) const noexcept;
+        void readString(std::string& t_string, const std::uint32_t t_position, const unsigned char t_bytes) const noexcept;
 
 
         /**
          * Reads "bytes" bytes from a stream, starting at byte "position" and null terminates them.
          *
-         * @param s         A reference to a string that will contain the data after reading it from the file
-         * @param position  The starting position of the pointer
-         * @param way       The point of the file that the position is relative  to (eg. start, or end)
-         * @param bytes     The number of bytes that should be read
+         * @param t_string    A reference to a string that will contain the data after reading it from the file
+         * @param t_position  The starting position of the pointer
+         * @param t_way       The point of the file that the position is relative  to (eg. start, or end)
+         * @param t_bytes     The number of bytes that should be read
          */
-        void readString(std::string &s, const std::uint32_t position, std::_Ios_Seekdir way, const unsigned char bytes) const noexcept;
+        void readString(std::string& t_string, const std::uint32_t t_position, std::_Ios_Seekdir t_way, const unsigned char t_bytes) const noexcept;
 
 
         /**

@@ -1,15 +1,14 @@
 #include <filehandler.hpp>
-#include <fstream>
 #include <iostream>
 
 
-Filehandler::Filehandler(std::string filename) noexcept {
-    this->m_filename = filename;
+Filehandler::Filehandler(std::string t_filename) noexcept {
+    this->m_filename = t_filename;
 
     if (exists()) {
 
         // TODO log debug
-        std::cout << "Creating file handler object for file: " << filename << std::endl;
+        std::cout << "Creating file handler object for file: " << t_filename << std::endl;
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
@@ -21,31 +20,31 @@ Filehandler::Filehandler(std::string filename) noexcept {
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint32_t position, const std::uint32_t bytes) const noexcept {
+void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position << " from file: " << m_filename << std::endl;
+    std::cout << "Reading " << t_bytes << " bytes starting at offset " << t_position << " from file: " << m_filename << std::endl;
 
-    m_stream.seekg(position, std::ios::beg);
-    m_stream.read(buffer, bytes);
+    m_stream.seekg(t_position, std::ios::beg);
+    m_stream.read(t_buffer, t_bytes);
 
 }
 
 
-void Filehandler::readBytes(char buffer[], const std::uint32_t position, enum std::_Ios_Seekdir way, const std::uint32_t bytes) const noexcept {
+void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept {
 
     // TODO log debug
-    std::cout << "Reading " << bytes << " bytes starting at offset " << position
-        << " relative to the " << (way ==  std::ios_base::beg ? "beginning" : "end")
+    std::cout << "Reading " << t_bytes << " bytes starting at offset " << t_position
+        << " relative to the " << (t_way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
-    m_stream.seekg(position, way);
-    m_stream.read(buffer, bytes);
+    m_stream.seekg(t_position, t_way);
+    m_stream.read(t_buffer, t_bytes);
 
 }
 
 
-void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, std::uint32_t size) const noexcept {
+void Filehandler::writeBytes(const std::uint32_t t_position, const char* t_bytes, std::uint32_t t_size) const noexcept {
 
     std::ofstream stream;
 
@@ -53,16 +52,16 @@ void Filehandler::writeBytes(const std::uint32_t position, const char* bytes, st
     stream.open(m_filename, std::ios::binary | std::ios::out);
 
     // place position at specified offset
-    stream.seekp(position, std::ios::beg);
+    stream.seekp(t_position, std::ios::beg);
 
     // write bytes to the file
-    stream.write(bytes, size);
+    stream.write(t_bytes, t_size);
 
 
     stream.close();
 }
 
-void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) const noexcept {
+void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) const noexcept {
 
     // TODO assert that all read/write operations were successful before deleting file at the end
 
@@ -92,28 +91,28 @@ void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) const
 
 
             // while bytes left > size of buffer
-            while (static_cast<std::uint32_t>(m_stream.tellg()) - position >= SIZE_OF_BUFFER) {
+            while (static_cast<std::uint32_t>(m_stream.tellg()) - t_position >= SIZE_OF_BUFFER) {
                 m_stream.read(buffer, SIZE_OF_BUFFER);
                 stream.write(buffer, SIZE_OF_BUFFER);
             }
 
             // dynamically creating buffer to get the last portion of the file
-            char* pbuffer = new char[position % SIZE_OF_BUFFER];
+            char* pbuffer = new char[t_position % SIZE_OF_BUFFER];
 
-            m_stream.read(pbuffer, position % SIZE_OF_BUFFER);
-            stream.write(pbuffer, position % SIZE_OF_BUFFER);
+            m_stream.read(pbuffer, t_position % SIZE_OF_BUFFER);
+            stream.write(pbuffer, t_position % SIZE_OF_BUFFER);
 
             delete [] pbuffer;
 
             // skipping the bytes that are supposed to be deleted
-            m_stream.seekg(bytes, std::ios::cur);
+            m_stream.seekg(t_bytes, std::ios::cur);
             auto current = m_stream.tellg();
             auto size_remaining = EOF_ - current;
 
 
             // if the last byte(s) have been removed there is no point in continueing
             if (size_remaining > 0) {
-                m_stream.seekg(bytes, std::ios::cur);
+                m_stream.seekg(t_bytes, std::ios::cur);
 
                 // copying the rest of the file
                 while (size_remaining >= SIZE_OF_BUFFER) {
@@ -232,73 +231,73 @@ void Filehandler::deleteBytes(std::uint32_t position, std::uint32_t bytes) const
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint32_t position, const unsigned char bytes) const noexcept {
+void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const unsigned char t_bytes) const noexcept {
 
     // TODO log debug
-    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position << " from the file: " << m_filename << std::endl;
+    std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position << " from the file: " << m_filename << std::endl;
 
-    char* buffer = new char[bytes];
+    char* buffer = new char[t_bytes];
 
-    m_stream.seekg(position, std::ios::beg);
-    m_stream.read(buffer, bytes);
+    m_stream.seekg(t_position, std::ios::beg);
+    m_stream.read(buffer, t_bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
-    if (buffer[bytes - 1] != '\0') {
+    if (buffer[t_bytes - 1] != '\0') {
         // TODO log debug
         std::cout << "String is not null terminated..." << std::endl;
 
-        char* newBuffer = new char[bytes + 1];
-        for (int i = 0; i < bytes; ++i) {
+        char* newBuffer = new char[t_bytes + 1];
+        for (int i = 0; i < t_bytes; ++i) {
            newBuffer[i] = buffer[i];
         }
 
-        newBuffer[bytes] = '\0';
+        newBuffer[t_bytes] = '\0';
 
         delete [] buffer;
         buffer = newBuffer;
     }
 
-    s = buffer;
+    t_string = buffer;
     delete []  buffer;
 }
 
 
-void Filehandler::readString(std::string &s, const std::uint32_t position, enum std::_Ios_Seekdir way, const unsigned char bytes) const noexcept {
+void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const unsigned char t_bytes) const noexcept {
 
     // TODO log debug
-    std::cout << "Reading " << int(bytes) << " bytes starting at offset " << position
-        << " relative to the " << (way ==  std::ios_base::beg ? "beginning" : "end")
+    std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position
+        << " relative to the " << (t_way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
-    char* buffer = new char[bytes];
+    char* buffer = new char[t_bytes];
 
-    m_stream.seekg(position, way);
-    m_stream.read(buffer, bytes);
+    m_stream.seekg(t_position, t_way);
+    m_stream.read(buffer, t_bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
-    if (buffer[bytes - 1] != '\0') {
+    if (buffer[t_bytes - 1] != '\0') {
         // TODO log info
         std::cout << "String is not null terminated..." << std::endl;
 
-        char* newBuffer = new char[bytes + 1];
-        for (int i = 0; i < bytes; ++i) {
+        char* newBuffer = new char[t_bytes + 1];
+        for (int i = 0; i < t_bytes; ++i) {
            newBuffer[i] = buffer[i];
         }
 
-        newBuffer[bytes] = '\0';
+        newBuffer[t_bytes] = '\0';
 
         delete [] buffer;
         buffer = newBuffer;
     }
 
-    s = buffer;
+    t_string = buffer;
     delete [] buffer;
 }
 
 
-std::shared_ptr<std::vector<std::string>> Filehandler::read() {
+std::shared_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 
     // TODO log info
     std::cout << "Reading file: " << m_filename << std::endl;

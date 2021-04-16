@@ -57,7 +57,7 @@ public:
 
 public:
     Song() = delete;
-    Song(std::string &path);
+    Song(std::string& t_path);
 
     /**
      * Print information contained in song object to standard out.

@@ -45,46 +45,48 @@ struct TextAndPositionContainer {
 /**
  * Checks whether ID3 metadata prepended to the file.
  *
- * @param handler A reference to a Filehandler object to read from the file
+ * @param t_handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
-bool dectectID3(Filehandler &handler) noexcept;
+bool dectectID3(Filehandler& t_handler) noexcept;
 
 
 /**
  * Checks whether ID3 metadata appended to the file.
  *
- * @param handler A reference to a Filehandler object to read from the file
+ * @param t_handler A reference to a Filehandler object to read from the file
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
-bool detectID3Footer(Filehandler &handler) noexcept;
+bool detectID3Footer(Filehandler& t_handler) noexcept;
 
 
 /**
  * Reads the byte that contains the version of the ID3 Tag
  *
- * @param handler A reference to a Filehandler object to read from the file
+ * @param t_handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the ID3 major version
  */
-std::uint8_t getVersion(Filehandler &handler) noexcept;
+std::uint8_t getVersion(Filehandler& t_handler) noexcept;
 
 
 /**
  * Reads the byte that contains the flags in the ID3 header, and returns it
  *
- * @param handler A reference to a Filehandler object to read from the file
+ * @param t_handler A reference to a Filehandler object to read from the file
  * @return a byte that contains the flags of the ID3 header
  */
-std::uint8_t getFlags(Filehandler &handler) noexcept;
+std::uint8_t getFlags(Filehandler& t_handler) noexcept;
 
 
 /**
  * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
  *
- * @param handler A reference to a Filehandler object to read from the file
+ * @param t_handler  A reference to a Filehandler object to read from the file
+ * @param t_extended A boolean indicating whether I'm looking for the size of a standard or extended header
+ *
  * @return 4 bytes that contain the size of the ID3 tag or the extended header
  */
-std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept;
+std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
 
 
 /**
@@ -120,30 +122,30 @@ std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept;
  * a flag indicating an error will be set to true along with an error
  * message instead of the decoded text and a posistion of 0.
  *
- * @param text_encoding The method that is used to encode the text
- * @param text          A shared pointer to a std::vector containing the text
- * @param position      An unsigned 32 bit integer indicating the start of the string
+ * @param t_text_encoding The method that is used to encode the text
+ * @param t_text          A shared pointer to a std::vector containing the text
+ * @param t_position      An unsigned 32 bit integer indicating the start of the string
  *
  * @return a container struct that contains the decoded text and the updated value of
  *         the position argument as well as an error flag that should be false.
  */
-inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) noexcept {
+inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_encoding, std::shared_ptr<std::vector<char>> t_data, std::uint32_t t_position) noexcept {
 
-    char c = data->at(position++);
+    char c = t_data->at(t_position++);
 
     std::string text = "";
 
     // Text is encoded using ISO-8859-1 standard
     // and using null terminated by 0x00,
     // (1 'zero' byte).
-    if (text_encoding == 0x00) {
+    if (t_text_encoding == 0x00) {
 
         // TODO log debug
         std::cout << "Decoding ISO-8859-1 encoded text" << std::endl;
 
         while (c != 0x00) {
             text += c;
-            c = data->at(position++);
+            c = t_data->at(t_position++);
         }
     }
 
@@ -158,7 +160,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
     //
     // The text is null terminated by 0x0000
     // (2 'zero' bytes).
-    else if (text_encoding == 0x01) {
+    else if (t_text_encoding == 0x01) {
 
         // TODO log debug
         std::cout << "Decoding UTF-16 encoded Unicode" << std::endl;
@@ -178,7 +180,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
     // The text UTF-16B encoded Unicode without BOM.
     // It is null terminated by 0x0000 (2 'zero' bytes)
-    else if (text_encoding == 0x02) {
+    else if (t_text_encoding == 0x02) {
 
         // TODO log debug
         std::cout << "Decoding UTF-16B encoded Unicode" << std::endl;
@@ -192,20 +194,20 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
 
             terminated = c == 0x00 ? terminated + 1 : 0;
 
-            c = data->at(position++);
+            c = t_data->at(t_position++);
         }
     }
 
     // The text is UTF-8 encoded Unicode.
     // It is terminated by 0x00 (1 'zero' byte)
-    else if (text_encoding == 0x03) {
+    else if (t_text_encoding == 0x03) {
 
         // TODO log debug
         std::cout << "Decoding UTF-8 encoded Unicode" << std::endl;
 
         while (c != 0x00) {
             text += c;
-            c = data->at(position++);
+            c = t_data->at(t_position++);
         }
     }
 
@@ -213,19 +215,19 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t text_en
     else {
 
         // TODO log error
-        std::cout << "'0x" << std::hex << int(text_encoding) << "' is not a valid value for text_encoding" << std::endl;
+        std::cout << "'0x" << std::hex << int(t_text_encoding) << "' is not a valid value for text_encoding" << std::endl;
 
-        return {"0x" + std::to_string(int(text_encoding)) + " is not a valid encoding method", 0, true};
+        return {"0x" + std::to_string(int(t_text_encoding)) + " is not a valid encoding method", 0, true};
     }
 
-    return {text, position, false};
+    return {text, t_position, false};
 
 }
 
 
-inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::vector<char>> data, std::uint32_t position) noexcept {
+inline std::string decode_text(std::uint8_t t_text_encoding, std::shared_ptr<std::vector<char>> t_data, std::uint32_t t_position) noexcept {
 
-    auto result = decode_text_retain_position(text_encoding, data, position);
+    auto result = decode_text_retain_position(t_text_encoding, t_data, t_position);
 
     if (!result.error)
         return result.text;
@@ -241,24 +243,24 @@ inline std::string decode_text(std::uint8_t text_encoding, std::shared_ptr<std::
  *
  * So {0, 0, 1, 63} (coming from {0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
  *
- * @param buffer   is a char array that contains the data
- * @param size     is the size of the char array
- * @param syncsafe is true if the data should be converted into a syncsafe integer
+ * @param t_buffer   is a char array that contains the data
+ * @param t_size     is the size of the char array
+ * @param t_syncsafe is true if the data should be converted into a syncsafe integer
  *
  * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
  */
-constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, bool syncsafe) noexcept {
+constexpr inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size, bool t_syncsafe) noexcept {
 
     std::uint64_t factor = 0;
 
     std::uint64_t number = 0;
 
     // going from last to first assuming that lsb is in the back
-    for (std::int32_t i = size - 1; i >= 0; --i) {
+    for (std::int32_t i = t_size - 1; i >= 0; --i) {
 
-        auto n = buffer[i] << factor;
+        auto n = t_buffer[i] << factor;
 
-        if (syncsafe)
+        if (t_syncsafe)
             n = (n & (0x7f << (factor >> 0))) >> (factor >> 3);
 
         number |= n;
@@ -276,18 +278,18 @@ constexpr inline std::uint64_t convert_bytes(char buffer[], std::uint32_t size, 
  *
  * A unique_ptr to that vector is then returned.
  *
- * @param number is the number that should be converted
+ * @param t_number is the number that should be converted
  * @return a std::unique_ptr to a std::vector that contains the bytes
  */
-inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) noexcept {
+inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) noexcept {
 
     std::unique_ptr<std::vector<char>> bytes = std::make_unique<std::vector<char>>();
 
-    while (number > (16*16)) {
-        std::uint8_t byte = number % (16*16);
+    while (t_number > (16*16)) {
+        std::uint8_t byte = t_number % (16*16);
         bytes->insert(bytes->begin(), static_cast<char>(byte));
 
-        number = number >> 8;
+        t_number = t_number >> 8;
     }
 
     return bytes;
@@ -300,19 +302,19 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t number) noex
  * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b01111111
  * for example.
  *
- * @param size is the integer that will be converted
- * @param arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
+ * @param t_size is the integer that will be converted
+ * @param t_arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
  */
-inline void convert_size(std::uint32_t size, char arr[4]) noexcept {
+inline void convert_size(std::uint32_t t_size, char t_arr[4]) noexcept {
 
     int i = 0;
-    while (size > 127) {
-        arr[i] = 127;
-        size -= 127;
+    while (t_size > 127) {
+        t_arr[i] = 127;
+        t_size -= 127;
         ++i;
     }
 
-    arr[i+1] = static_cast<char>(size);
+    t_arr[i+1] = static_cast<char>(t_size);
 }
 
 
@@ -326,10 +328,12 @@ inline void convert_size(std::uint32_t size, char arr[4]) noexcept {
  *
  * See https://id3.org/id3v2.4.0-structure section 6.1 for more information.
  *
- * @param  data The data that is supposed to be synchronized
+ * @param  t_data The data that is supposed to be synchronized
+ * @param  t_size The size of the data array
+ *
  * @return A pointer to the data that has been synchronized
  */
-void synchronize(const unsigned char* data, std::uint32_t size) noexcept;
+void synchronize(const unsigned char* t_data, std::uint32_t t_size) noexcept;
 
 
 /**
@@ -337,10 +341,10 @@ void synchronize(const unsigned char* data, std::uint32_t size) noexcept;
  *
  * Reads the content of a PCNT frame and increases it by 1.
  *
- * @param handler  A reference to a Filehandler object to read/write to the file
- * @param position is the offset of the start of the frame relative to the start of the file
+ * @param t_handler  A reference to a Filehandler object to read/write to the file
+ * @param t_position is the offset of the start of the frame relative to the start of the file
  */
-void increment_pc(Filehandler &handler, std::uint32_t position) noexcept;
+void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept;
 
 
 /**
@@ -348,13 +352,13 @@ void increment_pc(Filehandler &handler, std::uint32_t position) noexcept;
  * as a shared pointer to a vector that contains the raw bytes,
  * so that it can be parsed by another function.
  *
- * @param handler          A reference to a Filehandler object to read from the file
- * @param frame_id         A reference to a string that will be set to the frame id
- * @param position         The starting position of the frame in the file
+ * @param t_handler          A reference to a Filehandler object to read from the file
+ * @param t_frame_id         A reference to a string that will be set to the frame id
+ * @param t_position         The starting position of the frame in the file
  *
  * @return a shared pointer to a vector that contains the data of the frame
  */
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) noexcept;
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept;
 
 
 /**
@@ -363,19 +367,19 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
  *
  * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
  *
- * @param data     The data of the ID3 frame
- * @param frame_id The frameID of the frame
- * @param song     A reference to a {@class Song} object
+ * @param t_data     The data of the ID3 frame
+ * @param t_frame_id The frameID of the frame
+ * @param t_song     A reference to a {@class Song} object
  */
-void parseFrameData(std::unique_ptr<std::vector<char>> data, std::string frame_id, Song &song) noexcept;
+void parseFrameData(std::unique_ptr<std::vector<char>> t_data, std::string t_frame_id, Song& t_song) noexcept;
 
 
 /**
  * Function to extract ID3 encapsulated metadata from an mp3 file.
  *
- * @param song is a reference to a song object that represents the mp3 file.
+ * @param t_song is a reference to a song object that represents the mp3 file.
  */
-void readID3(Song &song) noexcept;
+void readID3(Song& t_song) noexcept;
 
 
 #endif // ID3_HPP

@@ -2,10 +2,10 @@
 #include <picture.hpp>
 
 
-bool detectID3(Filehandler &handler) noexcept {
+bool detectID3(Filehandler& t_handler) noexcept {
 
     std::string s;
-    handler.readString(s, LOCATION_START, 3);
+    t_handler.readString(s, LOCATION_START, 3);
 
     bool result = s.compare("ID3") == 0;
 
@@ -16,10 +16,10 @@ bool detectID3(Filehandler &handler) noexcept {
 }
 
 
-bool detectID3Footer(Filehandler &handler) noexcept {
+bool detectID3Footer(Filehandler& t_handler) noexcept {
 
     std::string s;
-    handler.readString(s, LOCATION_START, std::ios::end, 3);
+    t_handler.readString(s, LOCATION_START, std::ios::end, 3);
 
 
     bool result = s.compare("3DI") == 0;
@@ -31,11 +31,11 @@ bool detectID3Footer(Filehandler &handler) noexcept {
 }
 
 
-std::uint8_t getVersion(Filehandler &handler) noexcept {
+std::uint8_t getVersion(Filehandler& t_handler) noexcept {
 
     char buffer[SIZE_OF_VERSION];
 
-    handler.readBytes(buffer, LOCATION_VERSION, SIZE_OF_VERSION);
+    t_handler.readBytes(buffer, LOCATION_VERSION, SIZE_OF_VERSION);
 
     std::uint8_t version = static_cast<std::uint8_t>(*buffer);
 
@@ -46,23 +46,23 @@ std::uint8_t getVersion(Filehandler &handler) noexcept {
 }
 
 
-std::uint8_t getFlags(Filehandler &handler) noexcept {
+std::uint8_t getFlags(Filehandler& t_handler) noexcept {
     char buffer[SIZE_OF_FLAGS];
 
-    handler.readBytes(buffer, LOCATION_FLAGS, SIZE_OF_FLAGS);
+    t_handler.readBytes(buffer, LOCATION_FLAGS, SIZE_OF_FLAGS);
 
     return static_cast<std::uint8_t>(*buffer);
 }
 
 
-std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept {
+std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 
-    const unsigned char BUFFER_LOCATION = extended ? SIZE_OF_HEADER : LOCATION_SIZE;
+    const unsigned char BUFFER_LOCATION = t_extended ? SIZE_OF_HEADER : LOCATION_SIZE;
 
     // Have to do this, since C++ doesn't support variable length arrays
     std::vector<char> buffer(SIZE_OF_SIZE);
 
-    handler.readBytes(buffer.data(), BUFFER_LOCATION, SIZE_OF_SIZE);
+    t_handler.readBytes(buffer.data(), BUFFER_LOCATION, SIZE_OF_SIZE);
 
 
     // TODO max size of tag (update this as well as position)
@@ -72,44 +72,44 @@ std::uint32_t getSize(Filehandler &handler, const bool extended) noexcept {
 }
 
 
-void synchronize(const char* data, std::uint32_t size) noexcept {
+void synchronize(const char* t_data, std::uint32_t t_size) noexcept {
 
     std::vector<char> bytes;
 
     bool sync = true;
 
-    for (std::uint32_t i = 0; i < size; ++i) {
+    for (std::uint32_t i = 0; i < t_size; ++i) {
         if (sync) {
-            bytes.push_back(data[i]);
-            sync = (static_cast<unsigned char>(data[i]) != 0xff);
+            bytes.push_back(t_data[i]);
+            sync = (static_cast<unsigned char>(t_data[i]) != 0xff);
         }
 
         else {
-            if (data[i] != 0x00)
-                bytes.push_back(data[i]);
+            if (t_data[i] != 0x00)
+                bytes.push_back(t_data[i]);
 
             sync = true;
         }
 
     }
 
-    data = bytes.data();
+    t_data = bytes.data();
 }
 
 
-void increment_pc(Filehandler &handler, std::uint32_t position) noexcept {
+void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 
     // TODO this needs some testing and fixing
 
     // saving the position of the start of the header, as I will need this later
-    std::uint32_t original_position = position;
+    std::uint32_t original_position = t_position;
 
     std::string frame_id;
 
     // read counter and convert it from a null terminated hex string to a number
     // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
-    if (auto data = readFrame(handler, frame_id, position)) {
+    if (auto data = readFrame(t_handler, frame_id, t_position)) {
 
         // frame data is never more than std::uint32_t
         std::uint32_t size = static_cast<std::uint32_t>((*data)->size());
@@ -153,7 +153,7 @@ void increment_pc(Filehandler &handler, std::uint32_t position) noexcept {
         char buffer_flags[2];
 
         // read flags
-        handler.readBytes(buffer_flags, offset + 4, 2);
+        t_handler.readBytes(buffer_flags, offset + 4, 2);
 
         // copy flags over to that buffer as well
         for (char byte : buffer_flags) {
@@ -186,8 +186,8 @@ void increment_pc(Filehandler &handler, std::uint32_t position) noexcept {
 
         // TODO data not null terminated, is it supposed to be?
         // TODO currently it's a string, we might not want this
-        handler.deleteBytes(offset, 4 + 2 + size);
-        handler.writeBytes(offset, payload, 4 + 2 + data_size);
+        t_handler.deleteBytes(offset, 4 + 2 + size);
+        t_handler.writeBytes(offset, payload, 4 + 2 + data_size);
 
         delete [] payload;
     }
@@ -195,65 +195,65 @@ void increment_pc(Filehandler &handler, std::uint32_t position) noexcept {
 }
 
 
-void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_id, Song &song) noexcept {
+void parseFrameData(std::shared_ptr<std::vector<char>> t_data, std::string t_frame_id, Song& t_song) noexcept {
 
-    if (frame_id.compare("TIT2") == 0) {
+    if (t_frame_id.compare("TIT2") == 0) {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(data->at(0), data, 1);
+        std::string content = decode_text(t_data->at(0), t_data, 1);
 
         // TODO log verbose
         std::cout << "Found a TIT2 frame, setting song title to: " << content << std::endl;
 
-        song.m_title = content;
+        t_song.m_title = content;
 
-    } else if (frame_id.compare("TALB") == 0) {
+    } else if (t_frame_id.compare("TALB") == 0) {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(data->at(0), data, 1);
+        std::string content = decode_text(t_data->at(0), t_data, 1);
 
         // TODO log verbose
         std::cout << "Found a TALB frame, setting album title to: " << content << std::endl;
 
-        song.m_album = content;
+        t_song.m_album = content;
 
-    } else if (frame_id.compare("TPE1") == 0) {
+    } else if (t_frame_id.compare("TPE1") == 0) {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(data->at(0), data, 1);
+        std::string content = decode_text(t_data->at(0), t_data, 1);
 
         // TODO log verbose
         std::cout << "Found a TPE1 frame, setting artist to: " << content << std::endl;
 
-        song.m_artist = content;
+        t_song.m_artist = content;
 
-    } else if (frame_id.compare("TDRL") == 0) {
+    } else if (t_frame_id.compare("TDRL") == 0) {
 
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
         // TODO deal with possibility of having an error
-        std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
+        std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
 
         // TODO log verbose
         std::cout << "Found a TDRL frame setting release year to: " << content << std::endl;
 
-        song.m_release = content;
+        t_song.m_release = content;
 
-    } else if (frame_id.compare("TDRC") == 0) {
+    } else if (t_frame_id.compare("TDRC") == 0) {
 
         // release year has precedence over recording year but if
         // there is no TDRL frame, this frame will be used for the date instead
-        if (song.m_release.compare("") == 0) {
+        if (t_song.m_release.compare("") == 0) {
 
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data->at(0), data, 1).substr(0, 5);
+            std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
 
             // TODO log verbose
             std::cout << "Found a TDRC frame setting release year to: " << content << std::endl;
 
-            song.m_release = content;
+            t_song.m_release = content;
         }
 
         else {
@@ -262,33 +262,33 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
             std::cout << "Found a TDRC frame, but release year has already been set. Skipping..." << std::endl;
         }
 
-    } else if (frame_id.compare("TLEN") == 0) {
+    } else if (t_frame_id.compare("TLEN") == 0) {
 
-        auto len = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
+        auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
 
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
 
-        song.m_duration = len;
+        t_song.m_duration = len;
 
-    } else if (frame_id.compare("TDLY") == 0) {
+    } else if (t_frame_id.compare("TDLY") == 0) {
 
-        auto delay = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
+        auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
 
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
 
-        song.m_delay = delay;
+        t_song.m_delay = delay;
 
-    } else if (frame_id.compare("TCON") == 0) {
+    } else if (t_frame_id.compare("TCON") == 0) {
 
         // custom genres have precedence over content type but if
         // there is no custom genre set, this frame will be used for the genre instead
         // TODO this is different for older tag versions
-        if (song.m_genre.compare("Unknown Genre") == 0) {
+        if (t_song.m_genre.compare("Unknown Genre") == 0) {
 
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data->at(0), data, 1);
+            std::string content = decode_text(t_data->at(0), t_data, 1);
 
             // TODO log verbose
             std::cout << "Found a TCON frame, setting genre to: " << content << std::endl;
@@ -296,10 +296,10 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
             // TODO not sure if this is always fine (as there can also be numbers apparently)
             //      so maybe this is not the correct way to "parse" the data, but I'll have to
             //      check with more files.
-            song.m_genre = content;
+            t_song.m_genre = content;
         }
 
-    } else if (frame_id.compare("TRCK") == 0) {
+    } else if (t_frame_id.compare("TRCK") == 0) {
 
         // TODO log info
         std::cout << "Found a TRCK frame, setting track number to: ";
@@ -308,7 +308,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
         // TRCK frame can contain a / with the total amount of tracks
         // after the track number. I don't care about that
-        for (char c : *data) {
+        for (char c : *t_data) {
             if (c == '/')
                 break;
             else
@@ -318,9 +318,9 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         // TODO log info
         std::cout << track_number << std::endl;
 
-        song.m_track_number = track_number;
+        t_song.m_track_number = track_number;
 
-    } else if (frame_id.compare("APIC") == 0) {
+    } else if (t_frame_id.compare("APIC") == 0) {
 
         // TODO log info
         std::cout << "Found an APIC frame" << std::endl;
@@ -328,23 +328,23 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
         std::uint32_t iterator = 0;
 
         // byte indicating text encoding
-        std::uint8_t text_encoding = data->at(iterator++);
+        std::uint8_t text_encoding = t_data->at(iterator++);
 
         std::string mime_type = "";
 
-        char c = data->at(iterator);
+        char c = t_data->at(iterator);
 
         while (c != 0) {
             mime_type += c;
-            c = data->at(++iterator);
+            c = t_data->at(++iterator);
         }
 
         // TODO log debug
         std::cout << "Found picture with MIME type: " << mime_type << std::endl;
 
-        ID3::PictureType pic_type = static_cast<ID3::PictureType>(data->at(iterator++));
+        ID3::PictureType pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
 
-        auto container = decode_text_retain_position(text_encoding, data, iterator);
+        auto container = decode_text_retain_position(text_encoding, t_data, iterator);
 
         if (!container.error) {
 
@@ -356,8 +356,8 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
 
             // extracting picture data
-            while (iterator < data->size()) {
-                pic_data->push_back(data->at(iterator++));
+            while (iterator < t_data->size()) {
+                pic_data->push_back(t_data->at(iterator++));
             }
 
 
@@ -365,7 +365,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
             // TODO not sure if a copy is the best idea here, but I'll leave
             //      it like this for now
-            song.m_art.push_back(art);
+            t_song.m_art.push_back(art);
 
         }
 
@@ -376,18 +376,18 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
             std::cout << container.text << std::endl;
         }
 
-    } else if (frame_id.compare("PCNT") == 0) {
+    } else if (t_frame_id.compare("PCNT") == 0) {
 
-        std::uint64_t play_counter = convert_bytes(data->data(), static_cast<std::uint32_t>(data->size()), false);
+        std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
 
         // TODO log info
         std::cout << "Found an PCNT frame, setting play counter to: " << play_counter << std::endl;
 
-        song.m_play_counter = play_counter;
+        t_song.m_play_counter = play_counter;
 
     } else {
         // TODO log warn
-        std::cout << "frame id: " << frame_id << " is not supported yet" << std::endl;
+        std::cout << "frame id: " << t_frame_id << " is not supported yet" << std::endl;
     }
 
     // TODO TFLT (audio type, default is MPEG)
@@ -395,11 +395,11 @@ void parseFrameData(std::shared_ptr<std::vector<char>> data, std::string frame_i
 
 }
 
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler, std::string &frame_id, std::uint32_t &position) noexcept {
+std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept {
 
-    handler.readString(frame_id, position, SIZE_OF_FRAME_ID);
+    t_handler.readString(t_frame_id, t_position, SIZE_OF_FRAME_ID);
 
-    if (frame_id[0] == 0x00) {
+    if (t_frame_id[0] == 0x00) {
         // TODO log debug
         std::cout << "Encountered a frame id starting with 0x00 which is probably due to padding...\n"
                   <<  "Skipping to the end of the tag." << std::endl;
@@ -407,19 +407,19 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
         return {};
     }
 
-    position += SIZE_OF_FRAME_ID;
+    t_position += SIZE_OF_FRAME_ID;
 
     char size_buffer[SIZE_OF_SIZE];
 
-    handler.readBytes(size_buffer, position, SIZE_OF_SIZE);
+    t_handler.readBytes(size_buffer, t_position, SIZE_OF_SIZE);
 
     std::uint32_t frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE, true));
 
-    position += SIZE_OF_SIZE;
+    t_position += SIZE_OF_SIZE;
 
     char flags_buffer[2];
 
-    handler.readBytes(flags_buffer, position, 2);
+    t_handler.readBytes(flags_buffer, t_position, 2);
 
     std::uint8_t status_flags = flags_buffer[0];
 
@@ -459,16 +459,16 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
         // TODO put data of group frames together
     }
 
-    position += 2;
+    t_position += 2;
 
-    std::cout << "reading " << frame_data_size << " bytes of frame with id " << frame_id << std::endl;
+    std::cout << "reading " << frame_data_size << " bytes of frame with id " << t_frame_id << std::endl;
 
     auto frame_content = std::make_unique<std::vector<char>>(frame_data_size);
 
-    handler.readBytes(frame_content->data(), position, frame_data_size);
+    t_handler.readBytes(frame_content->data(), t_position, frame_data_size);
 
     // taking frame data in account when updating position
-    position += frame_data_size;
+    t_position += frame_data_size;
 
     // synchronizing frame data
     if (format_flags & (1 << 1)) {
@@ -481,9 +481,9 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler &handler
 }
 
 
-void readID3(Song &song) noexcept {
+void readID3(Song& t_song) noexcept {
 
-    Filehandler handler = Filehandler(song.m_path);
+    Filehandler handler = Filehandler(t_song.m_path);
 
     if (detectID3(handler)) {
         auto version = getVersion(handler);
@@ -569,7 +569,7 @@ void readID3(Song &song) noexcept {
                     if (frame_id.compare("PCNT") == 0) {
 
                         // setting posistion of start of play counter frame
-                        song.m_counter_offset = original_position_file;
+                        t_song.m_counter_offset = original_position_file;
 
                     }
 
@@ -589,7 +589,7 @@ void readID3(Song &song) noexcept {
                         std::cout << "frame_id has not been set properly" << std::endl;
                     }
 
-                    parseFrameData(frame_content, frame_id, song);
+                    parseFrameData(frame_content, frame_id, t_song);
 
                 }
             }
@@ -600,7 +600,7 @@ void readID3(Song &song) noexcept {
     }
     else {
         // TODO log debug
-        std::cout << "No ID3 Tag has been prepended to file: " << song.m_path << std::endl;
+        std::cout << "No ID3 Tag has been prepended to file: " << t_song.m_path << std::endl;
     }
 }
 
