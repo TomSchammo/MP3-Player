@@ -9,7 +9,6 @@
 #ifndef PLAYLIST_HPP
 #define PLAYLIST_HPP
 
-#include <vector>
 #include <song.hpp>
 
 namespace Playlist {

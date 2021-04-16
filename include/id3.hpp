@@ -14,7 +14,6 @@
 #include <filehandler.hpp>
 #include <song.hpp>
 #include <iostream>
-#include <string>
 
 // constants
 constexpr std::uint8_t LOCATION_START = 0;
