@@ -2,7 +2,7 @@ SHELL = /bin/sh
 
 CXX	 := -gcc
 ERRFLAGS := -pedantic-errors -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align \
-			-Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wmisleading-indentation \
+			-Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion -Wmisleading-indentation \
 			-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast \
 			-Wdouble-promotion -Wformat=2
 CXXFLAGS := -std=c++17 $(ERRFLAGS)
