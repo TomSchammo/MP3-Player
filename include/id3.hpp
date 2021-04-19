@@ -32,6 +32,13 @@ constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
 // TODO reconsider readID3 return type
 // TODO consider wrapping everything in namespace
 
+/*
+ * Container for text read from a buffer, the current position in
+ * the buffer (position of the end of the text) and an error flag.
+ *
+ * If the error flag is set to true, the text variable contains
+ * the error message and the position is set to 0.
+ */
 struct TextAndPositionContainer {
 
     std::string text;
