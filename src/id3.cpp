@@ -112,10 +112,10 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
     if (auto data = readFrame(t_handler, frame_id, t_position)) {
 
         // frame data is never more than std::uint32_t
-        std::uint32_t size = static_cast<std::uint32_t>((*data)->size());
+        std::uint32_t size = static_cast<std::uint32_t>(data->size());
 
         // read counter (and convert it from base 16 to base 10)
-        std::uint64_t counter = convert_bytes(((*data)->data()), size, false);
+        std::uint64_t counter = convert_bytes((data->data()), size, false);
 
         counter += 1;
 
@@ -395,7 +395,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> t_data, std::string t_fra
 
 }
 
-std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept {
+std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept {
 
     t_handler.readString(t_frame_id, t_position, SIZE_OF_FRAME_ID);
 
@@ -404,7 +404,7 @@ std::optional<std::shared_ptr<std::vector<char>>> readFrame(Filehandler& t_handl
         std::cout << "Encountered a frame id starting with 0x00 which is probably due to padding...\n"
                   <<  "Skipping to the end of the tag." << std::endl;
 
-        return {};
+        return nullptr;
     }
 
     t_position += SIZE_OF_FRAME_ID;
@@ -552,10 +552,11 @@ void readID3(Song& t_song) noexcept {
 
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
-                auto result = readFrame(handler, frame_id, position);
+                auto frame_content = readFrame(handler, frame_id, position);
 
                 // There are no frames left, the rest is padding
-                if (!result.has_value()) {
+                if (frame_content == nullptr) {
+
                     // TODO log debug
                     std::cout << "Result has no value, so read a frame_id starting with 0x00" << std::endl;
 
@@ -564,7 +565,6 @@ void readID3(Song& t_song) noexcept {
                 }
 
                 else {
-                    auto frame_content = result.value();
 
                     if (frame_id.compare("PCNT") == 0) {
 
