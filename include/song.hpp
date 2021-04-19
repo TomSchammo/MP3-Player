@@ -56,7 +56,7 @@ public:
     std::vector<ID3::Picture> m_art{};
 
 public:
-    Song(std::string& t_path);
+    Song(const std::string& t_path);
 
     Song() = delete;
     Song(const Song&) = default;

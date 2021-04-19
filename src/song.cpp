@@ -2,10 +2,9 @@
 #include <iostream>
 
 
-Song::Song(std::string& t_path) {
+Song::Song(const std::string& t_path) : m_path(t_path) {
     // TODO log debug (or info?)
     std::cout << "Created song object for file: " << t_path << std::endl;
-    m_path = t_path;
 }
 
 void Song::print() {

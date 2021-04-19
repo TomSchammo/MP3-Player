@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Filehandler::Filehandler(std::string t_filename) noexcept : m_filename(t_filename) {
+Filehandler::Filehandler(const std::string& t_filename) noexcept : m_filename(t_filename) {
 
     if (exists()) {
 

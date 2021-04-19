@@ -28,7 +28,9 @@ class Filehandler {
          *
          * @param t_filename name of the file
          */
-        Filehandler(std::string t_filename) noexcept;
+        Filehandler(const std::string& t_filename) noexcept;
+
+        Filehandler() = delete;
 
         // Enabling move operations
         Filehandler(Filehandler &&) = default;
