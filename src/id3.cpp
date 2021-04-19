@@ -352,7 +352,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> t_data, std::string t_fra
 
             iterator = container.position;
 
-            auto pic_data = std::make_shared<std::vector<char>>();
+            auto pic_data = std::make_unique<std::vector<char>>();
 
 
             // extracting picture data
@@ -361,7 +361,7 @@ void parseFrameData(std::shared_ptr<std::vector<char>> t_data, std::string t_fra
             }
 
 
-            ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
+            ID3::Picture art = ID3::Picture(std::move(pic_data), mime_type, pic_type);
 
             // TODO not sure if a copy is the best idea here, but I'll leave
             //      it like this for now
