@@ -2,13 +2,12 @@
 #include <iostream>
 
 
-Filehandler::Filehandler(std::string t_filename) noexcept {
-    this->m_filename = t_filename;
+Filehandler::Filehandler(std::string t_filename) noexcept : m_filename(t_filename) {
 
     if (exists()) {
 
         // TODO log debug
-        std::cout << "Creating file handler object for file: " << t_filename << std::endl;
+        std::cout << "Creating file handler object for file: " << m_filename << std::endl;
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
@@ -107,6 +106,8 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             // skipping the bytes that are supposed to be deleted
             m_stream.seekg(t_bytes, std::ios::cur);
             auto current = m_stream.tellg();
+
+            // TODO make sure this is always > 0, and then make it unsigned
             auto size_remaining = EOF_ - current;
 
 
@@ -121,6 +122,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
                     size_remaining = EOF_ - m_stream.tellg();
                 }
 
+                // TODO size_remaining has to be > 0
                 pbuffer = new char[size_remaining];
 
                 m_stream.read(pbuffer, size_remaining);
@@ -297,16 +299,17 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 }
 
 
-std::shared_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
+std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 
     // TODO log info
     std::cout << "Reading file: " << m_filename << std::endl;
 
+    // TODO can this be improved?
     char data[1];
 
     m_stream.seekg(0, std::ios::beg);
 
-    auto lines = std::make_shared<std::vector<std::string>>();
+    auto lines = std::make_unique<std::vector<std::string>>();
 
     while (!m_stream.eof()) {
 

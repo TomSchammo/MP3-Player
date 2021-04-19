@@ -118,7 +118,7 @@ class Filehandler {
          * Reads the whole (text) file and puts every line into a vector of strings.
          * Then a shared_ptr to that vector is returned.
          */
-        std::shared_ptr<std::vector<std::string>> read() const noexcept;
+        std::unique_ptr<std::vector<std::string>> read() const noexcept;
 
 
         /**
