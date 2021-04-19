@@ -38,16 +38,22 @@ namespace ID3 {
     class Picture
     {
     public:
-        Picture(std::unique_ptr<std::vector<char>> t_data, std::string t_mime_type, ID3::PictureType t_pic_type) noexcept;
+        Picture(std::shared_ptr<std::vector<char>> t_data, std::string t_mime_type, ID3::PictureType t_pic_type) noexcept;
+
+        Picture(const Picture&) = default;
+        Picture& operator=(const Picture&) = default;
+        Picture(Picture &&) = default;
+        Picture& operator=(Picture &&) = default;
+
 
         // picture data
-        const std::unique_ptr<std::vector<char>> m_data;
+        std::shared_ptr<std::vector<char>> m_data;
 
         // MIME type
-        const std::string m_mime_type;
+        std::string m_mime_type;
 
         // type of picture (see PictureType)
-        const ID3::PictureType m_pic_type;
+        ID3::PictureType m_pic_type;
 
     };
 }

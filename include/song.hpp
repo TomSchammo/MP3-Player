@@ -56,15 +56,20 @@ public:
     std::vector<ID3::Picture> m_art{};
 
 public:
-    Song() = delete;
     Song(std::string& t_path);
+
+    Song() = delete;
+    Song(const Song&) = default;
+    Song& operator=(const Song&) = default;
+    Song(Song &&) = default;
+    Song& operator=(Song &&) = default;
 
     /**
      * Print information contained in song object to standard out.
      */
     void print();
 
-    // TODO decrease play counter?
+    // TODO increase play counter?
     virtual ~Song();
 
 };
