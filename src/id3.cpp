@@ -195,7 +195,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 }
 
 
-void parseFrameData(std::shared_ptr<std::vector<char>> t_data, std::string t_frame_id, Song& t_song) noexcept {
+void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::string t_frame_id, Song& t_song) noexcept {
 
     if (t_frame_id.compare("TIT2") == 0) {
 
