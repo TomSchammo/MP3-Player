@@ -150,9 +150,19 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
         // TODO log debug
         std::cout << "Decoding ISO-8859-1 encoded text" << std::endl;
 
-        while (c != 0x00) {
+        while (c != 0x00 && t_position != t_data->size()) {
             text += c;
             c = t_data->at(t_position++);
+        }
+
+        // string is not null terminated
+        if (c != 0x00) {
+
+            // TODO log warn (or debug?)
+            std::cout << "String is not null terminated" << std::endl;
+
+            text += c;
+
         }
     }
 
@@ -212,9 +222,19 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
         // TODO log debug
         std::cout << "Decoding UTF-8 encoded Unicode" << std::endl;
 
-        while (c != 0x00) {
+        while (c != 0x00 && t_position != t_data->size()) {
             text += c;
             c = t_data->at(t_position++);
+        }
+
+        // string is not null terminated
+        if (c != 0x00) {
+
+            // TODO log warn (or debug?)
+            std::cout << "String is not null terminated" << std::endl;
+
+            text += c;
+
         }
     }
 
