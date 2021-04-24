@@ -283,11 +283,10 @@ inline std::string decode_text(std::uint8_t t_text_encoding, std::unique_ptr<std
  *
  * @param t_buffer   is a char array that contains the data
  * @param t_size     is the size of the char array
- * @param t_syncsafe is true if the data should be converted into a syncsafe integer
  *
  * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
  */
-constexpr inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size, bool t_syncsafe) noexcept {
+inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size) noexcept {
 
     std::uint64_t factor = 0;
 
@@ -296,14 +295,12 @@ constexpr inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_si
     // going from last to first assuming that lsb is in the back
     for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-        std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i] << factor);
-
-        if (t_syncsafe)
-            n = (n & static_cast<std::uint64_t>(0x7f << (factor >> 0))) >> (factor >> 3);
+        std::uint64_t n = static_cast<std::uint64_t>(static_cast<std::uint8_t>(t_buffer[i]) << factor);
 
         number |= n;
 
-        // increasing the factor by 2 each time
+        // increasing the factor by 8 each time
+        // as we are reading 8 bits at a time
         factor += 8;
     }
 

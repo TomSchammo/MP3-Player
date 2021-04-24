@@ -66,7 +66,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 
 
     // TODO max size of tag (update this as well as position)
-    std::uint32_t size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE, true));
+    std::uint32_t size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE));
 
     return size;
 }
@@ -115,7 +115,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         std::uint32_t size = static_cast<std::uint32_t>(data->size());
 
         // read counter (and convert it from base 16 to base 10)
-        std::uint64_t counter = convert_bytes((data->data()), size, false);
+        std::uint64_t counter = convert_bytes((data->data()), size);
 
         counter += 1;
 
@@ -264,7 +264,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
     } else if (t_frame_id.compare("TLEN") == 0) {
 
-        auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
+        auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
         // TODO log verbose
         std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
@@ -273,7 +273,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
     } else if (t_frame_id.compare("TDLY") == 0) {
 
-        auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
+        auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
         // TODO log verbose
         std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
@@ -393,7 +393,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
     } else if (t_frame_id.compare("PCNT") == 0) {
 
-        std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()), false);
+        std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
         // TODO log info
         std::cout << "Found an PCNT frame, setting play counter to: " << play_counter << std::endl;
@@ -428,7 +428,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
     t_handler.readBytes(size_buffer, t_position, SIZE_OF_SIZE);
 
-    std::uint32_t frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE, true));
+    std::uint32_t frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE));
 
     t_position += SIZE_OF_SIZE;
 
