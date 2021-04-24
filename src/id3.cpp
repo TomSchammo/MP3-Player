@@ -342,38 +342,53 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // TODO log debug
         std::cout << "Found picture with MIME type: " << mime_type << std::endl;
 
-        ID3::PictureType pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
+        // MIME Type is not a link, continuing as planned
+        if (mime_type.compare("-->") != 0) {
 
-        auto container = decode_text_retain_position(text_encoding, t_data, iterator);
+            ID3::PictureType pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
 
-        if (!container.error) {
+            auto container = decode_text_retain_position(text_encoding, t_data, iterator);
 
-            std::string description = container.text;
+            if (!container.error) {
 
-            iterator = container.position;
+                // TODO this is never used
+                // std::string description = container.text;
 
-            auto pic_data = std::make_shared<std::vector<char>>();
+                iterator = container.position;
+
+                auto pic_data = std::make_shared<std::vector<char>>();
 
 
-            // extracting picture data
-            while (iterator < t_data->size()) {
-                pic_data->push_back(t_data->at(iterator++));
+                // extracting picture data
+                while (iterator < t_data->size()) {
+                    pic_data->push_back(t_data->at(iterator++));
+                }
+
+
+                ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
+
+                // TODO not sure if a copy is the best idea here, but I'll leave
+                //      it like this for now
+                t_song.m_art.push_back(art);
+
             }
 
+            else {
+                // TODO deal with error
 
-            ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
-
-            // TODO not sure if a copy is the best idea here, but I'll leave
-            //      it like this for now
-            t_song.m_art.push_back(art);
-
+                // TODO log error
+                std::cout << container.text << std::endl;
+            }
         }
 
+        // MIME Type is a link
+        // Links are ignored because this code will not run on a network capable device,
+        // so there is no way it will ever make use of that information.
         else {
-            // TODO deal with error
 
-            // TODO log error
-            std::cout << container.text << std::endl;
+            // TODO log warn
+            std::cout << "Found APIC frames containing links, those are ignored as they are of no use\
+                         for the purpose of this device." << std::endl;
         }
 
     } else if (t_frame_id.compare("PCNT") == 0) {
