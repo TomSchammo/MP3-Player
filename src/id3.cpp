@@ -138,7 +138,6 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         convert_size(size, size_bytes);
 
         // create buffer with enough room for size (4), flags (2) and data (data_size)
-        // TODO could also just create buffer with max size (4*0b01111)
         char* payload = new char[4 + 2 + data_size];
 
         int i = 0;
