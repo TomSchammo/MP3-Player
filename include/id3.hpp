@@ -353,7 +353,7 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
     else {
 
         for (std::uint8_t factor = 0; factor < 4; factor++) {
-            std::uint8_t n = static_cast<std::uint8_t>((t_size & (0x7f << factor)) >> factor);
+            std::uint8_t n = static_cast<std::uint8_t>((t_size & (0x7f << (factor << 3))) >> (factor << 3));
             t_arr[factor] = n;
         }
 
