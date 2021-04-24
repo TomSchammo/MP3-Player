@@ -133,7 +133,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         std::cout << "Increased play counter" << std::endl;
         std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
 
-        char size_bytes[4];
+        std::array<std::uint8_t, 4> size_bytes {};
 
         convert_size(size, size_bytes);
 
@@ -143,8 +143,8 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         int i = 0;
 
         // copy all the size bytes into 1 buffer
-        for (char byte : size_bytes) {
-            payload[i] = byte;
+        for (auto byte : size_bytes) {
+            payload[i] = static_cast<char>(byte);
             ++i;
         }
 

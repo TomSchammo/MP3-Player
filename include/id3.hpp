@@ -10,6 +10,8 @@
 #ifndef ID3_HPP
 #define ID3_HPP
 
+#include <array>
+#include <bits/c++config.h>
 #include <filehandler.hpp>
 #include <song.hpp>
 #include <iostream>
@@ -340,16 +342,22 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
  * @param t_size is the integer that will be converted
  * @param t_arr  is an array of std::uint8_ts with a length of 4 that will be filled with the bytes
  */
-inline void convert_size(std::uint32_t t_size, char t_arr[4]) noexcept {
+inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_arr) noexcept {
 
-    int i = 0;
-    while (t_size > 127) {
-        t_arr[i] = 127;
-        t_size -= 127;
-        ++i;
+    if (t_size <= 2139062143){
+        // TODO log error
+        std::cout << "t_size has to be a syncsafe integer" << std::endl;
     }
 
-    t_arr[i+1] = static_cast<char>(t_size);
+
+    else {
+
+        for (std::uint8_t factor = 0; factor < 4; factor++) {
+            std::uint8_t n = static_cast<std::uint8_t>((t_size & (0x7f << factor)) >> factor);
+            t_arr[factor] = n;
+        }
+
+    }
 }
 
 
