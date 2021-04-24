@@ -439,21 +439,25 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
     std::uint8_t format_flags = flags_buffer[1];
 
     if (format_flags & 1) {
+        std::cout << "Expecting data length indicator in frame " << t_frame_id << std::endl;
         // TODO Data length indicator has been added
         // TODO idk what this is even for
     }
 
     if (format_flags & (1 << 2)) {
+        std::cout << t_frame_id << " is an encrypted frame..." << std::endl;
         // TODO frame is encrypted
         // TODO 1 byte with encryption method is added
         // TODO see ENCR frame
     }
 
     if (format_flags & (1 << 3)) {
+        std::cout << t_frame_id << " is a compressed frame..." << std::endl;
         // TODO frame is compressed with zlib
     }
 
     if (format_flags & (1 << 6)) {
+        std::cout << t_frame_id << " is a group frame..." << std::endl;
         // TODO frame belongs to group
         // TODO read group identifier
         // TODO put data of group frames together
