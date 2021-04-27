@@ -209,9 +209,11 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
         char terminated = 0;
 
         // iterating until 2 consecutive 0x00 bytes are found
+        // TODO idk, this might work for common 1 byte characters
+        //      but 2 byte characters will be wrong
         while (terminated < 2) {
 
-            terminated = c == 0x00 ? terminated + 1 : 0;
+            terminated = (c == 0x00 ? terminated + 1 : 0);
 
             c = t_data->at(t_position++);
         }
@@ -314,6 +316,9 @@ inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size) noexce
  * Splits a decimal number into byte sized chunks and puts them in a vector.
  *
  * A unique_ptr to that vector is then returned.
+ *
+ * TODO what about syncsafety???
+ * TODO can I reserve space beforehand?
  *
  * @param t_number is the number that should be converted
  * @return a std::unique_ptr to a std::vector that contains the bytes

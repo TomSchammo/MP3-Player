@@ -93,6 +93,7 @@ void synchronize(const char* t_data, std::uint32_t t_size) noexcept {
 
     }
 
+    // TODO does this work as intended?
     t_data = bytes.data();
 }
 
@@ -356,7 +357,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
                 iterator = container.position;
 
-                auto pic_data = std::make_shared<std::vector<char>>();
+                auto pic_data = std::make_shared<std::vector<char>>(t_data->size() - iterator);
 
 
                 // extracting picture data
@@ -507,7 +508,7 @@ void readID3(Song& t_song) noexcept {
     if (detectID3(handler)) {
         auto version = getVersion(handler);
 
-        // TODO verbose logging instead of this
+        // TODO log info
         std::cout << "ID3v2." << static_cast<std::uint16_t>(version) << std::endl;
 
         // TODO proceed with extracting metadata
