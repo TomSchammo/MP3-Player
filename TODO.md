@@ -1,8 +1,15 @@
 # TODO
 
+## Bugfixes
+
+- There is something wrong with certain files. I probably made some mistakes when keeping track
+  of the pointer location.
+
 ## Software
 
 ### ID3 Tags
+
+- [ ] Trying to reduce the number of allocations by pre-allocating a buffer for the entire tag instead of reading small chunks from the file
 
 - [ ] Implement basic ID3 Tags (read)
 - [ ] Synchronize ID3 Tags/Frames
