@@ -357,7 +357,8 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
                 iterator = container.position;
 
-                auto pic_data = std::make_shared<std::vector<char>>(t_data->size() - iterator);
+                auto pic_data = std::make_shared<std::vector<char>>();
+                pic_data->reserve(t_data->size() - iterator);
 
 
                 // extracting picture data
@@ -593,7 +594,9 @@ void readID3(Song& t_song) noexcept {
 
                     }
 
-                    size_remaining -= (position - original_position_file);
+                    // TODO this seems wrong
+                    // size_remaining -= (position - original_position_file);
+                    size_remaining -= (position);
 
                     // TODO log info
                     std::cout << "Size remaining: " << size_remaining << std::endl;
