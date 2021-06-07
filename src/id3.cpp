@@ -77,7 +77,7 @@ void synchronize(const char* t_data, std::uint32_t t_size) noexcept {
 
     bool sync = true;
 
-    for (std::uint32_t i = 0; i < t_size; ++i) {
+    for (std::uint_fast32_t i = 0; i < t_size; ++i) {
         if (sync) {
             bytes.push_back(t_data[i]);
             sync = (static_cast<unsigned char>(t_data[i]) != 0xff);
@@ -296,9 +296,10 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         // TRCK frame can contain a / with the total amount of tracks
         // after the track number. I don't care about that
-        for (char c : *t_data) {
+        for (std::int_fast8_t c : *t_data) {
             if (c == '/')
                 break;
+
             else
                 track_number += c;
         }
