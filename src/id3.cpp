@@ -130,8 +130,8 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
             data_size += 1;
 
         // TODO log debug
-        std::cout << "Increased play counter" << std::endl;
-        std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
+        // std::cout << "Increased play counter" << std::endl;
+        // std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
 
         std::array<std::uint8_t, 4> size_bytes {};
 
@@ -177,11 +177,11 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         }
 
         // TODO log debug
-        std::cout << "Writing bytes:\n";
-        for (std::uint32_t cnt = 0; cnt < data_size; ++cnt) {
-            std::cout <<  std::hex << payload[cnt] << " ";
-        }
-        std::cout << "\n to file."<< std::endl;
+        // std::cout << "Writing bytes:\n";
+        // for (std::uint32_t cnt = 0; cnt < data_size; ++cnt) {
+            // std::cout <<  std::hex << payload[cnt] << " ";
+        // }
+        // std::cout << "\n to file."<< std::endl;
 
 
         // TODO data not null terminated, is it supposed to be?
@@ -473,12 +473,12 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
     // taking frame data in account when updating position
     t_position += frame_data_size;
 
-    // synchronizing frame data
-    if (format_flags & (1 << 1)) {
 
+    // synchronizing frame data
+    if (format_flags & (1 << 1))
         synchronize(frame_content->data(), static_cast<std::uint32_t>(frame_content->size()));
 
-    }
+
 
     return frame_content;
 }
@@ -492,7 +492,7 @@ void readID3(Song& t_song) noexcept {
         auto version = getVersion(handler);
 
         // TODO log info
-        std::cout << "ID3v2." << static_cast<std::uint16_t>(version) << std::endl;
+        // std::cout << "ID3v2." << static_cast<std::uint16_t>(version) << std::endl;
 
         // TODO proceed with extracting metadata
         auto flags = getFlags(handler);

@@ -333,7 +333,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
 
 
 /**
- * Converts an integer into 4 separate bytes with the msb beeing a 0.
+ * Converts an integer into 4 separate bytes with the msb being a 0.
  *
  * So 128 will be converted to 0b00000000, 0b00000000, 0b00000001, 0b01111111
  * for example.
