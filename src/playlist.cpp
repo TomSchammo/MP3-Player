@@ -9,7 +9,7 @@ void Playlist::readM3U(const char* t_filename, std::vector<Song>& t_songlist) {
 
         auto paths = filehandler.read();
 
-        for (auto path : *paths) {
+        for (const auto& path : *paths) {
             Song song(path);
             t_songlist.push_back(song);;
         }

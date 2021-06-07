@@ -38,8 +38,8 @@ public:
     std::string m_album = "Unknown Album";
     std::string m_artist = "Unknown Artist";
     std::string m_genre = "Unknown Genre";
-    std::string m_release = "";
-    std::string m_track_number = "";
+    std::string m_release;
+    std::string m_track_number;
 
     // TODO consider making these strings as well
     std::uint32_t m_audio_start = 0;
@@ -51,12 +51,12 @@ public:
     // offset of the player counter
     std::uint32_t m_counter_offset = 0;
 
-    std::string m_path = "";
+    std::string m_path;
 
     std::vector<ID3::Picture> m_art{};
 
 public:
-    Song(const std::string& t_path);
+    explicit Song(const std::string& t_path);
 
     Song() = delete;
     Song(const Song&) = default;

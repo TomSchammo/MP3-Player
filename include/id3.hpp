@@ -143,7 +143,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
 
     char c = t_data->at(t_position++);
 
-    std::string text = "";
+    std::string text;
 
     // Text is encoded using ISO-8859-1 standard
     // and using null terminated by 0x00,
@@ -284,7 +284,7 @@ inline std::string decode_text(std::uint8_t t_text_encoding, std::unique_ptr<std
  *
  * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
  */
-inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size) noexcept {
+inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
 
     std::uint64_t factor = 0;
 
@@ -293,7 +293,7 @@ inline std::uint64_t convert_bytes(char t_buffer[], std::uint32_t t_size) noexce
     // going from last to first assuming that lsb is in the back
     for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-        std::uint64_t n = static_cast<std::uint64_t>(static_cast<std::uint8_t>(t_buffer[i]) << factor);
+        auto n = static_cast<std::uint64_t>(static_cast<std::uint8_t>(t_buffer[i]) << factor);
 
         number |= n;
 
@@ -322,7 +322,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
     std::unique_ptr<std::vector<char>> bytes = std::make_unique<std::vector<char>>();
 
     while (t_number > (16*16)) {
-        std::uint8_t byte = static_cast<std::uint8_t>(t_number % (16*16));
+        auto byte = static_cast<std::uint8_t>(t_number % (16*16));
         bytes->insert(bytes->begin(), static_cast<char>(byte));
 
         t_number = t_number >> 8;
@@ -352,7 +352,7 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
     else {
 
         for (std::uint8_t factor = 0; factor < 4; factor++) {
-            std::uint8_t n = static_cast<std::uint8_t>((t_size & (0x7f << (factor << 3))) >> (factor << 3));
+            auto n = static_cast<std::uint8_t>((t_size & (0x7f << (factor << 3))) >> (factor << 3));
             t_arr[factor] = n;
         }
 

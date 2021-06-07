@@ -7,7 +7,7 @@ bool detectID3(Filehandler& t_handler) noexcept {
     std::string s;
     t_handler.readString(s, LOCATION_START, 3);
 
-    bool result = s.compare("ID3") == 0;
+    bool result = s == "ID3";
 
     logging::log<logging::LogLevel::DDEBUG>(result ? "Found ID3 header!" : "No ID3 header present in file");
 
@@ -36,7 +36,7 @@ std::uint8_t getVersion(Filehandler& t_handler) noexcept {
 
     t_handler.readBytes(buffer, LOCATION_VERSION, SIZE_OF_VERSION);
 
-    std::uint8_t version = static_cast<std::uint8_t>(*buffer);
+    auto version = static_cast<std::uint8_t>(*buffer);
 
 
     logging::log<logging::LogLevel::DDEBUG>("ID3 file has version: 2." + std::to_string(int(version)));
@@ -65,7 +65,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 
 
     // TODO max size of tag (update this as well as position)
-    std::uint32_t size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE));
+    auto size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE));
 
     return size;
 }
@@ -112,7 +112,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
     if (auto data = readFrame(t_handler, frame_id, t_position)) {
 
         // frame data is never more than std::uint32_t
-        std::uint32_t size = static_cast<std::uint32_t>(data->size());
+        auto size = static_cast<std::uint32_t>(data->size());
 
         // read counter (and convert it from base 16 to base 10)
         std::uint64_t counter = convert_bytes((data->data()), size);
@@ -195,9 +195,9 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 }
 
 
-void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::string t_frame_id, Song& t_song) noexcept {
+void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string &t_frame_id, Song& t_song) noexcept {
 
-    if (t_frame_id.compare("TIT2") == 0) {
+    if (t_frame_id == "TIT2") {
 
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
@@ -206,7 +206,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_title = content;
 
-    } else if (t_frame_id.compare("TALB") == 0) {
+    } else if (t_frame_id == "TALB") {
 
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
@@ -215,7 +215,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_album = content;
 
-    } else if (t_frame_id.compare("TPE1") == 0) {
+    } else if (t_frame_id == "TPE1") {
 
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
@@ -224,7 +224,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_artist = content;
 
-    } else if (t_frame_id.compare("TDRL") == 0) {
+    } else if (t_frame_id == "TDRL") {
 
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
@@ -235,11 +235,11 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_release = content;
 
-    } else if (t_frame_id.compare("TDRC") == 0) {
+    } else if (t_frame_id == "TDRC") {
 
         // release year has precedence over recording year but if
         // there is no TDRL frame, this frame will be used for the date instead
-        if (t_song.m_release.compare("") == 0) {
+        if (t_song.m_release.empty()) {
 
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
@@ -256,7 +256,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             logging::log<logging::LogLevel::INFO>("Found a TDRC frame, but release year has already been set. Skipping...");
         }
 
-    } else if (t_frame_id.compare("TLEN") == 0) {
+    } else if (t_frame_id == "TLEN") {
 
         auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
@@ -264,7 +264,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_duration = len;
 
-    } else if (t_frame_id.compare("TDLY") == 0) {
+    } else if (t_frame_id == "TDLY") {
 
         auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
@@ -272,12 +272,12 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         t_song.m_delay = delay;
 
-    } else if (t_frame_id.compare("TCON") == 0) {
+    } else if (t_frame_id == "TCON") {
 
         // custom genres have precedence over content type but if
         // there is no custom genre set, this frame will be used for the genre instead
         // TODO this is different for older tag versions
-        if (t_song.m_genre.compare("Unknown Genre") == 0) {
+        if (t_song.m_genre == "Unknown Genre") {
 
             // TODO deal with possibility of having an error
             std::string content = decode_text(t_data->at(0), t_data, 1);
@@ -290,9 +290,9 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             t_song.m_genre = content;
         }
 
-    } else if (t_frame_id.compare("TRCK") == 0) {
+    } else if (t_frame_id == "TRCK") {
 
-        std::string track_number = "";
+        std::string track_number;
 
         // TRCK frame can contain a / with the total amount of tracks
         // after the track number. I don't care about that
@@ -309,7 +309,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         t_song.m_track_number = track_number;
 
 
-    } else if (t_frame_id.compare("APIC") == 0) {
+    } else if (t_frame_id == "APIC") {
 
         logging::log<logging::LogLevel::INFO>("Found an APIC frame");
 
@@ -318,7 +318,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // byte indicating text encoding
         std::uint8_t text_encoding = t_data->at(iterator++);
 
-        std::string mime_type = "";
+        std::string mime_type;
 
         char c = t_data->at(iterator);
 
@@ -330,9 +330,9 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         logging::log<logging::LogLevel::DDEBUG>("Found picture with MIME type: " + mime_type);
 
         // MIME Type is not a link, continuing as planned
-        if (mime_type.compare("-->") != 0) {
+        if (mime_type != "-->") {
 
-            ID3::PictureType pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
+            auto pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
 
             auto container = decode_text_retain_position(text_encoding, t_data, iterator);
 
@@ -377,7 +377,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
                          for the purpose of this device.");
         }
 
-    } else if (t_frame_id.compare("PCNT") == 0) {
+    } else if (t_frame_id == "PCNT") {
 
         std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
@@ -412,7 +412,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
     t_handler.readBytes(size_buffer, t_position, SIZE_OF_SIZE);
 
-    std::uint32_t frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE));
+    auto frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE));
 
     t_position += SIZE_OF_SIZE;
 
