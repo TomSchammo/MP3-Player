@@ -15,6 +15,7 @@
 #include <filehandler.hpp>
 #include <song.hpp>
 #include <iostream>
+#include <log.hpp>
 
 // constants
 constexpr std::uint8_t LOCATION_START = 0;
@@ -149,8 +150,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
     // (1 'zero' byte).
     if (t_text_encoding == 0x00) {
 
-        // TODO log debug
-        std::cout << "Decoding ISO-8859-1 encoded text" << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Decoding ISO-8859-1 encoded text");
 
         while (c != 0x00 && t_position != t_data->size()) {
             text += c;
@@ -160,8 +160,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
         // string is not null terminated
         if (c != 0x00) {
 
-            // TODO log warn (or debug?)
-            std::cout << "String is not null terminated" << std::endl;
+            logging::log<logging::LogLevel::WARNING>("String is not null terminated");
 
             text += c;
 
@@ -181,10 +180,8 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
     // (2 'zero' bytes).
     else if (t_text_encoding == 0x01) {
 
-        // TODO log debug
-        std::cout << "Decoding UTF-16 encoded Unicode" << std::endl;
-
-        std::cout << "[Error] UTF-16 has not been implemented yet" << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-16 encoded Unicode");
+        logging::log<logging::LogLevel::ERROR>("UTF-16 has not been implemented yet");
 
         char terminated = 0;
 
@@ -195,16 +192,15 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
 
             c = data->at(position++);
         }
+
     }
 
     // The text UTF-16B encoded Unicode without BOM.
     // It is null terminated by 0x0000 (2 'zero' bytes)
     else if (t_text_encoding == 0x02) {
 
-        // TODO log debug
-        std::cout << "Decoding UTF-16B encoded Unicode" << std::endl;
-
-        std::cout << "[Error] UTF-16B has not been implemented yet" << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-16B encoded Unicode");
+        logging::log<logging::LogLevel::ERROR>("UTF-16B has not been implemented yet");
 
         char terminated = 0;
 
@@ -223,8 +219,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
     // It is terminated by 0x00 (1 'zero' byte)
     else if (t_text_encoding == 0x03) {
 
-        // TODO log debug
-        std::cout << "Decoding UTF-8 encoded Unicode" << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-8 encoded Unicode");
 
         while (c != 0x00 && t_position != t_data->size()) {
             text += c;
@@ -234,8 +229,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
         // string is not null terminated
         if (c != 0x00) {
 
-            // TODO log warn (or debug?)
-            std::cout << "String is not null terminated" << std::endl;
+            logging::log<logging::LogLevel::WARNING>("String is not null terminated");
 
             text += c;
 

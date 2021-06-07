@@ -9,8 +9,8 @@ bool detectID3(Filehandler& t_handler) noexcept {
 
     bool result = s.compare("ID3") == 0;
 
-    // TODO log debug
-    std::cout << (result ? "Found ID3 header!" : "No ID3 header present in file") << std::endl;
+    logging::log<logging::LogLevel::DDEBUG>(result ? "Found ID3 header!" : "No ID3 header present in file");
+
 
     return result;
 }
@@ -21,11 +21,10 @@ bool detectID3Footer(Filehandler& t_handler) noexcept {
     std::string s;
     t_handler.readString(s, LOCATION_START, std::ios::end, 3);
 
-
     bool result = s.compare("3DI") == 0;
 
-    // TODO log debug
-    std::cout << (result ? "Found ID3 footer!" : "No ID3 footer present in file") << std::endl;
+
+    logging::log<logging::LogLevel::DDEBUG>(result ? "Found ID3 footer!" : "No ID3 footer present in file");
 
     return result;
 }
@@ -39,8 +38,8 @@ std::uint8_t getVersion(Filehandler& t_handler) noexcept {
 
     std::uint8_t version = static_cast<std::uint8_t>(*buffer);
 
-    // TODO log debug
-    std::cout << "ID3 file has version: 2." << int(version) << std::endl;
+
+    logging::log<logging::LogLevel::DDEBUG>("ID3 file has version: 2." + std::to_string(int(version)));
 
     return version;
 }
@@ -203,8 +202,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
 
-        // TODO log verbose
-        std::cout << "Found a TIT2 frame, setting song title to: " << content << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TIT2 frame, setting song title to: " + content);
 
         t_song.m_title = content;
 
@@ -213,8 +211,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
 
-        // TODO log verbose
-        std::cout << "Found a TALB frame, setting album title to: " << content << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TALB frame, setting album title to: " + content);
 
         t_song.m_album = content;
 
@@ -223,8 +220,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1);
 
-        // TODO log verbose
-        std::cout << "Found a TPE1 frame, setting artist to: " << content << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TPE1 frame, setting artist to: " + content);
 
         t_song.m_artist = content;
 
@@ -235,8 +231,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // TODO deal with possibility of having an error
         std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
 
-        // TODO log verbose
-        std::cout << "Found a TDRL frame setting release year to: " << content << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TDRL frame, setting release year to: " + content);
 
         t_song.m_release = content;
 
@@ -251,24 +246,21 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             // TODO deal with possibility of having an error
             std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
 
-            // TODO log verbose
-            std::cout << "Found a TDRC frame setting release year to: " << content << std::endl;
+            logging::log<logging::LogLevel::INFO>("Found a TDRC frame, setting release year to: " + content);
 
             t_song.m_release = content;
         }
 
         else {
 
-            // TODO log debug
-            std::cout << "Found a TDRC frame, but release year has already been set. Skipping..." << std::endl;
+            logging::log<logging::LogLevel::INFO>("Found a TDRC frame, but release year has already been set. Skipping...");
         }
 
     } else if (t_frame_id.compare("TLEN") == 0) {
 
         auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
-        // TODO log verbose
-        std::cout << "Found a TLEN frame, setting track length to: " << len << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TLEN frame, setting track length to: " + std::to_string(len));
 
         t_song.m_duration = len;
 
@@ -276,8 +268,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
 
         auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
-        // TODO log verbose
-        std::cout << "Found a TDLY frame, setting delay to: " << delay << "ms" << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TDLY frame, setting delay to: " + std::to_string(delay) + "ms");
 
         t_song.m_delay = delay;
 
@@ -291,8 +282,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             // TODO deal with possibility of having an error
             std::string content = decode_text(t_data->at(0), t_data, 1);
 
-            // TODO log verbose
-            std::cout << "Found a TCON frame, setting genre to: " << content << std::endl;
+            logging::log<logging::LogLevel::INFO>("Found a TCON frame, setting genre to: " + content);
 
             // TODO not sure if this is always fine (as there can also be numbers apparently)
             //      so maybe this is not the correct way to "parse" the data, but I'll have to
@@ -301,9 +291,6 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         }
 
     } else if (t_frame_id.compare("TRCK") == 0) {
-
-        // TODO log info
-        std::cout << "Found a TRCK frame, setting track number to: ";
 
         std::string track_number = "";
 
@@ -316,15 +303,14 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
                 track_number += c;
         }
 
-        // TODO log info
-        std::cout << track_number << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found a TRCK frame, setting track number to: " + track_number);
 
         t_song.m_track_number = track_number;
 
+
     } else if (t_frame_id.compare("APIC") == 0) {
 
-        // TODO log info
-        std::cout << "Found an APIC frame" << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found an APIC frame");
 
         std::uint32_t iterator = 0;
 
@@ -340,8 +326,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             c = t_data->at(++iterator);
         }
 
-        // TODO log debug
-        std::cout << "Found picture with MIME type: " << mime_type << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Found picture with MIME type: " + mime_type);
 
         // MIME Type is not a link, continuing as planned
         if (mime_type.compare("-->") != 0) {
@@ -378,8 +363,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
             else {
                 // TODO deal with error
 
-                // TODO log error
-                std::cout << container.text << std::endl;
+                logging::log<logging::LogLevel::ERROR>(container.text);
             }
         }
 
@@ -388,23 +372,21 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::strin
         // so there is no way it will ever make use of that information.
         else {
 
-            // TODO log warn
-            std::cout << "Found APIC frames containing links, those are ignored as they are of no use\
-                         for the purpose of this device." << std::endl;
+            logging::log<logging::LogLevel::WARNING>("Found APIC frames containing links, those are ignored as they are of no use\
+                         for the purpose of this device.");
         }
 
     } else if (t_frame_id.compare("PCNT") == 0) {
 
         std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
 
-        // TODO log info
-        std::cout << "Found an PCNT frame, setting play counter to: " << play_counter << std::endl;
+        logging::log<logging::LogLevel::INFO>("Found an PCNT frame, setting play counter to: " + std::to_string(play_counter));
+
 
         t_song.m_play_counter = play_counter;
 
     } else {
-        // TODO log warn
-        std::cout << "frame id: " << t_frame_id << " is not supported yet" << std::endl;
+        logging::log<logging::LogLevel::WARNING>("FrameID: " + t_frame_id + " is not supported yet");
     }
 
     // TODO TFLT (audio type, default is MPEG)
@@ -417,9 +399,8 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
     t_handler.readString(t_frame_id, t_position, SIZE_OF_FRAME_ID);
 
     if (t_frame_id[0] == 0x00) {
-        // TODO log debug
-        std::cout << "Encountered a frame id starting with 0x00 which is probably due to padding...\n"
-                  <<  "Skipping to the end of the tag." << std::endl;
+
+        logging::log<logging::LogLevel::DDEBUG>("Encountered a frame id starting with 0x00 which is probably due to padding, skipping to the end of the tag...");
 
         return nullptr;
     }
@@ -456,25 +437,25 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
     std::uint8_t format_flags = flags_buffer[1];
 
     if (format_flags & 1) {
-        std::cout << "Expecting data length indicator in frame " << t_frame_id << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>("Expecting data length indicator in frame ");
         // TODO Data length indicator has been added
         // TODO idk what this is even for
     }
 
     if (format_flags & (1 << 2)) {
-        std::cout << t_frame_id << " is an encrypted frame..." << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>(t_frame_id + " is an encrypted frame...");
         // TODO frame is encrypted
         // TODO 1 byte with encryption method is added
         // TODO see ENCR frame
     }
 
     if (format_flags & (1 << 3)) {
-        std::cout << t_frame_id << " is a compressed frame..." << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>(t_frame_id + " is a compressed frame...");
         // TODO frame is compressed with zlib
     }
 
     if (format_flags & (1 << 6)) {
-        std::cout << t_frame_id << " is a group frame..." << std::endl;
+        logging::log<logging::LogLevel::DDEBUG>(t_frame_id + " is a group frame...");
         // TODO frame belongs to group
         // TODO read group identifier
         // TODO put data of group frames together
@@ -482,7 +463,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
     t_position += 2;
 
-    std::cout << "reading " << frame_data_size << " bytes of frame with id " << t_frame_id << std::endl;
+    logging::log<logging::LogLevel::DDEBUG>("Reading " + std::to_string(frame_data_size) + " bytes of Frame with ID " + t_frame_id);
 
     auto frame_content = std::make_unique<std::vector<char>>(frame_data_size);
 
@@ -518,16 +499,14 @@ void readID3(Song& t_song) noexcept {
         // TODO size is without 10 bytes of header
         auto size = getSize(handler, false);
 
-        // TODO log info
-        std::cout << "Size of ID3 tag: " << size << std::endl;
+        logging::log<logging::LogLevel::INFO>("ID3 Tag has " + std::to_string(size) + " bytes");
 
         std::uint32_t extended_size = 0;
 
         // Not supported ID3 version, skipping the tag
         // TODO Implement ID3v2.2 and below
         if (version != 4 && version != 3) {
-            // TODO log error
-            std::cout << "This software does not support ID3 version ID3v2." << version << std::endl;
+            logging::log<logging::LogLevel::ERROR>("This software does not support ID3 version ID3v2." + std::to_string(static_cast<int>(version)));
 
             // TODO set filepointer to after tag?
             // TODO if I'd do that, I'd have to know whether it contains extended headers though (for complete size)
@@ -537,24 +516,24 @@ void readID3(Song& t_song) noexcept {
 
             // TODO synchronize
             if (flags & (1 << 7)) {
-                std::cout << "This tag is unsynchronised..." << std::endl;
+                logging::log<logging::LogLevel::DDEBUG>("This tag is unsynchronised...");
             }
 
             // Extended header is present, skipping it...
             if (flags & (1 << 6)) {
                 extended_size = getSize(handler, true);
 
-                // TODO log verbose
-                std::cout << "This tag contains and extended header. Skipping it for now..." << std::endl;
+                logging::log<logging::LogLevel::DDEBUG>("This tag has an extended header. Skipping it for now...");
 
             }
 
             // TODO footer present (do I care?)
             // TODO probably need to tell the mp3 decoder to stop 10 bytes before EOF
             if (flags & (1 << 4)) {
+                logging::log<logging::LogLevel::DDEBUG>("This tag has a footer. Skipping it for now...");
+
                 // size += 10;
                 // don't do this, just set a footer bit to true or something
-                std::cout << "footer" << std::endl;
             }
 
 
@@ -563,8 +542,7 @@ void readID3(Song& t_song) noexcept {
 
             std::uint32_t position = SIZE_OF_HEADER + extended_size;
 
-            // TODO log debug
-            std::cout << "Starting to read frames at position " << position << std::endl;
+            logging::log<logging::LogLevel::DDEBUG>("Starting to read frames at position " + std::to_string(position));
 
             while (size_remaining > 0) {
                 std::cout << size_remaining << " bytes remaining..." << std::endl;
