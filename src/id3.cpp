@@ -71,29 +71,24 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 }
 
 
-void synchronize(const char* t_data, std::uint32_t t_size) noexcept {
-
-    std::vector<char> bytes;
+void synchronize(std::unique_ptr<std::vector<char>>& t_data) noexcept {
 
     bool sync = true;
 
-    for (std::uint_fast32_t i = 0; i < t_size; ++i) {
+    for (std::uint_fast32_t i = 0; i < t_data->size(); ++i) {
         if (sync) {
-            bytes.push_back(t_data[i]);
-            sync = (static_cast<unsigned char>(t_data[i]) != 0xff);
+            sync = (static_cast<unsigned char>(t_data->at(i)) != 0xff);
         }
 
         else {
-            if (t_data[i] != 0x00)
-                bytes.push_back(t_data[i]);
+            if (t_data->at(i) == 0x00)
+                t_data->erase(t_data->begin() + static_cast<long>(i));
 
             sync = true;
         }
 
     }
 
-    // TODO does this work as intended?
-    t_data = bytes.data();
 }
 
 
@@ -476,7 +471,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
     // synchronizing frame data
     if (format_flags & (1 << 1))
-        synchronize(frame_content->data(), static_cast<std::uint32_t>(frame_content->size()));
+        synchronize(frame_content);
 
 
 

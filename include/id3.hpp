@@ -370,12 +370,9 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
  *
  * See https://id3.org/id3v2.4.0-structure section 6.1 for more information.
  *
- * @param  t_data The data that is supposed to be synchronized
- * @param  t_size The size of the data array
- *
- * @return A pointer to the data that has been synchronized
+ * @param  t_data A reference to a std::unique_ptr of an std::vector<char> with data that is supposed to be synchronized
  */
-void synchronize(const unsigned char* t_data, std::uint32_t t_size) noexcept;
+void synchronize(std::unique_ptr<std::vector<char>>& t_data) noexcept;
 
 
 /**
