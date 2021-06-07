@@ -316,7 +316,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
         std::uint32_t iterator = 0;
 
         // byte indicating text encoding
-        std::uint8_t text_encoding = t_data->at(iterator++);
+        std::int8_t text_encoding = t_data->at(iterator++);
 
         std::string mime_type;
 
@@ -420,7 +420,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
     t_handler.readBytes(flags_buffer, t_position, 2);
 
-    std::uint8_t status_flags = flags_buffer[0];
+    std::int8_t status_flags = flags_buffer[0];
 
     if (status_flags & (1 << 5)) {
         // TODO frame should be discarded (bit == 1) if frame is unknown and tag is altered
@@ -435,7 +435,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
     }
 
     // TODO relevant bits: 6, 3, 2, 1, 0 (all)
-    std::uint8_t format_flags = flags_buffer[1];
+    std::int8_t format_flags = flags_buffer[1];
 
     if (format_flags & 1) {
         logging::log<logging::LogLevel::DDEBUG>("Expecting data length indicator in frame ");
