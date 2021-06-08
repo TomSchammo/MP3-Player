@@ -21,7 +21,7 @@ bool detectID3Footer(Filehandler& t_handler) noexcept {
     std::string s;
     t_handler.readString(s, LOCATION_START, std::ios::end, 3);
 
-    bool result = s.compare("3DI") == 0;
+    bool result = s == "3DI";
 
 
     logging::log<logging::LogLevel::DDEBUG>(result ? "Found ID3 footer!" : "No ID3 footer present in file");
@@ -543,7 +543,8 @@ void readID3(Song& t_song) noexcept {
             while (size_remaining > 0) {
                 std::cout << size_remaining << " bytes remaining..." << std::endl;
                 std::cout << size_remaining << " > 0" << std::endl;
-                std::string frame_id = "";
+
+                std::string frame_id;
 
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
