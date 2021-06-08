@@ -413,7 +413,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
  * @param t_frame_id The frameID of the frame
  * @param t_song     A reference to a {@class Song} object
  */
-void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, std::string t_frame_id, Song& t_song) noexcept;
+void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept;
 
 
 /**

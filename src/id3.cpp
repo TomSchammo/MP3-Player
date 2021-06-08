@@ -190,7 +190,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 }
 
 
-void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string &t_frame_id, Song& t_song) noexcept {
+void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept {
 
     if (t_frame_id == "TIT2") {
 
