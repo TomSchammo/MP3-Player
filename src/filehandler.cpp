@@ -1,28 +1,26 @@
 #include <filehandler.hpp>
 #include <iostream>
+#include <log.hpp>
 
+using namespace logging;
 
-Filehandler::Filehandler(const std::string& t_filename) noexcept : m_filename(t_filename) {
+Filehandler::Filehandler(std::string  t_filename) noexcept : m_filename(std::move(t_filename)) {
 
     if (exists()) {
 
-        // TODO log debug
-        std::cout << "Creating file handler object for file: " << m_filename << std::endl;
+        log<LogLevel::DDEBUG>("Creating file handler object for file " + m_filename);
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
 
-    else {
-        // TODO log warn
-        std::cout << "File " << m_filename << " does not exist!" << std::endl;
-    }
+    else
+        log<LogLevel::WARNING>("File " + m_filename + " does not exist!");
 }
 
 
 void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
-    // TODO log debug
-    std::cout << "Reading " << t_bytes << " bytes starting at offset " << t_position << " from file: " << m_filename << std::endl;
+    log<LogLevel::DDEBUG>("Reading " + std::to_string(t_bytes) + " bytes starting at offset " + std::to_string(t_position) + " from file: " + m_filename);
 
     m_stream.seekg(t_position, std::ios::beg);
     m_stream.read(t_buffer, t_bytes);
@@ -139,17 +137,15 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             bool error = false;
 
             if (m_stream.is_open()) {
-                // TODO log error
-                std::cout << "Error when closing streams" << std::endl;
-                std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
+                // std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
+                log<LogLevel::ERROR>("Error when closing streams: m_stream is expected to be closed but is open!");
                 error = true;
 
             }
 
             if (stream.is_open()) {
-                // TODO log error
-                std::cout << "Error when closing streams" << std::endl;
-                std::cout << "stream (" << &stream << ") is expected to be closed, but is open" << std::endl;
+                // std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
+                log<LogLevel::ERROR>("Error when closing streams: m_stream is expected to be closed but is open!");
                 error = true;
 
             }
@@ -159,33 +155,26 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
                 // replacing old file with new one
                 if (std::remove(m_filename.c_str()) == 0) {
                     if (std::rename((m_filename + ".tmp").c_str(), m_filename.c_str()) != 0) {
-                        // TODO log error
-                        std::cout << "Could not rename " << m_filename << ".tmp to " << m_filename << std::endl;
+                        log<LogLevel::ERROR>("Could not rename " + m_filename + ".tmp to " + m_filename);
                     }
 
                     else {
-                        // TODO log info
-                        std::cout << "Successfully renamed " << m_filename << ".tmp to " << m_filename << std::endl;
+                        log<LogLevel::INFO>("Successfully renamed " + m_filename + ".tmp to " + m_filename);
 
                         // reopening stream
                         m_stream.open(m_filename, std::ios::binary | std::ios::in);
 
-                        if (m_stream.is_open()) {
-                            // TODO log info
-                            std::cout << "Successfully re-opened filestream for file " << m_filename << std::endl;
-                        }
+                        if (m_stream.is_open())
+                            log<LogLevel::INFO>("Successfully re-opened filestream for file " + m_filename);
 
-                        else {
-                            // TODO log error
-                            std::cout << "Failure when re-opening filestream for file " << m_filename << std::endl;
-                        }
+                        else
+                            log<LogLevel::ERROR>("Failure when re-opening filestream for file " + m_filename);
 
                     }
                 }
 
                 else {
-                    // TODO log error
-                    std::cout << "Could not remove " << m_filename << std::endl;
+                    log<LogLevel::ERROR>("Could not remove " + m_filename);
                 }
             }
 
@@ -199,8 +188,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             }
         }
         else {
-            // TODO log error
-            std::cout << "[ERROR] stream position is supposed to be at the end of the file" << std::endl;
+            log<LogLevel::ERROR>("Stream position is supposed to be at the end of the file");
 
             // TODO deal with this
         }
@@ -211,23 +199,18 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
         if (!stream.is_open()) {
 
-            // TODO log error
-            std::cout << "Could not open " << m_filename << ".tmp" << std::endl;
-            std::cout << "Cleaning up..." << std::endl;
+            log<LogLevel::ERROR>("Could not open " + m_filename + ".tmp");
+            log<LogLevel::ERROR>("Cleaning up...");
 
-            if (std::remove((m_filename + ".tmp").c_str()) == 0) {
-                // TODO log info
-                std::cout << "Successfully deleted " << m_filename << ".tmp" << std::endl;
+            if (std::remove((m_filename + ".tmp").c_str()) == 0)
+                log<LogLevel::INFO>("Successfully deleted " + m_filename + ".tmp");
 
-            } else {
-                // TODO log error
-                std::cout << "Could not remove " << m_filename << ".tmp" << std::endl;
-            }
+            else
+                log<LogLevel::ERROR>("Could not remove " + m_filename + ".tmp");
         }
 
         if (!m_stream.is_open()) {
-            // TODO log error
-            std::cout << "Expected opened filestream for file " << m_filename << " but stream was closed..."<< std::endl;
+            log<LogLevel::ERROR>("Expected opened filestream for file " + m_filename + " but stream was closed...");
         }
     }
 }
@@ -238,30 +221,23 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
     // TODO log debug
     std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position << " from the file: " << m_filename << std::endl;
 
-    char* buffer = new char[t_bytes];
+    std::vector<char> buffer(t_bytes);
 
     m_stream.seekg(t_position, std::ios::beg);
-    m_stream.read(buffer, t_bytes);
+    m_stream.read(buffer.data(), t_bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
-    if (buffer[t_bytes - 1] != '\0') {
-        // TODO log debug
-        std::cout << "String is not null terminated..." << std::endl;
+    if (buffer.at(t_bytes - 1) != '\0') {
 
-        char* newBuffer = new char[t_bytes + 1];
-        for (int i = 0; i < t_bytes; ++i) {
-           newBuffer[i] = buffer[i];
-        }
+        log<LogLevel::DDEBUG>("String is not null terminated...");
 
-        newBuffer[t_bytes] = '\0';
+        buffer.push_back('\0');
 
-        delete [] buffer;
-        buffer = newBuffer;
     }
 
-    t_string = buffer;
-    delete []  buffer;
+    // TODO
+    t_string = std::string(buffer.data());
 }
 
 
@@ -272,37 +248,26 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
         << " relative to the " << (t_way ==  std::ios_base::beg ? "beginning" : "end")
         << " of the file: " << m_filename << std::endl;
 
-    char* buffer = new char[t_bytes];
+    std::vector<char> buffer(t_bytes);
 
     m_stream.seekg(t_position, t_way);
-    m_stream.read(buffer, t_bytes);
+    m_stream.read(buffer.data(), t_bytes);
 
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
-    if (buffer[t_bytes - 1] != '\0') {
-        // TODO log info
-        std::cout << "String is not null terminated..." << std::endl;
+    if (buffer.at(t_bytes - 1) != '\0') {
+        log<LogLevel::INFO>("String is not null terminated...");
 
-        char* newBuffer = new char[t_bytes + 1];
-        for (int i = 0; i < t_bytes; ++i) {
-           newBuffer[i] = buffer[i];
-        }
-
-        newBuffer[t_bytes] = '\0';
-
-        delete [] buffer;
-        buffer = newBuffer;
+        buffer.push_back('\0');
     }
 
-    t_string = buffer;
-    delete [] buffer;
+    t_string = std::string(buffer.data());
 }
 
 
 std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 
-    // TODO log info
-    std::cout << "Reading file: " << m_filename << std::endl;
+    log<LogLevel::INFO>("Reading file: " + m_filename);
 
     // TODO can this be improved?
     char data[1];
@@ -314,7 +279,7 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
     while (!m_stream.eof()) {
 
         m_stream.read(data, 1);
-        std::string line = "";
+        std::string line;
 
         // while char read not equal "\n"
         while (data[0] != 10) {
@@ -325,8 +290,7 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
         lines->push_back(line);
     }
 
-    // TODO log info
-    std::cout << "Read " << lines->size() << " lines in file " << m_filename << std::endl;
+    log<LogLevel::INFO>("Read " + std::to_string(lines->size()) + " lines in file " + m_filename);
 
     return lines;
 }
@@ -339,5 +303,5 @@ Filehandler::~Filehandler() noexcept {
         m_stream.close();
     }
 
-    std::cout << "Destorying filehandler object for file: " << m_filename << std::endl;
+    std::cout << "Destroying filehandler object for file: " << m_filename << std::endl;
 }
