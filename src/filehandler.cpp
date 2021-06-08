@@ -105,11 +105,10 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             m_stream.seekg(t_bytes, std::ios::cur);
             auto current = m_stream.tellg();
 
-            // TODO make sure this is always > 0, and then make it unsigned
             auto size_remaining = EOF_ - current;
 
 
-            // if the last byte(s) have been removed there is no point in continueing
+            // if the last byte(s) have been removed there is no point in continuing
             if (size_remaining > 0) {
                 m_stream.seekg(t_bytes, std::ios::cur);
 
@@ -120,8 +119,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
                     size_remaining = EOF_ - m_stream.tellg();
                 }
 
-                // TODO size_remaining has to be > 0
-                pbuffer = new char[size_remaining];
+                pbuffer = new char[static_cast<unsigned long>(size_remaining)];
 
                 m_stream.read(pbuffer, size_remaining);
                 stream.write(pbuffer, size_remaining);
