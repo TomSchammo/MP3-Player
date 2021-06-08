@@ -131,17 +131,17 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
  * message instead of the decoded text and a posistion of 0.
  *
  * @param t_text_encoding The method that is used to encode the text
- * @param t_text          A const l-value reference to a unique pointer to a std::vector containing the text
+ * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
  * @param t_position      An unsigned 32 bit integer indicating the start of the string
  *
  * @return a container struct that contains the decoded text and the updated value of
  *         the position argument as well as an error flag that should be false.
  */
-inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_encoding,
-                                                            std::unique_ptr<std::vector<char>> const& t_data,
+inline TextAndPositionContainer decode_text_retain_position(std::int8_t t_text_encoding,
+                                                            std::vector<char> const& t_data,
                                                             std::uint32_t t_position) noexcept {
 
-    char c = t_data->at(t_position++);
+    char c = t_data.at(t_position++);
 
     std::string text;
 
@@ -152,9 +152,9 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
 
         logging::log<logging::LogLevel::DDEBUG>("Decoding ISO-8859-1 encoded text");
 
-        while (c != 0x00 && t_position != t_data->size()) {
+        while (c != 0x00 && t_position != t_data.size()) {
             text += c;
-            c = t_data->at(t_position++);
+            c = t_data.at(t_position++);
         }
 
         // string is not null terminated
@@ -211,7 +211,7 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
 
             terminated = (c == 0x00 ? terminated + 1 : 0);
 
-            c = t_data->at(t_position++);
+            c = t_data.at(t_position++);
         }
     }
 
@@ -221,9 +221,9 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
 
         logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-8 encoded Unicode");
 
-        while (c != 0x00 && t_position != t_data->size()) {
+        while (c != 0x00 && t_position != t_data.size()) {
             text += c;
-            c = t_data->at(t_position++);
+            c = t_data.at(t_position++);
         }
 
         // string is not null terminated
@@ -256,12 +256,12 @@ inline TextAndPositionContainer decode_text_retain_position(std::uint8_t t_text_
  *
  *
  * @param t_text_encoding The method that is used to encode the text
- * @param t_text          A const l-value reference to a unique pointer to a std::vector containing the text
+ * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
  * @param t_position      An unsigned 32 bit integer indicating the start of the string
  *
  * @return a std::string containing the text, nullptr if there is an error (for now) TODO pls fix
  */
-inline std::string decode_text(std::uint8_t t_text_encoding, std::unique_ptr<std::vector<char>> const& t_data, std::uint32_t t_position) noexcept {
+inline std::string decode_text(std::int8_t t_text_encoding, std::vector<char> const& t_data, std::uint32_t t_position) noexcept {
 
     auto result = decode_text_retain_position(t_text_encoding, t_data, t_position);
 
@@ -413,7 +413,7 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
  * @param t_frame_id The frameID of the frame
  * @param t_song     A reference to a {@class Song} object
  */
-void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept;
+void parseFrameData(std::vector<char> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept;
 
 
 /**

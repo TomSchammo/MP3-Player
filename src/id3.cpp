@@ -191,12 +191,12 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 }
 
 
-void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept {
+void parseFrameData(std::vector<char> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept {
 
     if (t_frame_id == "TIT2") {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data->at(0), t_data, 1);
+        std::string content = decode_text(t_data.at(0), t_data, 1);
 
         log<LogLevel::INFO>("Found a TIT2 frame, setting song title to: " + content);
 
@@ -205,7 +205,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
     } else if (t_frame_id == "TALB") {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data->at(0), t_data, 1);
+        std::string content = decode_text(t_data.at(0), t_data, 1);
 
         log<LogLevel::INFO>("Found a TALB frame, setting album title to: " + content);
 
@@ -214,7 +214,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
     } else if (t_frame_id == "TPE1") {
 
         // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data->at(0), t_data, 1);
+        std::string content = decode_text(t_data.at(0), t_data, 1);
 
         log<LogLevel::INFO>("Found a TPE1 frame, setting artist to: " + content);
 
@@ -225,7 +225,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
         // starting from 0, five characters (4 + '\0')
         // TODO is this right?
         // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
+        std::string content = decode_text(t_data.at(0), t_data, 1).substr(0, 5);
 
         log<LogLevel::INFO>("Found a TDRL frame, setting release year to: " + content);
 
@@ -240,7 +240,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
             // TODO deal with possibility of having an error
-            std::string content = decode_text(t_data->at(0), t_data, 1).substr(0, 5);
+            std::string content = decode_text(t_data.at(0), t_data, 1).substr(0, 5);
 
             log<LogLevel::INFO>("Found a TDRC frame, setting release year to: " + content);
 
@@ -254,7 +254,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
 
     } else if (t_frame_id == "TLEN") {
 
-        auto len = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
+        auto len = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
 
         log<LogLevel::INFO>("Found a TLEN frame, setting track length to: " + std::to_string(len));
 
@@ -262,7 +262,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
 
     } else if (t_frame_id == "TDLY") {
 
-        auto delay = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
+        auto delay = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
 
         log<LogLevel::INFO>("Found a TDLY frame, setting delay to: " + std::to_string(delay) + "ms");
 
@@ -276,7 +276,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
         if (t_song.m_genre == "Unknown Genre") {
 
             // TODO deal with possibility of having an error
-            std::string content = decode_text(t_data->at(0), t_data, 1);
+            std::string content = decode_text(t_data.at(0), t_data, 1);
 
             log<LogLevel::INFO>("Found a TCON frame, setting genre to: " + content);
 
@@ -292,7 +292,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
 
         // TRCK frame can contain a / with the total amount of tracks
         // after the track number. I don't care about that
-        for (std::int_fast8_t c : *t_data) {
+        for (std::int_fast8_t c : t_data) {
             if (c == '/')
                 break;
 
@@ -312,15 +312,15 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
         std::uint32_t iterator = 0;
 
         // byte indicating text encoding
-        std::int8_t text_encoding = t_data->at(iterator++);
+        std::int8_t text_encoding = t_data.at(iterator++);
 
         std::string mime_type;
 
-        char c = t_data->at(iterator);
+        char c = t_data.at(iterator);
 
         while (c != 0) {
             mime_type += c;
-            c = t_data->at(++iterator);
+            c = t_data.at(++iterator);
         }
 
         log<LogLevel::DDEBUG>("Found picture with MIME type: " + mime_type);
@@ -328,7 +328,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
         // MIME Type is not a link, continuing as planned
         if (mime_type != "-->") {
 
-            auto pic_type = static_cast<ID3::PictureType>(t_data->at(iterator++));
+            auto pic_type = static_cast<ID3::PictureType>(t_data.at(iterator++));
 
             auto container = decode_text_retain_position(text_encoding, t_data, iterator);
 
@@ -340,12 +340,12 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
                 iterator = container.position;
 
                 auto pic_data = std::make_shared<std::vector<char>>();
-                pic_data->reserve(t_data->size() - iterator);
+                pic_data->reserve(t_data.size() - iterator);
 
 
                 // extracting picture data
-                while (iterator < t_data->size()) {
-                    pic_data->push_back(t_data->at(iterator++));
+                while (iterator < t_data.size()) {
+                    pic_data->push_back(t_data.at(iterator++));
                 }
 
 
@@ -375,7 +375,7 @@ void parseFrameData(std::unique_ptr<std::vector<char>> const& t_data, const std:
 
     } else if (t_frame_id == "PCNT") {
 
-        std::uint64_t play_counter = convert_bytes(t_data->data(), static_cast<std::uint32_t>(t_data->size()));
+        std::uint64_t play_counter = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
 
         log<LogLevel::INFO>("Found an PCNT frame, setting play counter to: " + std::to_string(play_counter));
 
@@ -584,7 +584,7 @@ void readID3(Song& t_song) noexcept {
                         log<LogLevel::ERROR>("frame_id has not been set properly");
                     }
 
-                    parseFrameData(frame_content, frame_id, t_song);
+                    parseFrameData(*frame_content, frame_id, t_song);
 
                 }
             }
