@@ -542,8 +542,8 @@ void readID3(Song& t_song) noexcept {
             log<LogLevel::DDEBUG>("Starting to read frames at position " + std::to_string(position));
 
             while (size_remaining > 0) {
-                std::cout << size_remaining << " bytes remaining..." << std::endl;
-                std::cout << size_remaining << " > 0" << std::endl;
+                log<LogLevel::INFO>(std::to_string(size_remaining) + " bytes remaining...");
+                log<LogLevel::INFO>(std::to_string(size_remaining) + " > 0");
 
                 std::string frame_id;
 
@@ -554,8 +554,7 @@ void readID3(Song& t_song) noexcept {
                 // There are no frames left, the rest is padding
                 if (frame_content == nullptr) {
 
-                    // TODO log debug
-                    std::cout << "Result has no value, so read a frame_id starting with 0x00" << std::endl;
+                    log<LogLevel::DDEBUG>("Result has no value, so read a frame_id starting with 0x00");
 
                     position = size_remaining;
                     size_remaining = 0;
@@ -574,18 +573,15 @@ void readID3(Song& t_song) noexcept {
                     // size_remaining -= (position - original_position_file);
                     size_remaining -= (position);
 
-                    // TODO log info
-                    std::cout << "Size remaining: " << size_remaining << std::endl;
+                    log<LogLevel::INFO>("Size remaining: " + std::to_string(size_remaining));
 
-                    // TODO log info
-                    std::cout << "Continuing to read at position: " << position << std::endl;
+                    log<LogLevel::INFO>("Continuing to read at position: " + std::to_string(position));
 
                     // frame_id has been not been set properly,
                     // still parsing the frame as I can't skip it
                     // without knowing it's size
-                    if (frame_id.compare("") == 0) {
-                        // TODO log error
-                        std::cout << "frame_id has not been set properly" << std::endl;
+                    if (frame_id.empty()) {
+                        log<LogLevel::ERROR>("frame_id has not been set properly");
                     }
 
                     parseFrameData(frame_content, frame_id, t_song);
@@ -597,9 +593,9 @@ void readID3(Song& t_song) noexcept {
 
 
     }
+
     else {
-        // TODO log debug
-        std::cout << "No ID3 Tag has been prepended to file: " << t_song.m_path << std::endl;
+        log<LogLevel::DDEBUG>("No ID3 Tag has been prepended to file: " + t_song.m_path);
     }
 }
 
