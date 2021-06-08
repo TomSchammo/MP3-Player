@@ -59,8 +59,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 
     const unsigned char BUFFER_LOCATION = t_extended ? SIZE_OF_HEADER : LOCATION_SIZE;
 
-    // Have to do this, since C++ doesn't support variable length arrays
-    std::vector<char> buffer(SIZE_OF_SIZE);
+    std::array<char, SIZE_OF_SIZE> buffer{};
 
     t_handler.readBytes(buffer.data(), BUFFER_LOCATION, SIZE_OF_SIZE);
 
