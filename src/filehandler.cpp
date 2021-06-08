@@ -220,6 +220,9 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 
     std::vector<char> buffer(t_bytes);
 
+    // reserving enough space for the string and a potentially missing  null terminator to avoid reallocations
+    buffer.reserve(t_bytes + 1);
+
     m_stream.seekg(t_position, std::ios::beg);
     m_stream.read(buffer.data(), t_bytes);
 
@@ -246,6 +249,9 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
         << " of the file: " << m_filename << std::endl;
 
     std::vector<char> buffer(t_bytes);
+
+    // reserving enough space for the string and a potentially missing  null terminator to avoid reallocations
+    buffer.reserve(t_bytes + 1);
 
     m_stream.seekg(t_position, t_way);
     m_stream.read(buffer.data(), t_bytes);
