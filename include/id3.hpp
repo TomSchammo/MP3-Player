@@ -277,7 +277,7 @@ inline std::string decode_text(std::uint8_t t_text_encoding, std::unique_ptr<std
 /**
  * Converts data in a char buffer into a base 10 number that can be worked with.
  *
- * So {0, 0, 1, 63} (coming from {0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
+ * So {0, 0, 1, 63} ({0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
  *
  * @param t_buffer   is a char array that contains the data
  * @param t_size     is the size of the char array
@@ -293,7 +293,7 @@ inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) 
     // going from last to first assuming that lsb is in the back
     for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-        auto n = static_cast<std::uint64_t>(static_cast<std::uint8_t>(t_buffer[i]) << factor);
+        std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i]) << factor;
 
         number |= n;
 
