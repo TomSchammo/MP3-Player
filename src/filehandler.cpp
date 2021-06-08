@@ -218,8 +218,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
 void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const unsigned char t_bytes) const noexcept {
 
-    // TODO log debug
-    std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position << " from the file: " << m_filename << std::endl;
+    log<LogLevel::DDEBUG>("Reading " + std::to_string(int(t_bytes)) + " bytes starting at offset " + std::to_string(t_position) + " from file: " + m_filename);
 
     std::vector<char> buffer(t_bytes);
 
@@ -299,9 +298,9 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 Filehandler::~Filehandler() noexcept {
 
     if(m_stream.is_open()) {
-        std::cout << "Closing stream of " << m_filename << std::endl;
+        log<LogLevel::INFO>("Closing stream of " + m_filename);
         m_stream.close();
     }
 
-    std::cout << "Destroying filehandler object for file: " << m_filename << std::endl;
+    log<LogLevel::INFO>("Destroying filehandler object for file " + m_filename);
 }
