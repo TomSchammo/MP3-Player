@@ -128,7 +128,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
  *
  * If the value of that byte is not valid (meaning none of the above)
  * a flag indicating an error will be set to true along with an error
- * message instead of the decoded text and a posistion of 0.
+ * message instead of the decoded text and a position of 0.
  *
  * @param t_text_encoding The method that is used to encode the text
  * @param t_data          A const l-value reference to a std::vector containing the bytes of the text

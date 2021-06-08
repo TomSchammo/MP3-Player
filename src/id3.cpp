@@ -487,8 +487,7 @@ void readID3(Song& t_song) noexcept {
     if (detectID3(handler)) {
         auto version = getVersion(handler);
 
-        // TODO log info
-        // std::cout << "ID3v2." << static_cast<std::uint16_t>(version) << std::endl;
+        log<LogLevel::INFO>("ID3v2." + std::to_string(static_cast<std::uint16_t>(version)));
 
         // TODO proceed with extracting metadata
         auto flags = getFlags(handler);
@@ -562,7 +561,7 @@ void readID3(Song& t_song) noexcept {
 
                 else {
 
-                    if (frame_id.compare("PCNT") == 0) {
+                    if (frame_id == "PCNT") {
 
                         // setting posistion of start of play counter frame
                         t_song.m_counter_offset = original_position_file;
