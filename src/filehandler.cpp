@@ -8,7 +8,7 @@ Filehandler::Filehandler(std::string  t_filename) noexcept : m_filename(std::mov
 
     if (exists()) {
 
-        log<LogLevel::DDEBUG>("Creating file handler object for file " + m_filename);
+        log<LogLevel::INFO>("Creating file handler object for file " + m_filename);
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
