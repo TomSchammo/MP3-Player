@@ -4,7 +4,7 @@
 using namespace logging;
 using namespace ID3;
 
-bool detectID3(Filehandler& t_handler) noexcept {
+bool ID3::detectID3(Filehandler& t_handler) noexcept {
 
     std::string s;
     t_handler.readString(s, LOCATION_START, 3);

@@ -58,6 +58,7 @@ namespace ID3 {
         const byte format_flags;
     };
 
+
     /**
      * Container for text read from a buffer, the current position in
      * the buffer (position of the end of the text) and an error flag.
@@ -76,6 +77,14 @@ namespace ID3 {
         bool error;
     };
 
+
+    /**
+     * Checks whether ID3 metadata prepended to the file.
+     *
+     * @param t_handler A reference to a Filehandler object to read from the file
+     * @return true if an ID3 tag is prepended to the file, false otherwise
+     */
+    bool detectID3(Filehandler& t_handler) noexcept;
 
 
     /**
@@ -176,15 +185,6 @@ namespace ID3 {
      */
         void synchronize(std::vector<char>& t_data) noexcept;
 }
-
-
-/**
- * Checks whether ID3 metadata prepended to the file.
- *
- * @param t_handler A reference to a Filehandler object to read from the file
- * @return true if an ID3 tag is prepended to the file, false otherwise
- */
-bool dectectID3(Filehandler& t_handler) noexcept;
 
 
 /**
