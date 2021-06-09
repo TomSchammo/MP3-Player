@@ -158,12 +158,16 @@ namespace ID3 {
         void synchronize(std::vector<char>& t_data) noexcept;
 }
 
-/*
+/**
  * Container for text read from a buffer, the current position in
  * the buffer (position of the end of the text) and an error flag.
  *
  * If the error flag is set to true, the text variable should contain
  * the error message and the position should be set to 0.
+ *
+ * text:     The text extracted from said buffer
+ * position; Position at the end of the text
+ * bool:     true if there was an error when decoding, false otherwise
  */
 struct TextAndPositionContainer {
 
