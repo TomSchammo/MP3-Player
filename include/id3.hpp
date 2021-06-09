@@ -35,7 +35,6 @@ namespace ID3 {
     constexpr byte SIZE_OF_VERSION = 1;
 
     constexpr byte SIZE_OF_SIZE = 4;
-    constexpr byte SIZE_OF_FRAME_ID = 4;
 
     // TODO reconsider readID3 return type
 
@@ -118,6 +117,7 @@ namespace ID3 {
         return number;
     }
 
+
     /**
      * Reads the content of a frame header, converts the 4 byte ID to a null-terminated string and puts the 4 size bytes
      * into an unsigned 32 bit integer and saves that, along with the flags into a FrameHeader struct.
@@ -183,7 +183,7 @@ namespace ID3 {
      *
      * @param  t_data A reference to a std::unique_ptr of an std::vector<char> with data that is supposed to be synchronized
      */
-        void synchronize(std::vector<char>& t_data) noexcept;
+    void synchronize(std::vector<char>& t_data) noexcept;
 }
 
 
