@@ -474,19 +474,6 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
 
 
 /**
- * Parses the data from an ID3 frame, and saves it to the respective member
- * variable of the Song object included in in the parameters.
- *
- * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
- *
- * @param t_data     The data of the ID3 frame
- * @param t_frame_id The frameID of the frame
- * @param t_song     A reference to a {@class Song} object
- */
-void parseFrameData(std::vector<char> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept;
-
-
-/**
  * Function to extract ID3 encapsulated metadata from an mp3 file.
  *
  * @param t_song is a reference to a song object that represents the mp3 file.
