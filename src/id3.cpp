@@ -92,6 +92,7 @@ void synchronize(std::vector<char>& t_data) noexcept {
 }
 
 
+/*
 void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 
     // TODO this needs some testing and fixing
@@ -188,6 +189,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
     }
 
 }
+ */
 
 
 void parseFrameData(std::vector<char> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept {
