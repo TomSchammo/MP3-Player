@@ -555,8 +555,7 @@ void readID3(Song& t_song) noexcept {
             }
 
 
-            // TODO are 32 bits enough, if not, need to up position and this to uint64
-            std::int32_t size_remaining = size + extended_size;
+            std::int64_t size_remaining = size + extended_size;
 
             std::uint32_t position = SIZE_OF_HEADER + extended_size;
 
@@ -578,7 +577,8 @@ void readID3(Song& t_song) noexcept {
 
                     log<LogLevel::DDEBUG>("Result has no value, so read a frame_id starting with 0x00");
 
-                    position = size_remaining;
+                    // this is alright because size_remaining > 0
+                    position = static_cast<std::uint32_t>(size_remaining);
                     size_remaining = 0;
                 }
 
