@@ -565,8 +565,6 @@ void readID3(Song& t_song) noexcept {
                 log<LogLevel::INFO>(std::to_string(size_remaining) + " bytes remaining...");
                 log<LogLevel::INFO>(std::to_string(size_remaining) + " > 0");
 
-                std::string frame_id;
-
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
                 auto frame_header = readFrameHeader(handler, position);
@@ -584,7 +582,7 @@ void readID3(Song& t_song) noexcept {
 
                 else {
 
-                    if (frame_id == "PCNT") {
+                    if (frame_header.id == "PCNT") {
 
                         // setting posistion of start of play counter frame
                         t_song.m_counter_offset = original_position_file;
@@ -602,7 +600,8 @@ void readID3(Song& t_song) noexcept {
                     // frame_id has been not been set properly,
                     // still parsing the frame as I can't skip it
                     // without knowing it's size
-                    if (frame_id.empty()) {
+                    // TODO is this ever empty?
+                    if (frame_header.id.empty()) {
                         log<LogLevel::ERROR>("frame_id has not been set properly");
                     }
 
