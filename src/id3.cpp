@@ -193,260 +193,278 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
  */
 
 
-void parseFrameData(std::vector<char> const& t_data, const std::string& t_frame_id, Song& t_song) noexcept {
+std::unique_ptr<std::vector<char>> ID3::prepareFrameData(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position) noexcept {
 
-    if (t_frame_id == "TIT2") {
+    log<LogLevel::DDEBUG>("Reading " + std::to_string(t_frame_header.size) + " bytes of Frame with ID " + t_frame_header.id);
 
-        // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data.at(0), t_data, 1);
+    auto frame_content = readFrame(t_handler, t_position, t_frame_header.size);
 
-        log<LogLevel::INFO>("Found a TIT2 frame, setting song title to: " + content);
+    // synchronizing frame data
+    if (t_frame_header.format_flags & (1 << 1))
+        synchronize(*frame_content);
 
-        t_song.m_title = content;
 
-    } else if (t_frame_id == "TALB") {
+    if (t_frame_header.format_flags & (1 << 2)) {
+        log<LogLevel::DDEBUG>(t_frame_header.id + " is an encrypted frame...");
+        // TODO frame is encrypted
+        // TODO 1 byte with encryption method is added
+        // TODO see ENCR frame
+        // TODO decrypt after sync
+    }
 
-        // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data.at(0), t_data, 1);
+    if (t_frame_header.format_flags & (1 << 3)) {
+        log<LogLevel::DDEBUG>(t_frame_header.id + " is a compressed frame...");
+        // TODO frame is compressed with zlib
+        // TODO decompress after sync
+    }
 
-        log<LogLevel::INFO>("Found a TALB frame, setting album title to: " + content);
+    return frame_content;
 
-        t_song.m_album = content;
+}
 
-    } else if (t_frame_id == "TPE1") {
 
-        // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data.at(0), t_data, 1);
+bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position, Song& t_song) noexcept {
 
-        log<LogLevel::INFO>("Found a TPE1 frame, setting artist to: " + content);
+    // this frame is a padding frame, skipping
+    if (t_frame_header.id[0] == 0x00) {
 
-        t_song.m_artist = content;
+        log<LogLevel::DDEBUG>("Encountered a frame id starting with 0x00 which is probably due to padding, skipping to the end of the tag...");
 
-    } else if (t_frame_id == "TDRL") {
+        // TODO this does not work, there is no such things as 'padding frames'
+        // TODO I have to skip to the end of the tag
+        t_position += t_frame_header.size;
 
-        // starting from 0, five characters (4 + '\0')
-        // TODO is this right?
-        // TODO deal with possibility of having an error
-        std::string content = decode_text(t_data.at(0), t_data, 1).substr(0, 5);
+        return false;
+    }
 
-        log<LogLevel::INFO>("Found a TDRL frame, setting release year to: " + content);
+    else {
 
-        t_song.m_release = content;
 
-    } else if (t_frame_id == "TDRC") {
+        if (t_frame_header.id == "TIT2") {
 
-        // release year has precedence over recording year but if
-        // there is no TDRL frame, this frame will be used for the date instead
-        if (t_song.m_release.empty()) {
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            // TODO deal with possibility of having an error
+            std::string content = decode_text(data.at(0), data, 1);
+
+            log<LogLevel::INFO>("Found a TIT2 frame, setting song title to: " + content);
+
+            t_song.m_title = content;
+
+        } else if (t_frame_header.id == "TALB") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            // TODO deal with possibility of having an error
+            std::string content = decode_text(data.at(0), data, 1);
+
+            log<LogLevel::INFO>("Found a TALB frame, setting album title to: " + content);
+
+            t_song.m_album = content;
+
+        } else if (t_frame_header.id == "TPE1") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            // TODO deal with possibility of having an error
+            std::string content = decode_text(data.at(0), data, 1);
+
+            log<LogLevel::INFO>("Found a TPE1 frame, setting artist to: " + content);
+
+            t_song.m_artist = content;
+
+        } else if (t_frame_header.id == "TDRL") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
 
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
             // TODO deal with possibility of having an error
-            std::string content = decode_text(t_data.at(0), t_data, 1).substr(0, 5);
+            std::string content = decode_text(data.at(0), data, 1).substr(0, 5);
 
-            log<LogLevel::INFO>("Found a TDRC frame, setting release year to: " + content);
+            log<LogLevel::INFO>("Found a TDRL frame, setting release year to: " + content);
 
             t_song.m_release = content;
-        }
 
-        else {
+        } else if (t_frame_header.id == "TDRC") {
 
-            log<LogLevel::INFO>("Found a TDRC frame, but release year has already been set. Skipping...");
-        }
+            // release year has precedence over recording year but if
+            // there is no TDRL frame, this frame will be used for the date instead
+            if (t_song.m_release.empty()) {
 
-    } else if (t_frame_id == "TLEN") {
+                auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
-        auto len = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
+                // starting from 0, five characters (4 + '\0')
+                // TODO is this right?
+                // TODO deal with possibility of having an error
+                std::string content = decode_text(data.at(0), data, 1).substr(0, 5);
 
-        log<LogLevel::INFO>("Found a TLEN frame, setting track length to: " + std::to_string(len));
+                log<LogLevel::INFO>("Found a TDRC frame, setting release year to: " + content);
 
-        t_song.m_duration = len;
-
-    } else if (t_frame_id == "TDLY") {
-
-        auto delay = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
-
-        log<LogLevel::INFO>("Found a TDLY frame, setting delay to: " + std::to_string(delay) + "ms");
-
-        t_song.m_delay = delay;
-
-    } else if (t_frame_id == "TCON") {
-
-        // custom genres have precedence over content type but if
-        // there is no custom genre set, this frame will be used for the genre instead
-        // TODO this is different for older tag versions
-        if (t_song.m_genre == "Unknown Genre") {
-
-            // TODO deal with possibility of having an error
-            std::string content = decode_text(t_data.at(0), t_data, 1);
-
-            log<LogLevel::INFO>("Found a TCON frame, setting genre to: " + content);
-
-            // TODO not sure if this is always fine (as there can also be numbers apparently)
-            //      so maybe this is not the correct way to "parse" the data, but I'll have to
-            //      check with more files.
-            t_song.m_genre = content;
-        }
-
-    } else if (t_frame_id == "TRCK") {
-
-        std::string track_number;
-
-        // TRCK frame can contain a / with the total amount of tracks
-        // after the track number. I don't care about that
-        for (std::int_fast8_t c : t_data) {
-            if (c == '/')
-                break;
-
-            else
-                track_number += c;
-        }
-
-        log<LogLevel::INFO>("Found a TRCK frame, setting track number to: " + track_number);
-
-        t_song.m_track_number = track_number;
-
-
-    } else if (t_frame_id == "APIC") {
-
-        log<LogLevel::INFO>("Found an APIC frame");
-
-        std::uint32_t iterator = 0;
-
-        // byte indicating text encoding
-        std::int8_t text_encoding = t_data.at(iterator++);
-
-        std::string mime_type;
-
-        char c = t_data.at(iterator);
-
-        while (c != 0) {
-            mime_type += c;
-            c = t_data.at(++iterator);
-        }
-
-        log<LogLevel::DDEBUG>("Found picture with MIME type: " + mime_type);
-
-        // MIME Type is not a link, continuing as planned
-        if (mime_type != "-->") {
-
-            auto pic_type = static_cast<ID3::PictureType>(t_data.at(iterator++));
-
-            auto container = decode_text_retain_position(text_encoding, t_data, iterator);
-
-            if (!container.error) {
-
-                // TODO this is never used
-                // std::string description = container.text;
-
-                iterator = container.position;
-
-                auto pic_data = std::make_shared<std::vector<char>>();
-                pic_data->reserve(t_data.size() - iterator);
-
-
-                // extracting picture data
-                while (iterator < t_data.size()) {
-                    pic_data->push_back(t_data.at(iterator++));
-                }
-
-
-                ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
-
-                // TODO not sure if a copy is the best idea here, but I'll leave
-                //      it like this for now
-                t_song.m_art.push_back(art);
-
+                t_song.m_release = content;
             }
 
             else {
-                // TODO deal with error
 
-                log<LogLevel::ERROR>(container.text);
+                log<LogLevel::INFO>("Found a TDRC frame, but release year has already been set. Skipping...");
             }
-        }
 
-        // MIME Type is a link
-        // Links are ignored because this code will not run on a network capable device,
-        // so there is no way it will ever make use of that information.
-        else {
+        } else if (t_frame_header.id == "TLEN") {
 
-            log<LogLevel::WARNING>("Found APIC frames containing links, those are ignored as they are of no use\
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            auto len = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+
+            log<LogLevel::INFO>("Found a TLEN frame, setting track length to: " + std::to_string(len));
+
+            t_song.m_duration = len;
+
+        } else if (t_frame_header.id == "TDLY") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            auto delay = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+
+            log<LogLevel::INFO>("Found a TDLY frame, setting delay to: " + std::to_string(delay) + "ms");
+
+            t_song.m_delay = delay;
+
+        } else if (t_frame_header.id == "TCON") {
+
+            // custom genres have precedence over content type but if
+            // there is no custom genre set, this frame will be used for the genre instead
+            // TODO this is different for older tag versions
+            if (t_song.m_genre == "Unknown Genre") {
+
+                auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+                // TODO deal with possibility of having an error
+                std::string content = decode_text(data.at(0), data, 1);
+
+                log<LogLevel::INFO>("Found a TCON frame, setting genre to: " + content);
+
+                // TODO not sure if this is always fine (as there can also be numbers apparently)
+                //      so maybe this is not the correct way to "parse" the data, but I'll have to
+                //      check with more files.
+                t_song.m_genre = content;
+            }
+
+        } else if (t_frame_header.id == "TRCK") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            std::string track_number;
+
+            // TRCK frame can contain a / with the total amount of tracks
+            // after the track number. I don't care about that
+            for (std::int_fast8_t c : data) {
+                if (c == '/')
+                    break;
+
+                else
+                    track_number += c;
+            }
+
+            log<LogLevel::INFO>("Found a TRCK frame, setting track number to: " + track_number);
+
+            t_song.m_track_number = track_number;
+
+
+        } else if (t_frame_header.id == "APIC") {
+
+            log<LogLevel::INFO>("Found an APIC frame");
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            std::uint32_t iterator = 0;
+
+            // byte indicating text encoding
+            std::int8_t text_encoding = data.at(iterator++);
+
+            std::string mime_type;
+
+            char c = data.at(iterator);
+
+            while (c != 0) {
+                mime_type += c;
+                c = data.at(++iterator);
+            }
+
+            log<LogLevel::DDEBUG>("Found picture with MIME type: " + mime_type);
+
+            // MIME Type is not a link, continuing as planned
+            if (mime_type != "-->") {
+
+                auto pic_type = static_cast<ID3::PictureType>(data.at(iterator++));
+
+                auto container = decode_text_retain_position(text_encoding, data, iterator);
+
+                if (!container.error) {
+
+                    // TODO this is never used
+                    // std::string description = container.text;
+
+                    iterator = container.position;
+
+                    auto pic_data = std::make_shared<std::vector<char>>();
+                    pic_data->reserve(data.size() - iterator);
+
+
+                    // extracting picture data
+                    while (iterator < data.size()) {
+                        pic_data->push_back(data.at(iterator++));
+                    }
+
+
+                    ID3::Picture art = ID3::Picture(pic_data, mime_type, pic_type);
+
+                    // TODO not sure if a copy is the best idea here, but I'll leave
+                    //      it like this for now
+                    t_song.m_art.push_back(art);
+
+                }
+
+                else {
+                    // TODO deal with error
+
+                    log<LogLevel::ERROR>(container.text);
+                }
+            }
+
+                // MIME Type is a link
+                // Links are ignored because this code will not run on a network capable device,
+                // so there is no way it will ever make use of that information.
+            else {
+
+                log<LogLevel::WARNING>("Found APIC frames containing links, those are ignored as they are of no use\
                          for the purpose of this device.");
+            }
+
+        } else if (t_frame_header.id == "PCNT") {
+
+            auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
+
+            std::uint64_t play_counter = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+
+            log<LogLevel::INFO>("Found an PCNT frame, setting play counter to: " + std::to_string(play_counter));
+
+
+            t_song.m_play_counter = play_counter;
+
+        } else {
+            log<LogLevel::WARNING>("FrameID: " + t_frame_header.id + " is not supported yet");
         }
 
-    } else if (t_frame_id == "PCNT") {
+        // TODO TFLT (audio type, default is MPEG)
+        // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
 
-        std::uint64_t play_counter = convert_bytes(t_data.data(), static_cast<std::uint32_t>(t_data.size()));
-
-        log<LogLevel::INFO>("Found an PCNT frame, setting play counter to: " + std::to_string(play_counter));
-
-
-        t_song.m_play_counter = play_counter;
-
-    } else {
-        log<LogLevel::WARNING>("FrameID: " + t_frame_id + " is not supported yet");
+        return true;
     }
 
-    // TODO TFLT (audio type, default is MPEG)
-    // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
 
 }
 
-std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept {
-
-    t_handler.readString(t_frame_id, t_position, SIZE_OF_FRAME_ID);
-
-    if (t_frame_id[0] == 0x00) {
-
-        log<LogLevel::DDEBUG>("Encountered a frame id starting with 0x00 which is probably due to padding, skipping to the end of the tag...");
-
-        return nullptr;
-    }
-
-    t_position += SIZE_OF_FRAME_ID;
-
-    char size_buffer[SIZE_OF_SIZE];
-
-    t_handler.readBytes(size_buffer, t_position, SIZE_OF_SIZE);
-
-    auto frame_data_size = static_cast<std::uint32_t>(convert_bytes(size_buffer, SIZE_OF_SIZE));
-
-    t_position += SIZE_OF_SIZE;
-
-    char flags_buffer[2];
-
-    t_handler.readBytes(flags_buffer, t_position, 2);
-
-    std::int8_t status_flags = flags_buffer[0];
-
-    if (status_flags & (1 << 5)) {
-        // TODO frame should be discarded (bit == 1) if frame is unknown and tag is altered
-    }
-
-    if (status_flags & (1 << 4)) {
-        // TODO frame should be discarded (bit == 1) if frame is unknown and file is altered
-    }
-
-    if (status_flags & (1 << 3)) {
-        // TODO frame is read only (don't increase counter)
-    }
-
-    // TODO relevant bits: 6, 3, 2, 1, 0 (all)
-    std::int8_t format_flags = flags_buffer[1];
-
-    if (format_flags & 1) {
-        log<LogLevel::DDEBUG>("Expecting data length indicator in frame ");
-        // TODO Data length indicator has been added
-        // TODO idk what this is even for
-    }
-
-    if (format_flags & (1 << 2)) {
-        log<LogLevel::DDEBUG>(t_frame_id + " is an encrypted frame...");
-        // TODO frame is encrypted
-        // TODO 1 byte with encryption method is added
-        // TODO see ENCR frame
-    }
 FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept {
 
     char buffer[SIZE_OF_HEADER]{};
@@ -552,10 +570,11 @@ void readID3(Song& t_song) noexcept {
 
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
-                auto frame_content = readFrame(handler, frame_id, position);
+                auto frame_header = readFrameHeader(handler, position);
+                auto result = parseFrame(handler, frame_header, position, t_song);
 
                 // There are no frames left, the rest is padding
-                if (frame_content == nullptr) {
+                if (!result) {
 
                     log<LogLevel::DDEBUG>("Result has no value, so read a frame_id starting with 0x00");
 
@@ -587,7 +606,6 @@ void readID3(Song& t_song) noexcept {
                         log<LogLevel::ERROR>("frame_id has not been set properly");
                     }
 
-                    parseFrameData(*frame_content, frame_id, t_song);
 
                 }
             }
