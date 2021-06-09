@@ -51,12 +51,12 @@ namespace ID3 {
      * format_flags:    One byte containing the frame format flags with the msb and the 5th and 6th bit always set to 0 (0b0x00xxxx)
      *
      */
-     struct FrameHeader {
-         const std::string id;
-         const std::uint32_t size;
-         const byte status_flags;
-         const byte format_flags;
-     };
+    struct FrameHeader {
+        const std::string id;
+        const std::uint32_t size;
+        const byte status_flags;
+        const byte format_flags;
+    };
 
 
     /**
@@ -69,78 +69,78 @@ namespace ID3 {
      *
      * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
      */
-     inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
+    inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
 
-         std::uint64_t factor = 0;
+        std::uint64_t factor = 0;
 
-         std::uint64_t number = 0;
+        std::uint64_t number = 0;
 
-         // going from last to first assuming that lsb is in the back
-         for (std::int64_t i = t_size - 1; i >= 0; --i) {
+        // going from last to first assuming that lsb is in the back
+        for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-             std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i]) << factor;
+            std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i]) << factor;
 
-             number |= n;
+            number |= n;
 
-             // increasing the factor by 8 each time
-             // as we are reading 8 bits at a time
-             factor += 8;
-         }
+            // increasing the factor by 8 each time
+            // as we are reading 8 bits at a time
+            factor += 8;
+        }
 
-         return number;
-     }
+        return number;
+    }
 
-     /**
-      * Reads the content of a frame header, converts the 4 byte ID to a null-terminated string and puts the 4 size bytes
-      * into an unsigned 32 bit integer and saves that, along with the flags into a FrameHeader struct.
-      *
-      * @param t_handler    A reference to the file handler object for this file to read the frame header
-      * @param t_position   A reference to the position of the file pointer so that it knows where to start reading the 10 bytes
-      *
-      * @return A FrameHeader struct containing the frame ID, the size, the status- and format flags of the current frame
-      */
-     FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept;
-
-
-     /**
-      * The readFrame function is called to read the contents of a frame.
-      *
-      * After that that data is prepared to be parsed. This includes synchronizing it if has been desynchronized,
-      * decompressing it if it has been compressed and decrypting it if it has been encrypted.
-      *
-      * TODO decompression has not yet been implemented
-      * TODO decryption has not yet been implemented
-      *
-      *
-      * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
-      * @param t_frame_header   A reference to the frame header struct for this frame
-      * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
-      *
-      * @return A std::unique_ptr of a std::vector<char> containing the 'prepared' data
-      */
-     std::unique_ptr<std::vector<char>> prepareFrameData(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position) noexcept;
+    /**
+     * Reads the content of a frame header, converts the 4 byte ID to a null-terminated string and puts the 4 size bytes
+     * into an unsigned 32 bit integer and saves that, along with the flags into a FrameHeader struct.
+     *
+     * @param t_handler    A reference to the file handler object for this file to read the frame header
+     * @param t_position   A reference to the position of the file pointer so that it knows where to start reading the 10 bytes
+     *
+     * @return A FrameHeader struct containing the frame ID, the size, the status- and format flags of the current frame
+     */
+    FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept;
 
 
-     /**
-      * Checks if the frame ID is valid.
-      *
-      * If it is valid, it proceeds by calling the prepareFrameData function, which calls the the readFrame function,
-      * reads the frame data, and edits the data buffer so that it can be parsed (synchronization and decompression are
-      * examples of things that need to be done before the data can be read.
-      * After that the data is parsed and saved in the respective member variable in the Song object.
-      *
-      * If it is not, there has either been a mistake, or there is only padding left.
-      *
-      * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
-      *
-      * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
-      * @param t_frame_header   A reference to the frame header struct for this frame
-      * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
-      * @param t_song           A reference to the current song object to set the song data
-      *
-      * @return true if the frame is not padding frame, false if it is
-      */
-     bool parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position, Song& t_song) noexcept;
+    /**
+     * The readFrame function is called to read the contents of a frame.
+     *
+     * After that that data is prepared to be parsed. This includes synchronizing it if has been desynchronized,
+     * decompressing it if it has been compressed and decrypting it if it has been encrypted.
+     *
+     * TODO decompression has not yet been implemented
+     * TODO decryption has not yet been implemented
+     *
+     *
+     * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
+     * @param t_frame_header   A reference to the frame header struct for this frame
+     * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
+     *
+     * @return A std::unique_ptr of a std::vector<char> containing the 'prepared' data
+     */
+    std::unique_ptr<std::vector<char>> prepareFrameData(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position) noexcept;
+
+
+    /**
+     * Checks if the frame ID is valid.
+     *
+     * If it is valid, it proceeds by calling the prepareFrameData function, which calls the the readFrame function,
+     * reads the frame data, and edits the data buffer so that it can be parsed (synchronization and decompression are
+     * examples of things that need to be done before the data can be read.
+     * After that the data is parsed and saved in the respective member variable in the Song object.
+     *
+     * If it is not, there has either been a mistake, or there is only padding left.
+     *
+     * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
+     *
+     * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
+     * @param t_frame_header   A reference to the frame header struct for this frame
+     * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
+     * @param t_song           A reference to the current song object to set the song data
+     *
+     * @return true if the frame is not padding frame, false if it is
+     */
+    bool parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position, Song& t_song) noexcept;
 
 
     /**
