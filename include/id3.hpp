@@ -58,6 +58,25 @@ namespace ID3 {
         const byte format_flags;
     };
 
+    /**
+     * Container for text read from a buffer, the current position in
+     * the buffer (position of the end of the text) and an error flag.
+     *
+     * If the error flag is set to true, the text variable should contain
+     * the error message and the position should be set to 0.
+     *
+     * text:     The text extracted from said buffer
+     * position; Position at the end of the text
+     * bool:     true if there was an error when decoding, false otherwise
+     */
+    struct TextAndPositionContainer {
+
+        std::string text;
+        std::uint32_t position;
+        bool error;
+    };
+
+
 
     /**
      * Converts data in a char buffer into a base 10 number that can be worked with.
@@ -158,25 +177,6 @@ namespace ID3 {
         void synchronize(std::vector<char>& t_data) noexcept;
 }
 
-/**
- * Container for text read from a buffer, the current position in
- * the buffer (position of the end of the text) and an error flag.
- *
- * If the error flag is set to true, the text variable should contain
- * the error message and the position should be set to 0.
- *
- * text:     The text extracted from said buffer
- * position; Position at the end of the text
- * bool:     true if there was an error when decoding, false otherwise
- */
-struct TextAndPositionContainer {
-
-    std::string text;
-    std::uint32_t position;
-    bool error;
-};
-
-
 
 /**
  * Checks whether ID3 metadata prepended to the file.
@@ -265,7 +265,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
  * @return a container struct that contains the decoded text and the updated value of
  *         the position argument as well as an error flag that should be false.
  */
-inline TextAndPositionContainer decode_text_retain_position(std::int8_t t_text_encoding,
+inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_text_encoding,
                                                             std::vector<char> const& t_data,
                                                             std::uint32_t t_position) noexcept {
 
