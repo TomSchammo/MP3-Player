@@ -458,19 +458,15 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept;
 
 /**
  * Reads the content of a frame and returns the data (the whole frame minus the header),
- * as a unique pointer to a vector that contains the raw bytes,
- * so that it can be parsed by another function.
- *
- * It retuns a nullptr if there are no frames left. The rest of the tag can then be
- * skipped as all that's left are 0x00 bytes, used as padding.
+ * as a unique pointer to a vector that contains the raw bytes,so that it can be parsed by another function.
  *
  * @param t_handler          A reference to a Filehandler object to read from the file
- * @param t_frame_id         A reference to a string that will be set to the frame id
  * @param t_position         The starting position of the frame in the file
+ * @param t_bytes            The amount of bytes that should be read
  *
  * @return a unique pointer to a vector that contains the data of the frame or a nullptr
  */
-std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string& t_frame_id, std::uint32_t& t_position) noexcept;
+std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept;
 
 
 /**
