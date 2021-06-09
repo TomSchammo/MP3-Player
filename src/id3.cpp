@@ -2,6 +2,7 @@
 #include <picture.hpp>
 
 using namespace logging;
+using namespace ID3;
 
 bool detectID3(Filehandler& t_handler) noexcept {
 

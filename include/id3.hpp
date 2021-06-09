@@ -17,22 +17,31 @@
 #include <iostream>
 #include <log.hpp>
 
-// constants
-constexpr std::uint8_t LOCATION_START = 0;
-constexpr std::uint8_t LOCATION_VERSION = 3;
-constexpr std::uint8_t LOCATION_FLAGS = 5;
-constexpr std::uint8_t LOCATION_SIZE = 6;
-constexpr std::uint8_t SIZE_OF_FLAGS = 1;
-constexpr std::uint8_t SIZE_OF_HEADER = 10;
 
-// TODO Only reading major, don't care about revision just now
-constexpr std::uint8_t SIZE_OF_VERSION = 1;
+namespace ID3 {
 
-constexpr std::uint8_t SIZE_OF_SIZE = 4;
-constexpr std::uint8_t SIZE_OF_FRAME_ID = 4;
+    using byte = std::uint8_t;
 
-// TODO reconsider readID3 return type
-// TODO consider wrapping everything in namespace
+
+    // constants
+    constexpr byte LOCATION_START = 0;
+    constexpr byte LOCATION_VERSION = 3;
+    constexpr byte LOCATION_FLAGS = 5;
+    constexpr byte LOCATION_SIZE = 6;
+    constexpr byte SIZE_OF_FLAGS = 1;
+    constexpr byte SIZE_OF_HEADER = 10;
+
+    // TODO Only reading major, don't care about revision just now
+    constexpr byte SIZE_OF_VERSION = 1;
+
+    constexpr byte SIZE_OF_SIZE = 4;
+    constexpr byte SIZE_OF_FRAME_ID = 4;
+
+    // TODO reconsider readID3 return type
+
+
+
+}
 
 /*
  * Container for text read from a buffer, the current position in
