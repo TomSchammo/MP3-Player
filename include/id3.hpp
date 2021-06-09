@@ -141,6 +141,21 @@ namespace ID3 {
       * @return true if the frame is not padding frame, false if it is
       */
      bool parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position, Song& t_song) noexcept;
+
+
+    /**
+     * Synchronizes unsynchronized data.
+     *
+     * When applying unsynchronization, a 0x00 is inserted after every 0xff byte.
+     * This function reverses that scheme, so if there is a 0x00 byte after a 0xff,
+     * it is removed.
+     *
+     *
+     * See https://id3.org/id3v2.4.0-structure section 6.1 for more information.
+     *
+     * @param  t_data A reference to a std::unique_ptr of an std::vector<char> with data that is supposed to be synchronized
+     */
+        void synchronize(std::vector<char>& t_data) noexcept;
 }
 
 /*
@@ -467,21 +482,6 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
 
     }
 }
-
-
-/**
- * Synchronizes unsynchronized data.
- *
- * When applying unsynchronization, a 0x00 is inserted after every 0xff byte.
- * This function reverses that scheme, so if there is a 0x00 byte after a 0xff,
- * it is removed.
- *
- *
- * See https://id3.org/id3v2.4.0-structure section 6.1 for more information.
- *
- * @param  t_data A reference to a std::unique_ptr of an std::vector<char> with data that is supposed to be synchronized
- */
-void synchronize(std::vector<char>& t_data) noexcept;
 
 
 /**

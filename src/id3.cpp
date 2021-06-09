@@ -72,7 +72,7 @@ std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 }
 
 
-void synchronize(std::vector<char>& t_data) noexcept {
+void ID3::synchronize(std::vector<char>& t_data) noexcept {
 
     bool sync = true;
 
