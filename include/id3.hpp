@@ -98,6 +98,16 @@ namespace ID3 {
      */
     inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
 
+        std::vector<byte> byte_buffer{};
+        byte_buffer.reserve(t_size);
+
+        // I have to do this, because I can't read the contents of a file as unsigned chars
+        // but working with signed chars will fuck up conversions, so I have to convert it all to
+        // an unsigned representation and I have to accept the overhead.
+        for (std::uint_fast32_t i = 0; i < t_size; ++i) {
+           byte_buffer.push_back(static_cast<byte>(t_buffer[i]));
+        }
+
         std::uint64_t factor = 0;
 
         std::uint64_t number = 0;
@@ -105,7 +115,7 @@ namespace ID3 {
         // going from last to first assuming that lsb is in the back
         for (std::int64_t i = t_size - 1; i >= 0; --i) {
 
-            std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i]) << factor;
+            std::uint64_t n = static_cast<std::uint64_t>(byte_buffer[i]) << factor;
 
             number |= n;
 
