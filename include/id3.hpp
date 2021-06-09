@@ -41,6 +41,25 @@ namespace ID3 {
 
 
 
+
+    /**
+     * Struct containing the data of a frame header
+     *
+     * id:              4 bytes containing the frame id as a null terminated string
+     * size;            4 bytes containing the size of the tag as a syncsafe 32 bit integer
+     * status_flags:    One byte containing the frame status flags where msb and the 4 lower bits are always set to 0 (0b0xx0000)
+     * format_flags:    One byte containing the frame format flags with the msb and the 5th and 6th bit always set to 0 (0b0x00xxxx)
+     *
+     */
+     struct FrameHeader {
+         const std::string id;
+         const std::uint32_t size;
+         const byte status_flags;
+         const byte format_flags;
+     };
+
+
+
 }
 
 /*
