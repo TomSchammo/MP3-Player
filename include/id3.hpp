@@ -119,6 +119,28 @@ namespace ID3 {
       * @return A std::unique_ptr of a std::vector<char> containing the 'prepared' data
       */
      std::unique_ptr<std::vector<char>> prepareFrameData(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position) noexcept;
+
+
+     /**
+      * Checks if the frame ID is valid.
+      *
+      * If it is valid, it proceeds by calling the prepareFrameData function, which calls the the readFrame function,
+      * reads the frame data, and edits the data buffer so that it can be parsed (synchronization and decompression are
+      * examples of things that need to be done before the data can be read.
+      * After that the data is parsed and saved in the respective member variable in the Song object.
+      *
+      * If it is not, there has either been a mistake, or there is only padding left.
+      *
+      * See: {@link https://id3.org/id3v2.4.0-frames} for all frames
+      *
+      * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
+      * @param t_frame_header   A reference to the frame header struct for this frame
+      * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
+      * @param t_song           A reference to the current song object to set the song data
+      *
+      * @return true if the frame is not padding frame, false if it is
+      */
+     bool parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position, Song& t_song) noexcept;
 }
 
 /*
