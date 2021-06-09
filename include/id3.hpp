@@ -102,6 +102,23 @@ namespace ID3 {
      FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept;
 
 
+     /**
+      * The readFrame function is called to read the contents of a frame.
+      *
+      * After that that data is prepared to be parsed. This includes synchronizing it if has been desynchronized,
+      * decompressing it if it has been compressed and decrypting it if it has been encrypted.
+      *
+      * TODO decompression has not yet been implemented
+      * TODO decryption has not yet been implemented
+      *
+      *
+      * @param t_handler        A reference to the file handler object for this file to pass it on to the readFrame function
+      * @param t_frame_header   A reference to the frame header struct for this frame
+      * @param t_position       A reference to the position of the file pointer to pass it on the readFrame function
+      *
+      * @return A std::unique_ptr of a std::vector<char> containing the 'prepared' data
+      */
+     std::unique_ptr<std::vector<char>> prepareFrameData(Filehandler& t_handler, FrameHeader& t_frame_header, std::uint32_t& t_position) noexcept;
 }
 
 /*
