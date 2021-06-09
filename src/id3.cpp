@@ -447,34 +447,30 @@ std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::string
         // TODO 1 byte with encryption method is added
         // TODO see ENCR frame
     }
+FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept {
 
-    if (format_flags & (1 << 3)) {
-        log<LogLevel::DDEBUG>(t_frame_id + " is a compressed frame...");
-        // TODO frame is compressed with zlib
-    }
+    char buffer[SIZE_OF_HEADER]{};
 
-    if (format_flags & (1 << 6)) {
-        log<LogLevel::DDEBUG>(t_frame_id + " is a group frame...");
-        // TODO frame belongs to group
-        // TODO read group identifier
-        // TODO put data of group frames together
-    }
+    t_handler.readBytes(buffer, t_position, static_cast<std::uint32_t>(SIZE_OF_HEADER));
 
-    t_position += 2;
+    t_position += SIZE_OF_HEADER;
 
-    log<LogLevel::DDEBUG>("Reading " + std::to_string(frame_data_size) + " bytes of Frame with ID " + t_frame_id);
+    std::string frame_id;
 
-    auto frame_content = std::make_unique<std::vector<char>>(frame_data_size);
-
-    t_handler.readBytes(frame_content->data(), t_position, frame_data_size);
-
-    // taking frame data in account when updating position
-    t_position += frame_data_size;
+    frame_id = {buffer[0], buffer[1], buffer[2], buffer[3]};
 
 
-    // synchronizing frame data
-    if (format_flags & (1 << 1))
-        synchronize(*frame_content);
+    const char size_bytes[4] = {buffer[4], buffer[5], buffer[6], buffer[7]};
+
+    auto size = static_cast<std::uint32_t>(convert_bytes(size_bytes, SIZE_OF_SIZE));
+
+    auto status_flags = static_cast<byte>(buffer[8]);
+    auto format_flags = static_cast<byte>(buffer[9]);
+
+
+    return {frame_id, size, status_flags, format_flags};
+}
+
 
 
 

@@ -90,6 +90,18 @@ namespace ID3 {
          return number;
      }
 
+     /**
+      * Reads the content of a frame header, converts the 4 byte ID to a null-terminated string and puts the 4 size bytes
+      * into an unsigned 32 bit integer and saves that, along with the flags into a FrameHeader struct.
+      *
+      * @param t_handler    A reference to the file handler object for this file to read the frame header
+      * @param t_position   A reference to the position of the file pointer so that it knows where to start reading the 10 bytes
+      *
+      * @return A FrameHeader struct containing the frame ID, the size, the status- and format flags of the current frame
+      */
+     FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept;
+
+
 }
 
 /*
