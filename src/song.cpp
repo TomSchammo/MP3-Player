@@ -3,11 +3,10 @@
 #include <iostream>
 #include <log.hpp>
 
-using namespace logging;
 
 
 Song::Song(const std::string& t_path) : m_path(t_path) {
-    log<LogLevel::INFO>("Creating song object for file: " + t_path);
+    log::info(fmt::format("Creating song object for file: {}", t_path));
 }
 
 void write_img(Song &song) {
@@ -21,7 +20,7 @@ void write_img(Song &song) {
 
 
         // size is not what is supposed to be
-        log<LogLevel::DDEBUG>("Album art has size: " + std::to_string(art.m_data->size()));
+        log::debug(fmt::format("Album art has size: {}", art.m_data->size()));
     }
 }
 
@@ -44,5 +43,5 @@ void Song::print() {
 }
 
 Song::~Song() {
-    log<LogLevel::INFO>("Destroying song with path: " + m_path);
+    log::info(fmt::format("Destroying song with path: {}", m_path));
 }

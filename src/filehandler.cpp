@@ -2,25 +2,24 @@
 #include <iostream>
 #include <log.hpp>
 
-using namespace logging;
 
 Filehandler::Filehandler(std::string  t_filename) noexcept : m_filename(std::move(t_filename)) {
 
     if (exists()) {
 
-        log<LogLevel::INFO>("Creating file handler object for file " + m_filename);
+        log::info(fmt::format("Creating file handler object for file {}", m_filename));
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
 
     else
-        log<LogLevel::WARNING>("File " + m_filename + " does not exist!");
+        log::warn(fmt::format("File {}  does not exist!", m_filename));
 }
 
 
 void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
-    log<LogLevel::DDEBUG>("Reading " + std::to_string(t_bytes) + " bytes starting at offset " + std::to_string(t_position) + " from file: " + m_filename);
+    log::debug(fmt::format("Reading {} bytes starting at offset {} from file: ", t_bytes, t_position, m_filename));
 
     m_stream.seekg(t_position, std::ios::beg);
     m_stream.read(t_buffer, t_bytes);
@@ -30,10 +29,8 @@ void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, con
 
 void Filehandler::readBytes(char t_buffer[], const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept {
 
-    // TODO log debug
-    std::cout << "Reading " << t_bytes << " bytes starting at offset " << t_position
-        << " relative to the " << (t_way ==  std::ios_base::beg ? "beginning" : "end")
-        << " of the file: " << m_filename << std::endl;
+    log::debug(fmt::format("Reading {} bytes starting at offset {} relative to the {} of the file: {}",
+                           t_bytes, t_position, (t_way == std::ios_base::beg ? "beginning" : "end"), m_filename));
 
     m_stream.seekg(t_position, t_way);
     m_stream.read(t_buffer, t_bytes);
@@ -135,15 +132,13 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             bool error = false;
 
             if (m_stream.is_open()) {
-                // std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
-                log<LogLevel::ERROR>("Error when closing streams: m_stream is expected to be closed but is open!");
+                log::error("Error when closing streams: m_stream is expected to be closed but is open!");
                 error = true;
 
             }
 
             if (stream.is_open()) {
-                // std::cout << "m_stream (" << &m_stream << ") is expected to be closed, but is open" << std::endl;
-                log<LogLevel::ERROR>("Error when closing streams: m_stream is expected to be closed but is open!");
+                log::error("Error when closing streams: m_stream is expected to be closed but is open!");
                 error = true;
 
             }
@@ -153,26 +148,26 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
                 // replacing old file with new one
                 if (std::remove(m_filename.c_str()) == 0) {
                     if (std::rename((m_filename + ".tmp").c_str(), m_filename.c_str()) != 0) {
-                        log<LogLevel::ERROR>("Could not rename " + m_filename + ".tmp to " + m_filename);
+                        log::error(fmt::format("Could not rename {0}.tmp to {0}", m_filename));
                     }
 
                     else {
-                        log<LogLevel::INFO>("Successfully renamed " + m_filename + ".tmp to " + m_filename);
+                        log::info(fmt::format("Successfully renamed {0}.tmp to {0}" , m_filename));
 
                         // reopening stream
                         m_stream.open(m_filename, std::ios::binary | std::ios::in);
 
                         if (m_stream.is_open())
-                            log<LogLevel::INFO>("Successfully re-opened filestream for file " + m_filename);
+                            log::info(fmt::format("Successfully re-opened filestream for file {}", m_filename));
 
                         else
-                            log<LogLevel::ERROR>("Failure when re-opening filestream for file " + m_filename);
+                            log::error(fmt::format("Failure when re-opening filestream for file {}", m_filename));
 
                     }
                 }
 
                 else {
-                    log<LogLevel::ERROR>("Could not remove " + m_filename);
+                    log::error(fmt::format("Could not remove {}", m_filename));
                 }
             }
 
@@ -186,7 +181,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
             }
         }
         else {
-            log<LogLevel::ERROR>("Stream position is supposed to be at the end of the file");
+            log::error("Stream position is supposed to be at the end of the file");
 
             // TODO deal with this
         }
@@ -197,18 +192,18 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
         if (!stream.is_open()) {
 
-            log<LogLevel::ERROR>("Could not open " + m_filename + ".tmp");
-            log<LogLevel::ERROR>("Cleaning up...");
+            log::error(fmt::format("Could not open {}.tmp", m_filename));
+            log::error("Cleaning up...");
 
             if (std::remove((m_filename + ".tmp").c_str()) == 0)
-                log<LogLevel::INFO>("Successfully deleted " + m_filename + ".tmp");
+                log::info(fmt::format("Successfully deleted {}.tmp", m_filename));
 
             else
-                log<LogLevel::ERROR>("Could not remove " + m_filename + ".tmp");
+                log::error(fmt::format("Could not remove {}.tmp", m_filename));
         }
 
         if (!m_stream.is_open()) {
-            log<LogLevel::ERROR>("Expected opened filestream for file " + m_filename + " but stream was closed...");
+            log::error(fmt::format("Expected opened filestream for file {} but stream was closed...", m_filename));
         }
     }
 }
@@ -216,7 +211,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
 void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
-    log<LogLevel::DDEBUG>("Reading " + std::to_string(int(t_bytes)) + " bytes starting at offset " + std::to_string(t_position) + " from file: " + m_filename);
+    log::debug(fmt::format("Reading {} bytes starting at offset {} from file: {}", int(t_bytes), t_position, m_filename));
 
     std::vector<char> buffer(t_bytes);
 
@@ -230,7 +225,7 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
     // buffer that is one byte longer, and a '\0' byte is added at the end
     if (buffer.at(t_bytes - 1) != '\0') {
 
-        log<LogLevel::DDEBUG>("String is not null terminated...");
+        log::debug("String is not null terminated...");
 
         buffer.push_back('\0');
 
@@ -243,10 +238,9 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 
 void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept {
 
-    // TODO log debug
-    std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position
-        << " relative to the " << (t_way ==  std::ios_base::beg ? "beginning" : "end")
-        << " of the file: " << m_filename << std::endl;
+
+    log::debug(fmt::format("Reading {} bytes starting at offset {} relative to the {} of the file: {}",
+                           t_bytes, t_position, (t_way == std::ios_base::beg ? "beginning" : "end"), m_filename));
 
     std::vector<char> buffer(t_bytes);
 
@@ -259,7 +253,7 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
     // if the string read is not null terminated its contents are copied into a new
     // buffer that is one byte longer, and a '\0' byte is added at the end
     if (buffer.at(t_bytes - 1) != '\0') {
-        log<LogLevel::INFO>("String is not null terminated...");
+        log::info("String is not null terminated...");
 
         buffer.push_back('\0');
     }
@@ -270,7 +264,7 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 
 std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 
-    log<LogLevel::INFO>("Reading file: " + m_filename);
+    log::info(fmt::format("Reading file: {}", m_filename));
 
     // TODO can this be improved?
     char data[1];
@@ -293,7 +287,7 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
         lines->push_back(line);
     }
 
-    log<LogLevel::INFO>("Read " + std::to_string(lines->size()) + " lines in file " + m_filename);
+    log::info(fmt::format("Read {} lines in file {}", lines->size(), m_filename));
 
     return lines;
 }
@@ -302,9 +296,9 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 Filehandler::~Filehandler() noexcept {
 
     if(m_stream.is_open()) {
-        log<LogLevel::INFO>("Closing stream of " + m_filename);
+        log::info(fmt::format("Closing stream of ", m_filename));
         m_stream.close();
     }
 
-    log<LogLevel::INFO>("Destroying filehandler object for file " + m_filename);
+    log::info(fmt::format("Destroying filehandler object for file {}", m_filename));
 }

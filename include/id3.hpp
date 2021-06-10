@@ -309,7 +309,7 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
     // (1 'zero' byte).
     if (t_text_encoding == 0x00) {
 
-        logging::log<logging::LogLevel::DDEBUG>("Decoding ISO-8859-1 encoded text");
+        log::debug("Decoding ISO-8859-1 encoded text");
 
         while (c != 0x00 && t_position != t_data.size()) {
             text += c;
@@ -319,7 +319,7 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
         // string is not null terminated
         if (c != 0x00) {
 
-            logging::log<logging::LogLevel::WARNING>("String is not null terminated");
+            log::warn("String is not null terminated");
 
             text += c;
 
@@ -339,8 +339,8 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
     // (2 'zero' bytes).
     else if (t_text_encoding == 0x01) {
 
-        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-16 encoded Unicode");
-        logging::log<logging::LogLevel::ERROR>("UTF-16 has not been implemented yet");
+        log::debug("Decoding UTF-16 encoded Unicode");
+        log::error("UTF-16 has not been implemented yet");
 
         char terminated = 0;
 
@@ -358,8 +358,8 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
     // It is null terminated by 0x0000 (2 'zero' bytes)
     else if (t_text_encoding == 0x02) {
 
-        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-16B encoded Unicode");
-        logging::log<logging::LogLevel::ERROR>("UTF-16B has not been implemented yet");
+        log::debug("Decoding UTF-16B encoded Unicode");
+        log::error("UTF-16B has not been implemented yet");
 
         char terminated = 0;
 
@@ -378,7 +378,7 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
     // It is terminated by 0x00 (1 'zero' byte)
     else if (t_text_encoding == 0x03) {
 
-        logging::log<logging::LogLevel::DDEBUG>("Decoding UTF-8 encoded Unicode");
+        log::debug("Decoding UTF-8 encoded Unicode");
 
         while (c != 0x00 && t_position != t_data.size()) {
             text += c;
@@ -388,7 +388,7 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
         // string is not null terminated
         if (c != 0x00) {
 
-            logging::log<logging::LogLevel::WARNING>("String is not null terminated");
+            log::warn("String is not null terminated");
 
             text += c;
 

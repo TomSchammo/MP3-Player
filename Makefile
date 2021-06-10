@@ -6,7 +6,7 @@ ERRFLAGS := -pedantic-errors -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-sty
 			-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast \
 			-Wdouble-promotion -Wformat=2
 CXXFLAGS := -std=c++17 $(ERRFLAGS)
-LDFLAGS  := -L/usr/lib -lstdc++ -lm
+LDFLAGS  := -L/usr/lib -lstdc++ -lm -lfmt
 BUILD	:= ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
