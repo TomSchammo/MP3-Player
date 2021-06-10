@@ -465,6 +465,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
 }
 
+
 FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept {
 
     char buffer[SIZE_OF_HEADER]{};
@@ -489,6 +490,7 @@ FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_positi
     return {frame_id, size, status_flags, format_flags};
 }
 
+
 std::unique_ptr<std::vector<char>> ID3::readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept {
 
     auto frame_content = std::make_unique<std::vector<char>>(t_bytes);
@@ -507,6 +509,8 @@ void ID3::readID3(Song& t_song) noexcept {
     Filehandler handler = Filehandler(t_song.m_path);
 
     if (detectID3(handler)) {
+
+        // retrieve ID3 version
         auto version = getVersion(handler);
 
         log<LogLevel::INFO>("ID3v2." + std::to_string(static_cast<std::uint16_t>(version)));
