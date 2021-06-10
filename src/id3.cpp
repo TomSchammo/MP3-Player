@@ -502,7 +502,7 @@ std::unique_ptr<std::vector<char>> ID3::readFrame(Filehandler& t_handler, std::u
 }
 
 
-void readID3(Song& t_song) noexcept {
+void ID3::readID3(Song& t_song) noexcept {
 
     Filehandler handler = Filehandler(t_song.m_path);
 

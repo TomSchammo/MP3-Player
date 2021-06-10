@@ -236,6 +236,14 @@ namespace ID3 {
      * @param  t_data A reference to a std::unique_ptr of an std::vector<char> with data that is supposed to be synchronized
      */
     void synchronize(std::vector<char>& t_data) noexcept;
+
+
+    /**
+     * Function to extract ID3 encapsulated metadata from an mp3 file.
+     *
+     * @param t_song is a reference to a song object that represents the mp3 file.
+     */
+    void readID3(Song& t_song) noexcept;
 }
 
 
@@ -520,14 +528,6 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
  * @param t_position is the offset of the start of the frame relative to the start of the file
  */
 void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept;
-
-
-/**
- * Function to extract ID3 encapsulated metadata from an mp3 file.
- *
- * @param t_song is a reference to a song object that represents the mp3 file.
- */
-void readID3(Song& t_song) noexcept;
 
 
 #endif // ID3_HPP
