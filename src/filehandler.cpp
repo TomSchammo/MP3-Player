@@ -220,7 +220,7 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 
     std::vector<char> buffer(t_bytes);
 
-    // reserving enough space for the string and a potentially missing  null terminator to avoid reallocations
+    // reserving enough space for the string and a potentially missing  null terminator to avoid reallocation
     buffer.reserve(t_bytes + 1);
 
     m_stream.seekg(t_position, std::ios::beg);
