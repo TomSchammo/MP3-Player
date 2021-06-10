@@ -16,7 +16,7 @@
 #include <song.hpp>
 #include <iostream>
 #include <log.hpp>
-#include <fmt/ranges.h>
+#include <fmt/format.h>
 
 
 namespace ID3 {
