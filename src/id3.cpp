@@ -588,7 +588,7 @@ void ID3::readID3(Song& t_song) noexcept {
 
                     if (frame_header.id == "PCNT") {
 
-                        // setting posistion of start of play counter frame
+                        // setting position of start of play counter frame
                         t_song.m_counter_offset = original_position_file;
 
                     }
