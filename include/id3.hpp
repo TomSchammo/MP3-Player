@@ -326,7 +326,7 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
         }
     }
 
-    // Text is UTF-16 endcoded Unicode with BOM.
+    // Text is UTF-16 encoded Unicode with BOM.
     // The first text byte is 0xff followed by either
     // another 0xff byte or one 0xfe byte.
     //
