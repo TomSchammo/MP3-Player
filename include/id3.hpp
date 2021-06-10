@@ -432,41 +432,13 @@ inline std::string decode_text(std::int8_t t_text_encoding, std::vector<char> co
         return result.text;
 
     // TODO deal with error
-    else
+    else {
+        std::cout << "Got an error in decode_text" << std::endl;
+
         return nullptr;
-}
-
-
-/**
- * Converts data in a char buffer into a base 10 number that can be worked with.
- *
- * So {0, 0, 1, 63} ({0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
- *
- * @param t_buffer   is a char array that contains the data
- * @param t_size     is the size of the char array
- *
- * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
- */
-inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
-
-    std::uint64_t factor = 0;
-
-    std::uint64_t number = 0;
-
-    // going from last to first assuming that lsb is in the back
-    for (std::int64_t i = t_size - 1; i >= 0; --i) {
-
-        std::uint64_t n = static_cast<std::uint64_t>(t_buffer[i]) << factor;
-
-        number |= n;
-
-        // increasing the factor by 8 each time
-        // as we are reading 8 bits at a time
-        factor += 8;
     }
-
-    return number;
 }
+
 
 
 /**
