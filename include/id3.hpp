@@ -398,10 +398,11 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
     // Value of text_encoding is not valid
     else {
 
-        // TODO log error
-        std::cout << "'0x" << std::hex << int(t_text_encoding) << "' is not a valid value for text_encoding" << std::endl;
+        std::string message = fmt::format("{:#04x} is not a valid value for text_encoding", t_text_encoding);
 
-        return {"0x" + std::to_string(int(t_text_encoding)) + " is not a valid encoding method", 0, true};
+        log::error(message);
+
+        return {message, 0, true};
     }
 
     return {text, t_position, false};
@@ -503,8 +504,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
 inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_arr) noexcept {
 
     if (t_size <= 2139062143){
-        // TODO log error
-        std::cout << "t_size has to be a syncsafe integer" << std::endl;
+        log::error("t_size has to be a syncsafe integer");
     }
 
 

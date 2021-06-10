@@ -40,7 +40,7 @@ std::uint8_t ID3::getVersion(Filehandler& t_handler) noexcept {
     auto version = static_cast<std::uint8_t>(*buffer);
 
 
-    log::debug(fmt::format("ID3 file has version: 2.{}", int(version)));
+    log::debug(fmt::format("ID3 file has version: 2.{:d}", version));
 
     return version;
 }
@@ -511,7 +511,7 @@ void ID3::readID3(Song& t_song) noexcept {
         // retrieve ID3 version
         auto version = getVersion(handler);
 
-        log::info(fmt::format("ID3v2.{}", static_cast<std::uint16_t>(version)));
+        log::info(fmt::format("ID3v2.{:d}", version));
 
         // TODO proceed with extracting metadata
         auto flags = getFlags(handler);
@@ -526,7 +526,7 @@ void ID3::readID3(Song& t_song) noexcept {
         // Not supported ID3 version, skipping the tag
         // TODO Implement ID3v2.2 and below
         if (version != 4 && version != 3) {
-            log::error(fmt::format("This software does not support ID3 version ID3v2.{}", static_cast<int>(version)));
+            log::error(fmt::format("This software does not support ID3 version ID3v2.{:d}", version));
 
             // TODO set filepointer to after tag?
             // TODO if I'd do that, I'd have to know whether it contains extended headers though (for complete size)

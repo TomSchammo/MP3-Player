@@ -211,7 +211,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
 void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
-    log::debug(fmt::format("Reading {} bytes starting at offset {} from file: {}", int(t_bytes), t_position, m_filename));
+    log::debug(fmt::format("Reading {:d} bytes starting at offset {} from file: {}", t_bytes, t_position, m_filename));
 
     std::vector<char> buffer(t_bytes);
 
