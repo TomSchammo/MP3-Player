@@ -16,6 +16,7 @@
 #include <song.hpp>
 #include <iostream>
 #include <log.hpp>
+#include <fmt/ranges.h>
 
 
 namespace ID3 {
@@ -152,6 +153,8 @@ namespace ID3 {
             // as we are reading 8 bits at a time
             factor += 8;
         }
+
+        log::debug(fmt::format("Converted bytes {:#04x} to {}", fmt::join(byte_buffer, ", "), number));
 
         return number;
     }
