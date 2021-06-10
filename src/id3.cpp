@@ -489,7 +489,7 @@ FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_positi
     return {frame_id, size, status_flags, format_flags};
 }
 
-std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept {
+std::unique_ptr<std::vector<char>> ID3::readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept {
 
     auto frame_content = std::make_unique<std::vector<char>>(t_bytes);
 

@@ -189,6 +189,19 @@ namespace ID3 {
 
 
     /**
+     * Reads the content of a frame and returns the data (the whole frame minus the header),
+     * as a unique pointer to a vector that contains the raw bytes,so that it can be parsed by another function.
+     *
+     * @param t_handler          A reference to a Filehandler object to read from the file
+     * @param t_position         The starting position of the frame in the file
+     * @param t_bytes            The amount of bytes that should be read
+     *
+     * @return a unique pointer to a vector that contains the data of the frame or a nullptr
+     */
+    std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept;
+
+
+    /**
      * Checks if the frame ID is valid.
      *
      * If it is valid, it proceeds by calling the prepareFrameData function, which calls the the readFrame function,
@@ -507,19 +520,6 @@ inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_ar
  * @param t_position is the offset of the start of the frame relative to the start of the file
  */
 void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept;
-
-
-/**
- * Reads the content of a frame and returns the data (the whole frame minus the header),
- * as a unique pointer to a vector that contains the raw bytes,so that it can be parsed by another function.
- *
- * @param t_handler          A reference to a Filehandler object to read from the file
- * @param t_position         The starting position of the frame in the file
- * @param t_bytes            The amount of bytes that should be read
- *
- * @return a unique pointer to a vector that contains the data of the frame or a nullptr
- */
-std::unique_ptr<std::vector<char>> readFrame(Filehandler& t_handler, std::uint32_t& t_position, const std::uint32_t t_bytes) noexcept;
 
 
 /**
