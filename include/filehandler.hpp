@@ -102,7 +102,7 @@ class Filehandler {
          * @param t_position  The starting position of the pointer
          * @param t_bytes     The number of bytes that should be read
          */
-        void readString(std::string& t_string, const std::uint32_t t_position, const unsigned char t_bytes) const noexcept;
+        void readString(std::string& t_string, const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept;
 
 
         /**
@@ -113,7 +113,7 @@ class Filehandler {
          * @param t_way       The point of the file that the position is relative  to (eg. start, or end)
          * @param t_bytes     The number of bytes that should be read
          */
-        void readString(std::string& t_string, const std::uint32_t t_position, std::_Ios_Seekdir t_way, const unsigned char t_bytes) const noexcept;
+        void readString(std::string& t_string, const std::uint32_t t_position, std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept;
 
 
         /**

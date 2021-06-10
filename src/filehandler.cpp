@@ -214,7 +214,7 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 }
 
 
-void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const unsigned char t_bytes) const noexcept {
+void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, const std::uint32_t t_bytes) const noexcept {
 
     log<LogLevel::DDEBUG>("Reading " + std::to_string(int(t_bytes)) + " bytes starting at offset " + std::to_string(t_position) + " from file: " + m_filename);
 
@@ -241,7 +241,7 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 }
 
 
-void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const unsigned char t_bytes) const noexcept {
+void Filehandler::readString(std::string& t_string, const std::uint32_t t_position, enum std::_Ios_Seekdir t_way, const std::uint32_t t_bytes) const noexcept {
 
     // TODO log debug
     std::cout << "Reading " << int(t_bytes) << " bytes starting at offset " << t_position
