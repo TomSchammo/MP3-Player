@@ -32,7 +32,7 @@ bool detectID3Footer(Filehandler& t_handler) noexcept {
 }
 
 
-std::uint8_t getVersion(Filehandler& t_handler) noexcept {
+std::uint8_t ID3::getVersion(Filehandler& t_handler) noexcept {
 
     char buffer[SIZE_OF_VERSION];
 
@@ -47,7 +47,7 @@ std::uint8_t getVersion(Filehandler& t_handler) noexcept {
 }
 
 
-std::uint8_t getFlags(Filehandler& t_handler) noexcept {
+std::uint8_t ID3::getFlags(Filehandler& t_handler) noexcept {
     char buffer[SIZE_OF_FLAGS];
 
     t_handler.readBytes(buffer, LOCATION_FLAGS, SIZE_OF_FLAGS);
@@ -56,7 +56,7 @@ std::uint8_t getFlags(Filehandler& t_handler) noexcept {
 }
 
 
-std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept {
+std::uint32_t ID3::getSize(Filehandler& t_handler, const bool t_extended) noexcept {
 
     const unsigned char BUFFER_LOCATION = t_extended ? SIZE_OF_HEADER : LOCATION_SIZE;
 

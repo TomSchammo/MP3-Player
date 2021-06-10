@@ -87,6 +87,35 @@ namespace ID3 {
 
 
     /**
+     * Reads the byte that contains the version of the ID3 Tag
+     *
+     * @param t_handler A reference to a Filehandler object to read from the file
+     * @return a byte that contains the ID3 major version
+     */
+    std::uint8_t getVersion(Filehandler& t_handler) noexcept;
+
+
+    /**
+     * Reads the byte that contains the flags in the ID3 header, and returns it
+     *
+     * @param t_handler A reference to a Filehandler object to read from the file
+     * @return a byte that contains the flags of the ID3 header
+     */
+    std::uint8_t getFlags(Filehandler& t_handler) noexcept;
+
+
+    /**
+     * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
+     *
+     * @param t_handler  A reference to a Filehandler object to read from the file
+     * @param t_extended A boolean indicating whether I'm looking for the size of a standard or extended header
+     *
+     * @return 4 bytes that contain the size of the ID3 tag or the extended header
+     */
+    std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
+
+
+    /**
      * Converts data in a char buffer into a base 10 number that can be worked with.
      *
      * So {0, 0, 1, 63} ({0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
@@ -204,35 +233,6 @@ namespace ID3 {
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
 bool detectID3Footer(Filehandler& t_handler) noexcept;
-
-
-/**
- * Reads the byte that contains the version of the ID3 Tag
- *
- * @param t_handler A reference to a Filehandler object to read from the file
- * @return a byte that contains the ID3 major version
- */
-std::uint8_t getVersion(Filehandler& t_handler) noexcept;
-
-
-/**
- * Reads the byte that contains the flags in the ID3 header, and returns it
- *
- * @param t_handler A reference to a Filehandler object to read from the file
- * @return a byte that contains the flags of the ID3 header
- */
-std::uint8_t getFlags(Filehandler& t_handler) noexcept;
-
-
-/**
- * Reads the 4 bytes that contain the size of the ID3 tag (without the header and the footer) or the extended header.
- *
- * @param t_handler  A reference to a Filehandler object to read from the file
- * @param t_extended A boolean indicating whether I'm looking for the size of a standard or extended header
- *
- * @return 4 bytes that contain the size of the ID3 tag or the extended header
- */
-std::uint32_t getSize(Filehandler& t_handler, const bool t_extended) noexcept;
 
 
 /**
