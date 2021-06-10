@@ -5,7 +5,7 @@ ERRFLAGS := -pedantic-errors -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-sty
 			-Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion -Wmisleading-indentation \
 			-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast \
 			-Wdouble-promotion -Wformat=2
-CXXFLAGS := -std=c++17 $(ERRFLAGS)
+CXXFLAGS := -std=c++20 $(ERRFLAGS)
 LDFLAGS  := -L/usr/lib -lstdc++ -lm -lfmt
 BUILD	:= ./build
 OBJ_DIR  := $(BUILD)/objects
