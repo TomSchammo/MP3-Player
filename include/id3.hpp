@@ -347,12 +347,46 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
 
         char terminated = 0;
 
-        // iterating until 2 consecutive 0x00 bytes are found
-        while (terminated < 2) {
+        if (static_cast<std::uint8_t>(c) != 0xff) {
+            log::error(fmt::format("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.\n Expected 0xff, found {:#04x}", c));
 
-            terminated = c == 0x00 ? terminated + 1 : 0;
+            return {"BOM missing in UTF-16 encoded Unicode", 0, true};
+        }
 
-            c = data->at(position++);
+        else {
+
+            c = t_data.at(t_position++);
+
+            // big endian
+            if (static_cast<std::uint8_t>(c) == 0xff) {
+
+                log::info("Byte order is big endian");
+
+            }
+
+            // little endian
+            else if (static_cast<std::uint8_t>(c) == 0xfe) {
+
+                log::info("Byte order is big endian");
+            }
+
+            else {
+
+                log::error("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.");
+                log::error(fmt::format("First byte was 0xff, but expected 0xff or 0xfe for the second byte, found {:#04x}", c));
+
+                return {"Second byte of BOM missing in UTF-16 encoded Unicode", 0, true};
+
+            }
+
+            text = "UTF-16 has not been implemented yet";
+
+            // iterating until 2 consecutive 0x00 bytes are found
+            while (terminated < 2) {
+                terminated = (c == 0x00 ? terminated + 1 : 0);
+                t_position++;
+            }
+
         }
 
     }
@@ -367,14 +401,12 @@ inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_t
         char terminated = 0;
 
         // iterating until 2 consecutive 0x00 bytes are found
-        // TODO idk, this might work for common 1 byte characters
-        //      but 2 byte characters will be wrong
         while (terminated < 2) {
-
             terminated = (c == 0x00 ? terminated + 1 : 0);
-
-            c = t_data.at(t_position++);
+            t_position++;
         }
+
+        text = "UTF-16B has not been implemented yet";
     }
 
     // The text is UTF-8 encoded Unicode.
