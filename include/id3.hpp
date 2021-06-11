@@ -283,10 +283,15 @@ namespace ID3 {
                 text = "UTF-16 has not been implemented yet";
 
                 // iterating until 2 consecutive 0x00 bytes are found
-                while (terminated < 2) {
+                while (terminated < 2 and t_position < t_data.size()) {
                     terminated = (c == 0x00 ? terminated + 1 : 0);
+                    c =  t_data.at(t_position);
+                    // log::info(fmt::format("Read byte {:#04x} at position {}/{}", c, t_position, t_data.size()));
                     t_position++;
                 }
+
+                if (terminated < 2)
+                    log::warn("UTF-16 byte string is not 00 00 terminated");
 
             }
 
@@ -302,10 +307,15 @@ namespace ID3 {
             char terminated = 0;
 
             // iterating until 2 consecutive 0x00 bytes are found
-            while (terminated < 2) {
+            while (terminated < 2 and t_position < t_data.size()) {
                 terminated = (c == 0x00 ? terminated + 1 : 0);
+                c =  t_data.at(t_position);
+                // log::info(fmt::format("Read byte {:#04x} at position {}/{}", c, t_position, t_data.size()));
                 t_position++;
             }
+
+            if (terminated < 2)
+                log::warn("UTF-16 byte string is not 00 00 terminated");
 
             text = "UTF-16B has not been implemented yet";
         }
