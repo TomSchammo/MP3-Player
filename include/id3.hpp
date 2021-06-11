@@ -161,6 +161,219 @@ namespace ID3 {
 
 
     /**
+     * Decodes text according to the specified encoding and returns
+     * a string containing said text.
+     *
+     * The method used to encode the text is supplied to the function
+     * as a parameter as 1 byte.
+     *
+     * That byte can have the following values:
+     *
+     * 0x00:
+     *  The ISO-8859-1 standard is used to encode the text, and
+     *  the string is terminated by one 0x00 byte.
+     *
+     * 0x01:
+     *  The text contains UTF-16 encoded Unicode with BOM.
+     *  If the BOM bytes are ff ff, the byte order is big endian.
+     *  If the BOM bytes are ff fe, the byte order is little endian.
+     *
+     *  The string is null terminated by 00 00 bytes.
+     *
+     * 0x02:
+     *  The text contains UTF-16B encoded Unicode without BOM and
+     *  the string is null terminated by 00 00 bytes.
+     *
+     * 0x03:
+     *  The text contains UTF-8 encoded Unicode and is terminated
+     *  by one 0x00 byte.
+     *
+     *
+     * If the value of that byte is not valid (meaning none of the above)
+     * a flag indicating an error will be set to true along with an error
+     * message instead of the decoded text and a position of 0.
+     *
+     * @param t_text_encoding The method that is used to encode the text
+     * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
+     * @param t_position      An unsigned 32 bit integer indicating the start of the string
+     *
+     * @return a container struct that contains the decoded text and the updated value of
+     *         the position argument as well as an error flag that should be false.
+     */
+    inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_text_encoding,
+                                                                     std::vector<char> const& t_data,
+                                                                     std::uint32_t t_position) noexcept {
+
+        char c = t_data.at(t_position++);
+
+        std::string text;
+
+        // Text is encoded using ISO-8859-1 standard
+        // and using null terminated by 0x00,
+        // (1 'zero' byte).
+        if (t_text_encoding == 0x00) {
+
+            log::debug("Decoding ISO-8859-1 encoded text");
+
+            while (c != 0x00 && t_position != t_data.size()) {
+                text += c;
+                c = t_data.at(t_position++);
+            }
+
+            // string is not null terminated
+            if (c != 0x00) {
+
+                log::warn("String is not null terminated");
+
+                text += c;
+
+            }
+        }
+
+            // Text is UTF-16 encoded Unicode with BOM.
+            // The first text byte is 0xff followed by either
+            // another 0xff byte or one 0xfe byte.
+            //
+            // If the second byte is 0xff the byte order is
+            // big endian.
+            // If the second byte is 0xfe the byte order is
+            // little endian.
+            //
+            // The text is null terminated by 0x0000
+            // (2 'zero' bytes).
+        else if (t_text_encoding == 0x01) {
+
+            log::debug("Decoding UTF-16 encoded Unicode");
+            log::error("UTF-16 has not been implemented yet");
+
+            char terminated = 0;
+
+            if (static_cast<std::uint8_t>(c) != 0xff) {
+                log::error(fmt::format("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.\n Expected 0xff, found {:#04x}", c));
+
+                return {"BOM missing in UTF-16 encoded Unicode", 0, true};
+            }
+
+            else {
+
+                c = t_data.at(t_position++);
+
+                // big endian
+                if (static_cast<std::uint8_t>(c) == 0xff) {
+
+                    log::info("Byte order is big endian");
+
+                }
+
+                    // little endian
+                else if (static_cast<std::uint8_t>(c) == 0xfe) {
+
+                    log::info("Byte order is big endian");
+                }
+
+                else {
+
+                    log::error("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.");
+                    log::error(fmt::format("First byte was 0xff, but expected 0xff or 0xfe for the second byte, found {:#04x}", c));
+
+                    return {"Second byte of BOM missing in UTF-16 encoded Unicode", 0, true};
+
+                }
+
+                text = "UTF-16 has not been implemented yet";
+
+                // iterating until 2 consecutive 0x00 bytes are found
+                while (terminated < 2) {
+                    terminated = (c == 0x00 ? terminated + 1 : 0);
+                    t_position++;
+                }
+
+            }
+
+        }
+
+            // The text UTF-16B encoded Unicode without BOM.
+            // It is null terminated by 0x0000 (2 'zero' bytes)
+        else if (t_text_encoding == 0x02) {
+
+            log::debug("Decoding UTF-16B encoded Unicode");
+            log::error("UTF-16B has not been implemented yet");
+
+            char terminated = 0;
+
+            // iterating until 2 consecutive 0x00 bytes are found
+            while (terminated < 2) {
+                terminated = (c == 0x00 ? terminated + 1 : 0);
+                t_position++;
+            }
+
+            text = "UTF-16B has not been implemented yet";
+        }
+
+            // The text is UTF-8 encoded Unicode.
+            // It is terminated by 0x00 (1 'zero' byte)
+        else if (t_text_encoding == 0x03) {
+
+            log::debug("Decoding UTF-8 encoded Unicode");
+
+            while (c != 0x00 && t_position != t_data.size()) {
+                text += c;
+                c = t_data.at(t_position++);
+            }
+
+            // string is not null terminated
+            if (c != 0x00) {
+
+                log::warn("String is not null terminated");
+
+                text += c;
+
+            }
+        }
+
+            // Value of text_encoding is not valid
+        else {
+
+            std::string message = fmt::format("{:#04x} is not a valid value for text_encoding", t_text_encoding);
+
+            log::error(message);
+
+            return {message, 0, true};
+        }
+
+        return {text, t_position, false};
+
+    }
+
+
+    /**
+     * A wrapper for decode_text_retain_position for when the position is actually not of any interest after
+     * the function finished executing.
+     *
+     *
+     * @param t_text_encoding The method that is used to encode the text
+     * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
+     * @param t_position      An unsigned 32 bit integer indicating the start of the string
+     *
+     * @return a std::string containing the text, nullptr if there is an error (for now) TODO pls fix
+     */
+    inline std::string decode_text(std::int8_t t_text_encoding, std::vector<char> const& t_data, std::uint32_t t_position) noexcept {
+
+        auto result = ID3::decode_text_retain_position(t_text_encoding, t_data, t_position);
+
+        if (!result.error)
+            return result.text;
+
+            // TODO deal with error
+        else {
+            std::cout << "Got an error in decode_text" << std::endl;
+
+            return nullptr;
+        }
+    }
+
+
+    /**
      * Reads the content of a frame header, converts the 4 byte ID to a null-terminated string and puts the 4 size bytes
      * into an unsigned 32 bit integer and saves that, along with the flags into a FrameHeader struct.
      *
@@ -257,220 +470,6 @@ namespace ID3 {
  * @return true if an ID3 tag is prepended to the file, false otherwise
  */
 bool detectID3Footer(Filehandler& t_handler) noexcept;
-
-
-/**
- * Decodes text according to the specified encoding and returns
- * a string containing said text.
- *
- * The method used to encode the text is supplied to the function
- * as a parameter as 1 byte.
- *
- * That byte can have the following values:
- *
- * 0x00:
- *  The ISO-8859-1 standard is used to encode the text, and
- *  the string is terminated by one 0x00 byte.
- *
- * 0x01:
- *  The text contains UTF-16 encoded Unicode with BOM.
- *  If the BOM bytes are ff ff, the byte order is big endian.
- *  If the BOM bytes are ff fe, the byte order is little endian.
- *
- *  The string is null terminated by 00 00 bytes.
- *
- * 0x02:
- *  The text contains UTF-16B encoded Unicode without BOM and
- *  the string is null terminated by 00 00 bytes.
- *
- * 0x03:
- *  The text contains UTF-8 encoded Unicode and is terminated
- *  by one 0x00 byte.
- *
- *
- * If the value of that byte is not valid (meaning none of the above)
- * a flag indicating an error will be set to true along with an error
- * message instead of the decoded text and a position of 0.
- *
- * @param t_text_encoding The method that is used to encode the text
- * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
- * @param t_position      An unsigned 32 bit integer indicating the start of the string
- *
- * @return a container struct that contains the decoded text and the updated value of
- *         the position argument as well as an error flag that should be false.
- */
-inline ID3::TextAndPositionContainer decode_text_retain_position(std::int8_t t_text_encoding,
-                                                            std::vector<char> const& t_data,
-                                                            std::uint32_t t_position) noexcept {
-
-    char c = t_data.at(t_position++);
-
-    std::string text;
-
-    // Text is encoded using ISO-8859-1 standard
-    // and using null terminated by 0x00,
-    // (1 'zero' byte).
-    if (t_text_encoding == 0x00) {
-
-        log::debug("Decoding ISO-8859-1 encoded text");
-
-        while (c != 0x00 && t_position != t_data.size()) {
-            text += c;
-            c = t_data.at(t_position++);
-        }
-
-        // string is not null terminated
-        if (c != 0x00) {
-
-            log::warn("String is not null terminated");
-
-            text += c;
-
-        }
-    }
-
-    // Text is UTF-16 encoded Unicode with BOM.
-    // The first text byte is 0xff followed by either
-    // another 0xff byte or one 0xfe byte.
-    //
-    // If the second byte is 0xff the byte order is
-    // big endian.
-    // If the second byte is 0xfe the byte order is
-    // little endian.
-    //
-    // The text is null terminated by 0x0000
-    // (2 'zero' bytes).
-    else if (t_text_encoding == 0x01) {
-
-        log::debug("Decoding UTF-16 encoded Unicode");
-        log::error("UTF-16 has not been implemented yet");
-
-        char terminated = 0;
-
-        if (static_cast<std::uint8_t>(c) != 0xff) {
-            log::error(fmt::format("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.\n Expected 0xff, found {:#04x}", c));
-
-            return {"BOM missing in UTF-16 encoded Unicode", 0, true};
-        }
-
-        else {
-
-            c = t_data.at(t_position++);
-
-            // big endian
-            if (static_cast<std::uint8_t>(c) == 0xff) {
-
-                log::info("Byte order is big endian");
-
-            }
-
-            // little endian
-            else if (static_cast<std::uint8_t>(c) == 0xfe) {
-
-                log::info("Byte order is big endian");
-            }
-
-            else {
-
-                log::error("Text data is supposed to be UTF-16 encoded Unicode with BOM, but BOM does not appear to be present.");
-                log::error(fmt::format("First byte was 0xff, but expected 0xff or 0xfe for the second byte, found {:#04x}", c));
-
-                return {"Second byte of BOM missing in UTF-16 encoded Unicode", 0, true};
-
-            }
-
-            text = "UTF-16 has not been implemented yet";
-
-            // iterating until 2 consecutive 0x00 bytes are found
-            while (terminated < 2) {
-                terminated = (c == 0x00 ? terminated + 1 : 0);
-                t_position++;
-            }
-
-        }
-
-    }
-
-    // The text UTF-16B encoded Unicode without BOM.
-    // It is null terminated by 0x0000 (2 'zero' bytes)
-    else if (t_text_encoding == 0x02) {
-
-        log::debug("Decoding UTF-16B encoded Unicode");
-        log::error("UTF-16B has not been implemented yet");
-
-        char terminated = 0;
-
-        // iterating until 2 consecutive 0x00 bytes are found
-        while (terminated < 2) {
-            terminated = (c == 0x00 ? terminated + 1 : 0);
-            t_position++;
-        }
-
-        text = "UTF-16B has not been implemented yet";
-    }
-
-    // The text is UTF-8 encoded Unicode.
-    // It is terminated by 0x00 (1 'zero' byte)
-    else if (t_text_encoding == 0x03) {
-
-        log::debug("Decoding UTF-8 encoded Unicode");
-
-        while (c != 0x00 && t_position != t_data.size()) {
-            text += c;
-            c = t_data.at(t_position++);
-        }
-
-        // string is not null terminated
-        if (c != 0x00) {
-
-            log::warn("String is not null terminated");
-
-            text += c;
-
-        }
-    }
-
-    // Value of text_encoding is not valid
-    else {
-
-        std::string message = fmt::format("{:#04x} is not a valid value for text_encoding", t_text_encoding);
-
-        log::error(message);
-
-        return {message, 0, true};
-    }
-
-    return {text, t_position, false};
-
-}
-
-
-/**
- * A wrapper for decode_text_retain_position for when the position is actually not of any interest after
- * the function finished executing.
- *
- *
- * @param t_text_encoding The method that is used to encode the text
- * @param t_data          A const l-value reference to a std::vector containing the bytes of the text
- * @param t_position      An unsigned 32 bit integer indicating the start of the string
- *
- * @return a std::string containing the text, nullptr if there is an error (for now) TODO pls fix
- */
-inline std::string decode_text(std::int8_t t_text_encoding, std::vector<char> const& t_data, std::uint32_t t_position) noexcept {
-
-    auto result = decode_text_retain_position(t_text_encoding, t_data, t_position);
-
-    if (!result.error)
-        return result.text;
-
-    // TODO deal with error
-    else {
-        std::cout << "Got an error in decode_text" << std::endl;
-
-        return nullptr;
-    }
-}
-
 
 
 /**
