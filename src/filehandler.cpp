@@ -296,7 +296,7 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 Filehandler::~Filehandler() noexcept {
 
     if(m_stream.is_open()) {
-        log::info(fmt::format("Closing stream of ", m_filename));
+        log::info(fmt::format("Closing stream of {}", m_filename));
         m_stream.close();
     }
 
