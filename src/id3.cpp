@@ -456,6 +456,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
         // TODO TFLT (audio type, default is MPEG)
         // TODO MLLT (MPEG location lookup table (do I need this) (4.6), mentions player counter (4.16))
+        // TODO ENCR and AENC frames?
 
         return true;
     }
