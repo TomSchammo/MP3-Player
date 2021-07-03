@@ -431,9 +431,9 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
                 }
             }
 
-                // MIME Type is a link
-                // Links are ignored because this code will not run on a network capable device,
-                // so there is no way it will ever make use of that information.
+            // MIME Type is a link
+            // Links are ignored because this code will not run on a network capable device,
+            // so there is no way it will ever make use of that information.
             else {
 
                 log::warn("Found APIC frames containing links, those are ignored as they are of no use for the purpose of this device.");
