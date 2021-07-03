@@ -138,8 +138,8 @@ namespace ID3 {
            byte_buffer.push_back(static_cast<byte>(t_buffer[i]));
         }
 
-        std::uint64_t factor = 0;
 
+        std::uint_fast8_t factor = 0;
         std::uint64_t number = 0;
 
         // going from last to first assuming that lsb is in the back
