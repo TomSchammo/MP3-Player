@@ -444,6 +444,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
             std::uint64_t play_counter = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+            // TODO Play counter can be bigger than 64 bits
 
             log::info(fmt::format("Found an PCNT frame, setting play counter to: {}", play_counter));
 
