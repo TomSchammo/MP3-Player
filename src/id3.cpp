@@ -568,6 +568,7 @@ void ID3::readID3(Song& t_song) noexcept {
             while (size_remaining > 0) {
                 log::info(fmt::format("{} bytes remaining...", size_remaining));
                 log::info(fmt::format("{} > 0", size_remaining));
+                log::info(fmt::format("Continuing to read at position: {}", position));
 
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
@@ -599,7 +600,6 @@ void ID3::readID3(Song& t_song) noexcept {
 
                     log::info(fmt::format("Size remaining: {}", size_remaining));
 
-                    log::info(fmt::format("Continuing to read at position: {}", position));
 
                     // frame_id has been not been set properly,
                     // still parsing the frame as I can't skip it
