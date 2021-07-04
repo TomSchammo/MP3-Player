@@ -119,14 +119,17 @@ namespace ID3 {
     /**
      * Converts data in a char buffer into a base 10 number that can be worked with.
      *
-     * So {0, 0, 1, 63} ({0x00, 0x00, 0x01, 0x3f}) will be converted to 319.
+     * So {0, 0, 1, 63} ({0x00, 0x00, 0x01, 0x3f}) will be converted to 319 in case of normal encoding.
+     *
+     * If a synchsafe encoding is used the same will be converted to 0b10111111 which equals 191 in decimal.
      *
      * @param t_buffer   is a char array that contains the data
      * @param t_size     is the size of the char array
+     * @param t_syncsafe indicates whether synchsafe encoding used or not
      *
      * @return The unsigned 64 bit base 10 representation of the number stored in the buffer
      */
-    inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size) noexcept {
+    inline std::uint64_t convert_bytes(const char t_buffer[], std::uint32_t t_size, const bool t_syncsafe) noexcept {
 
         std::vector<byte> byte_buffer{};
         byte_buffer.reserve(t_size);
@@ -151,7 +154,10 @@ namespace ID3 {
 
             // increasing the factor by 8 each time
             // as we are reading 8 bits at a time
-            factor += 8;
+            // unless the integer is synchsafe, then
+            // the msb of every byte is omitted, so we
+            // only increase the factor by 7 bits.
+            factor += t_syncsafe ? 7 : 8;
         }
 
         log::debug(fmt::format("Converted bytes {:#04x} to {}", fmt::join(byte_buffer, ", "), number));
@@ -389,10 +395,11 @@ namespace ID3 {
      *
      * @param t_handler    A reference to the file handler object for this file to read the frame header
      * @param t_position   A reference to the position of the file pointer so that it knows where to start reading the 10 bytes
+     * @param t_syncsafe   True if the size is syncsafe (so if the frame is an ID3v2.4 frame), false otherwise
      *
      * @return A FrameHeader struct containing the frame ID, the size, the status- and format flags of the current frame
      */
-    FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept;
+    FrameHeader readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position, const bool t_syncsafe) noexcept;
 
 
     /**

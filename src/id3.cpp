@@ -65,7 +65,7 @@ std::uint32_t ID3::getSize(Filehandler& t_handler, const bool t_extended) noexce
 
 
     // TODO max size of tag (update this as well as position)
-    auto size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE));
+    auto size = static_cast<std::uint32_t>(convert_bytes(buffer.data(), SIZE_OF_SIZE, true));
 
     return size;
 }
@@ -313,7 +313,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
-            auto len = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+            auto len = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()), false);
 
             log::info(fmt::format("Found a TLEN frame, setting track length to: {}", len));
 
@@ -323,7 +323,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
-            auto delay = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
+            auto delay = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()), false);
 
             log::info(fmt::format("Found a TDLY frame, setting delay to: {}ms", delay));
 
@@ -443,8 +443,8 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
-            std::uint64_t play_counter = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()));
             // TODO Play counter can be bigger than 64 bits
+            std::uint64_t play_counter = convert_bytes(data.data(), static_cast<std::uint32_t>(data.size()), false);
 
             log::info(fmt::format("Found an PCNT frame, setting play counter to: {}", play_counter));
 
@@ -466,7 +466,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 }
 
 
-FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position) noexcept {
+FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_position, const bool t_syncsafe) noexcept {
 
     char buffer[SIZE_OF_HEADER]{};
 
@@ -481,7 +481,7 @@ FrameHeader ID3::readFrameHeader(Filehandler& t_handler, std::uint32_t& t_positi
 
     const char size_bytes[4] = {buffer[4], buffer[5], buffer[6], buffer[7]};
 
-    auto size = static_cast<std::uint32_t>(convert_bytes(size_bytes, SIZE_OF_SIZE));
+    auto size = static_cast<std::uint32_t>(convert_bytes(size_bytes, SIZE_OF_SIZE, t_syncsafe));
 
     auto status_flags = static_cast<byte>(buffer[8]);
     auto format_flags = static_cast<byte>(buffer[9]);
@@ -571,7 +571,7 @@ void ID3::readID3(Song& t_song) noexcept {
 
                 // TODO I should probably choose less ambiguous names
                 std::uint32_t original_position_file = position;
-                auto frame_header = readFrameHeader(handler, position);
+                auto frame_header = readFrameHeader(handler, position, version == 4);
                 auto result = parseFrame(handler, frame_header, position, t_song);
 
                 // There are no frames left, the rest is padding
