@@ -8,3 +8,6 @@ compile_commands.json
 .vim
 .cache
 test_files
+.idea/
+*.png
+callgrind.*
