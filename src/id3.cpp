@@ -595,9 +595,7 @@ void ID3::readID3(Song& t_song) noexcept {
 
                     }
 
-                    // TODO this seems wrong
-                    // size_remaining -= (position - original_position_file);
-                    size_remaining -= (position);
+                    size_remaining -= (position - original_position_file);
 
                     log::info(fmt::format("Size remaining: {}", size_remaining));
 
