@@ -5,15 +5,17 @@
 
 Filehandler::Filehandler(std::string  t_filename) noexcept : m_filename(std::move(t_filename)) {
 
+    log::info(fmt::format("Creating file handler object for file {}", m_filename));
+
     if (exists()) {
 
-        log::info(fmt::format("Creating file handler object for file {}", m_filename));
+        log::info(fmt::format("Opening file {}", m_filename));
 
         this->m_stream.open(m_filename, std::ios::binary | std::ios::in);
     }
 
     else
-        log::warn(fmt::format("File {}  does not exist!", m_filename));
+        log::warn(fmt::format("File {} does not exist!", m_filename));
 }
 
 

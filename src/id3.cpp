@@ -452,7 +452,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             t_song.m_play_counter = play_counter;
 
         } else {
-            log::warn(fmt::format("FrameID: {} is not supported yet", t_frame_header.id));
+            log::warn(fmt::format("FrameID: {} is not supported yet, skipping frame...", t_frame_header.id));
         }
 
         // TODO TFLT (audio type, default is MPEG)
