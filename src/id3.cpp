@@ -437,6 +437,8 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             else {
 
                 log::warn("Found APIC frames containing links, those are ignored as they are of no use for the purpose of this device.");
+
+                log::info(fmt::format("Skipping {} bytes...", t_frame_header.size));
             }
 
         } else if (t_frame_header.id == "PCNT") {
