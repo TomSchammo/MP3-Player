@@ -67,7 +67,7 @@ namespace ID3 {
      * the error message and the position should be set to 0.
      *
      * text:     The text extracted from said buffer
-     * position; Position at the end of the text
+     * position: Position at the end of the text (first byte after the last character)
      * bool:     true if there was an error when decoding, false otherwise
      */
     struct TextAndPositionContainer {
