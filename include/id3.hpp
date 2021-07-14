@@ -236,17 +236,17 @@ namespace ID3 {
             }
         }
 
-            // Text is UTF-16 encoded Unicode with BOM.
-            // The first text byte is 0xff followed by either
-            // another 0xff byte or one 0xfe byte.
-            //
-            // If the second byte is 0xff the byte order is
-            // big endian.
-            // If the second byte is 0xfe the byte order is
-            // little endian.
-            //
-            // The text is null terminated by 0x0000
-            // (2 'zero' bytes).
+        // Text is UTF-16 encoded Unicode with BOM.
+        // The first text byte is 0xff followed by either
+        // another 0xff byte or one 0xfe byte.
+        //
+        // If the second byte is 0xff the byte order is
+        // big endian.
+        // If the second byte is 0xfe the byte order is
+        // little endian.
+        //
+        // The text is null terminated by 0x0000
+        // (2 'zero' bytes).
         else if (t_text_encoding == 0x01) {
 
             log::debug("Decoding UTF-16 encoded Unicode");
@@ -303,8 +303,8 @@ namespace ID3 {
 
         }
 
-            // The text UTF-16B encoded Unicode without BOM.
-            // It is null terminated by 0x0000 (2 'zero' bytes)
+        // The text UTF-16B encoded Unicode without BOM.
+        // It is null terminated by 0x0000 (2 'zero' bytes)
         else if (t_text_encoding == 0x02) {
 
             log::debug("Decoding UTF-16B encoded Unicode");
@@ -326,8 +326,8 @@ namespace ID3 {
             text = "UTF-16B has not been implemented yet";
         }
 
-            // The text is UTF-8 encoded Unicode.
-            // It is terminated by 0x00 (1 'zero' byte)
+        // The text is UTF-8 encoded Unicode.
+        // It is terminated by 0x00 (1 'zero' byte)
         else if (t_text_encoding == 0x03) {
 
             log::debug("Decoding UTF-8 encoded Unicode");
@@ -347,7 +347,7 @@ namespace ID3 {
             }
         }
 
-            // Value of text_encoding is not valid
+        // Value of text_encoding is not valid
         else {
 
             std::string message = fmt::format("{:#04x} is not a valid value for text_encoding", t_text_encoding);
