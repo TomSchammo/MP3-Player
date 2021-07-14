@@ -1,3 +1,14 @@
+#define TEST
+
+#ifdef TEST
+
+#define CATCH_CONFIG_MAIN
+#include <test/test.hpp>
+
+// TODO disable logging
+
+#else
+
 #include <iostream>
 #include <string>
 #include <song.hpp>
@@ -5,8 +16,7 @@
 // #include <chrono>
 
 
-int main(int arc, char* agrv[])
-{
+int main(int arc, char* agrv[]) {
 
     if (arc > 1) {
 
@@ -39,3 +49,5 @@ int main(int arc, char* agrv[])
 
     return 0;
 }
+
+#endif // TEST
