@@ -26,5 +26,10 @@ TEST_CASE("Testing convert_bytes from id3.hpp", "[ID3::convert_bytes]") {
         REQUIRE(ID3::convert_bytes(buffer_4, 2, true) == 16256);
         REQUIRE(ID3::convert_bytes(buffer_3, 1, true) == 127);
     }
+
+    SECTION("Testing empty inputs") {
+        REQUIRE(ID3::convert_bytes({}, 0, false) == 0);
+        REQUIRE(ID3::convert_bytes({}, 0, true) == 0);
+    }
 }
 
