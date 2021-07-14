@@ -9,20 +9,20 @@ TEST_CASE("Testing convert_bytes from id3.hpp", "[ID3::convert_bytes]") {
     char buffer_3[1] = {static_cast<char>(0xff)};
     char buffer_4[2] = {static_cast<char>(0xff), 0x00};
 
-    SECTION("Converting non syncsafe integers") {
+    SECTION("Testing conversion of non syncsafe integers") {
         REQUIRE(ID3::convert_bytes(buffer_1, 4, false) == 319);
         REQUIRE(ID3::convert_bytes(buffer_2, 4, false) == 198518);
         REQUIRE(ID3::convert_bytes(buffer_3, 1, false) == 255);
         REQUIRE(ID3::convert_bytes(buffer_4, 2, false) == 65280);
     }
 
-    SECTION("Converting syncsafe integers") {
+    SECTION("Testing conversion of syncsafe integers") {
         REQUIRE(ID3::convert_bytes(buffer_1, 4, true) == 191);
         REQUIRE(ID3::convert_bytes(buffer_2, 4, true) == 50166);
     }
 
     // TODO there is an issue when passing non syncsafe integers as syncsafe intgers
-    SECTION("Supplying a non syncsafe integer as a syncsafe integer") {
+    SECTION("Testing supplying a non syncsafe integer as a syncsafe integer") {
         REQUIRE(ID3::convert_bytes(buffer_4, 2, true) == 16256);
         REQUIRE(ID3::convert_bytes(buffer_3, 1, true) == 127);
     }
