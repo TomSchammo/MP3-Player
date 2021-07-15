@@ -380,9 +380,9 @@ namespace ID3 {
         if (!result.error)
             return result.text;
 
-            // TODO deal with error
+        // TODO deal with error
         else {
-            std::cout << "Got an error in decode_text" << std::endl;
+            log::error("Got an error in decode_text");
 
             return nullptr;
         }
