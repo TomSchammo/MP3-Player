@@ -247,3 +247,48 @@ TEST_CASE("Testing decode_text_retain_position from id3.hpp", "[ID3::decode_text
         // TODO test for negative position
     }
 }
+
+
+TEST_CASE("Testing the synchronize function from id3.hpp", "[ID3::synchronize]") {
+
+
+    SECTION("Testing empty input buffers") {
+
+        std::vector<char> test_data_1 = {};
+        ID3::synchronize(test_data_1);
+        REQUIRE(test_data_1.size() == 0);
+    }
+
+
+    SECTION("Testing buffers with no unsynchronization") {
+
+        std::vector<char> test_data_1 =  {0x00, (char)0xff, 0x4e, (char)0xff, (char)0xbe};
+        ID3::synchronize(test_data_1);
+        REQUIRE(test_data_1.size() == 5);
+
+        std::vector<char> test_data_2 =  {0x01, (char)0xff, 0x4e, (char)0xff, (char)0xbe};
+        ID3::synchronize(test_data_2);
+        REQUIRE(test_data_2.size() == 5);
+
+        std::vector<char> test_data_3 =  {0x00, (char)0xfe, 0x4e, (char)0xfc, (char)0xbe};
+        ID3::synchronize(test_data_3);
+        REQUIRE(test_data_3.size() == 5);
+    }
+
+
+    SECTION("Testing buffers with unsynchronization") {
+
+        std::vector<char> test_data_1 =  {(char)0xff, 0x00, (char)0xff, (char)0xbe};
+        ID3::synchronize(test_data_1);
+        REQUIRE(test_data_1.size() == 3);
+
+        std::vector<char> test_data_2 =  {0x00, (char)0xff, 0x00, (char)0xff, (char)0xbe};
+        ID3::synchronize(test_data_2);
+        REQUIRE(test_data_2.size() == 4);
+
+        std::vector<char> test_data_3 =  {(char)0xff, 0x00, (char)0xff, 0x00, (char)0xbe, 0x00};
+        ID3::synchronize(test_data_3);
+        REQUIRE(test_data_3.size() == 4);
+    }
+
+}
