@@ -292,3 +292,395 @@ TEST_CASE("Testing the synchronize function from id3.hpp", "[ID3::synchronize]")
     }
 
 }
+
+
+TEST_CASE("Testing the convert_size function from id3.hpp", "[convert_size]") {
+
+
+    SECTION("Testing too big integers") {
+
+
+        SECTION("Testing 0xffffffff...") {
+
+            std::uint32_t integer = 0xffffffff;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(arr.at(0) == 0xde);
+            REQUIRE(arr.at(1) == 0xad);
+            REQUIRE(arr.at(2) == 0xbe);
+            REQUIRE(arr.at(3) == 0xef);
+        }
+
+
+        SECTION("Testing 0x7f7f7f80...") {
+
+            std::uint32_t integer = 0x7f7f7f80;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(arr.at(0) == 0xde);
+            REQUIRE(arr.at(1) == 0xad);
+            REQUIRE(arr.at(2) == 0xbe);
+            REQUIRE(arr.at(3) == 0xef);
+        }
+
+
+        SECTION("Testing 0x807f7f80...") {
+
+            std::uint32_t integer = 0x807f7f7f;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(arr.at(0) == 0xde);
+            REQUIRE(arr.at(1) == 0xad);
+            REQUIRE(arr.at(2) == 0xbe);
+            REQUIRE(arr.at(3) == 0xef);
+        }
+
+    }
+
+
+    SECTION("Testing integers that need 1 byte") {
+
+
+        SECTION("Testing 0x00...") {
+
+            std::uint32_t integer = 0x00;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x7f...") {
+
+            std::uint32_t integer = 0x7f;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x70...") {
+
+            std::uint32_t integer = 0x70;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x40...") {
+
+            std::uint32_t integer = 0x40;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+    }
+
+
+    SECTION("Testing integers that need 2 bytes") {
+
+
+        SECTION("Testing 0x7f7f...") {
+
+
+            std::uint32_t integer = 0x7f7f;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x0100...") {
+
+
+            std::uint32_t integer = 0x0100;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x7000...") {
+
+
+            std::uint32_t integer = 0x7000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x4000...") {
+
+
+            std::uint32_t integer = 0x4000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0xff...") {
+
+
+            std::uint32_t integer = 0xff;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+    }
+
+
+    SECTION("Testing integers that need 3 bytes") {
+
+
+        SECTION("Testing 0x7f7f7f...") {
+
+
+            std::uint32_t integer = 0x7f7f7f;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x010000...") {
+
+
+            std::uint32_t integer = 0x010000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x700000...") {
+
+
+            std::uint32_t integer = 0x700000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0x400000...") {
+
+
+            std::uint32_t integer = 0x400000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+        SECTION("Testing 0xffff...") {
+
+
+            std::uint32_t integer = 0xffff;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+
+        }
+
+
+    }
+
+
+    SECTION("Testing integers that need 4 bytes") {
+
+
+        SECTION("Testing 0x7f7f7f7f...") {
+
+
+            std::uint32_t integer = 0x7f7f7f7f;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+        }
+
+
+        SECTION("Testing 0x01000000...") {
+
+
+            std::uint32_t integer = 0x01000000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+        }
+
+
+        SECTION("Testing 0x70000000...") {
+
+
+            std::uint32_t integer = 0x70000000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+        }
+
+
+        SECTION("Testing 0x40000000...") {
+
+
+            std::uint32_t integer = 0x40000000;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+        }
+
+
+        SECTION("Testing 0xffffff...") {
+
+
+            std::uint32_t integer = 0xffffff;
+            std::array<std::uint8_t, 4> arr {0xde, 0xad, 0xbe, 0xef};
+
+            convert_size(integer, arr);
+
+            REQUIRE(false);
+            // REQUIRE();
+            // REQUIRE();
+            // REQUIRE();
+
+        }
+
+
+    }
+
+}
+
+
