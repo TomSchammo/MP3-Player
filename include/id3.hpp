@@ -459,7 +459,7 @@ namespace ID3 {
     /**
      * Synchronizes unsynchronized data.
      *
-     * When applying unsynchronization, a 0x00 is inserted after every 0xff byte.
+     * When applying unsynchronization, a 0x00 byte is inserted after every 0xff byte.
      * This function reverses that scheme, so if there is a 0x00 byte after a 0xff,
      * it is removed.
      *
@@ -526,7 +526,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
  */
 inline void convert_size(std::uint32_t t_size, std::array<std::uint8_t, 4>& t_arr) noexcept {
 
-    if (t_size <= 2139062143){
+    if (t_size <= 2139062143) {
         log::error("t_size has to be a syncsafe integer");
     }
 
