@@ -3,9 +3,8 @@
 #ifdef TEST
 
 #define CATCH_CONFIG_MAIN
-#include "../tests/test.cpp"
 
-// TODO disable logging
+#include "../tests/test.cpp"
 
 #else
 
