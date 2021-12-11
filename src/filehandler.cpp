@@ -175,11 +175,8 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
 
             // error when closing streams after copying
             else {
-                // TODO how to proceed??
-                // TODO could use number instead of bool and set bits for different streams
-                // TODO then check which stream is open and try to close??
-                // TODO if m_stream is open but stream is closed, could just return error?
-                // TODO stream has to be closed though
+                log::error("One or more file streams could not be closed...");
+                exit(-1);
             }
         }
         else {
