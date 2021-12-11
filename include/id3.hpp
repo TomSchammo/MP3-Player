@@ -40,6 +40,20 @@ namespace ID3 {
     // TODO reconsider readID3 return type
 
 
+    /**
+     * Struct containing the data of the ID3 tag header.
+     *
+     * identifier:    3 bytes containing the letters 'I' 'D' and '3' or in hex 0x49 0x44 and 0x33
+     * version:       Two bytes containing the major version and the revision
+     * flags:         One byte containing the flags for the tag with the 4 lower bits always set to 0 (0bxxxx0000)
+     * size:          4 bytes containing the size of the tag as an unsigned, syncsafe 32 bit integer
+     */
+    struct TagHeader {
+        const byte identifier[3];
+        const byte version[2];
+        const byte flags;
+        const std::uint32_t size;
+    };
 
 
     /**
