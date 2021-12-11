@@ -257,7 +257,6 @@ void Filehandler::readString(std::string& t_string, const std::uint32_t t_positi
 
     }
 
-    // TODO
     t_string = std::string(buffer.data());
 }
 
