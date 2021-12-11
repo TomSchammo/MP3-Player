@@ -125,15 +125,15 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         if (f)
             data_size += 1;
 
-        // TODO log debug
-        // std::cout << "Increased play counter" << std::endl;
-        // std::cout << "Writing play counter: 0x" << std::hex << counter << " and size: " << size << " back to file" << std::endl;
+        log::debug("Increased play counter");
+        log::debug(fmt::format("Writing play counter: {0:#x} and size {:d} back to file", counter, size))
 
         std::array<std::uint8_t, 4> size_bytes {};
 
         convert_size(size, size_bytes);
 
         // create buffer with enough room for size (4), flags (2) and data (data_size)
+        // TODO this should probably be a vector or something
         char* payload = new char[4 + 2 + data_size];
 
         int i = 0;
@@ -172,7 +172,8 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
             ++i;
         }
 
-        // TODO log debug
+        // fmt::join(begin, end, separator);
+        log::debug(fmt::format("Writing bytes: {:#04x} to file", fmt::join(payload, end, "\n")));
         // std::cout << "Writing bytes:\n";
         // for (std::uint32_t cnt = 0; cnt < data_size; ++cnt) {
             // std::cout <<  std::hex << payload[cnt] << " ";
