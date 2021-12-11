@@ -291,7 +291,6 @@ std::unique_ptr<std::vector<std::string>> Filehandler::read() const noexcept {
 
     log::info(fmt::format("Reading file: {}", m_filename));
 
-    // TODO can this be improved?
     char data[1];
 
     m_stream.seekg(0, std::ios::beg);
