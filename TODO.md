@@ -7,6 +7,8 @@
 
 ## Software
 
+- [ ] Makefile to improve test situation
+
 ### ID3 Tags
 
 - [ ] Trying to reduce the number of allocations by pre-allocating a buffer for the entire tag instead of reading small chunks from the file
@@ -15,6 +17,8 @@
 - [ ] Synchronize ID3 Tags/Frames
 - [ ] Increase Play Counter (If frame is present)
 - [ ] Add Play Counter Frame (If frame is not present)
+
+- [ ] Implement UTF-16
 
 ### MP3 Decoder
 
