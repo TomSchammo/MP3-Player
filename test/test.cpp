@@ -1,6 +1,9 @@
 
+#define CATCH_CONFIG_MAIN
+
 #include <catch2/catch.hpp>
 #include <id3.hpp>
+
 
 TEST_CASE("Testing convert_bytes from id3.hpp", "[ID3::convert_bytes]") {
 
@@ -682,5 +685,10 @@ TEST_CASE("Testing the convert_size function from id3.hpp", "[convert_size]") {
     }
 
 }
+
+
+// TEST_CASE("Testing the convert_dec function from id3.hpp", "[convert_dec]") {
+//
+// }
 
 
