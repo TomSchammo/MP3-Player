@@ -3,7 +3,7 @@
 #define LOG
 
 // uncomment this to enable unit tests instead of normal code execution
-#define TEST
+// #define TEST
 
 // logging is deactivated when running unit tests
 #ifdef TEST
