@@ -179,10 +179,37 @@ void Filehandler::deleteBytes(std::uint32_t t_position, std::uint32_t t_bytes) c
                 exit(-1);
             }
         }
-        else {
-            log::error("Stream position is supposed to be at the end of the file");
 
-            // TODO deal with this
+        else {
+            log::error("Stream position is supposed to be at the end of the file, aborting...");
+
+            m_stream.close();
+            stream.close();
+
+            bool error = false;
+
+            if (m_stream.is_open()) {
+                log::error("Error when closing streams: m_stream is expected to be closed but is open!");
+                error = true;
+
+            }
+
+            if (stream.is_open()) {
+                log::error("Error when closing streams: m_stream is expected to be closed but is open!");
+                error = true;
+
+            }
+
+            if (!error) {
+                if (std::remove((m_filename + ".tmp").c_str()) != 0)
+                    log::error(fmt::format("Could not remove {}.tmp", m_filename));
+
+            }
+
+            else {
+                log::error("One or more file streams could not be closed...");
+                exit(-1);
+            }
         }
     }
 
