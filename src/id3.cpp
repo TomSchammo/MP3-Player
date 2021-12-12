@@ -301,9 +301,6 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
 
                 if (!container.error) {
 
-                    // TODO this is never used
-                    // std::string description = container.text;
-
                     iterator = container.position;
 
                     auto pic_data = std::make_shared<std::vector<char>>();
