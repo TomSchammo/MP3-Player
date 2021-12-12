@@ -144,7 +144,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data.at(0), data, 1);
+            std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT);
 
             log::info(fmt::format("Found a TIT2 frame, setting song title to: {}", content));
 
@@ -155,7 +155,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data.at(0), data, 1);
+            std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT);
 
             log::info(fmt::format("Found a TALB frame, setting album title to: {}", content));
 
@@ -166,7 +166,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data.at(0), data, 1);
+            std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT);
 
             log::info(fmt::format("Found a TPE1 frame, setting artist to: {}", content));
 
@@ -180,7 +180,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
             // starting from 0, five characters (4 + '\0')
             // TODO is this right?
             // TODO deal with possibility of having an error
-            std::string content = decode_text(data.at(0), data, 1).substr(0, 5);
+            std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT).substr(0, 5);
 
             log::info(fmt::format("Found a TDRL frame, setting release year to: {}", content));
 
@@ -197,7 +197,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
                 // starting from 0, five characters (4 + '\0')
                 // TODO is this right?
                 // TODO deal with possibility of having an error
-                std::string content = decode_text(data.at(0), data, 1).substr(0, 5);
+                std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT).substr(0, 5);
 
                 log::info(fmt::format("Found a TDRC frame, setting release year to: {}", content));
 
@@ -239,7 +239,7 @@ bool ID3::parseFrame(Filehandler& t_handler, FrameHeader& t_frame_header, std::u
                 auto data = *prepareFrameData(t_handler, t_frame_header, t_position);
 
                 // TODO deal with possibility of having an error
-                std::string content = decode_text(data.at(0), data, 1);
+                std::string content = decode_text(data.at(LOCATION_TEXT_ENCODING), data, LOCATION_TEXT);
 
                 log::info(fmt::format("Found a TCON frame, setting genre to: {}", content));
 

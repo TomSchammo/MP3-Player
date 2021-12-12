@@ -40,6 +40,8 @@ namespace ID3 {
     // TODO reconsider readID3 return type
 
     constexpr byte SIZE_OF_BYTE = 8;
+    constexpr byte LOCATION_TEXT_ENCODING = 0;
+    constexpr byte LOCATION_TEXT = 1;
 
 
     /**
