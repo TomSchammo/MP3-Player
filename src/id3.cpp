@@ -522,7 +522,7 @@ void ID3::readID3(Song& t_song) noexcept {
         // TODO proceed with extracting metadata
         auto flags = getFlags(handler);
 
-        // TODO size is without 10 bytes of header
+        // NOTE size is without 10 bytes of header
         auto size = getSize(handler, false);
 
         log::info(fmt::format("ID3 Tag has {} bytes", size));
