@@ -69,7 +69,6 @@ public:
      */
     void print();
 
-    // TODO increase play counter?
     virtual ~Song();
 
 };
