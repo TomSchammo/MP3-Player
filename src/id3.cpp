@@ -95,7 +95,7 @@ void ID3::synchronize(std::vector<char>& t_data) noexcept {
 /*
 void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
 
-    // TODO this needs some testing and fixing
+    // NOTE this needs some testing and fixing
 
     // saving the position of the start of the header, as I will need this later
     std::uint32_t original_position = t_position;
@@ -103,7 +103,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
     std::string frame_id;
 
     // read counter and convert it from a null terminated hex string to a number
-    // TODO this does not work yet since, readFrame will interpret is at a string, not bytes,
+    // NOTE this does not work yet since, readFrame will interpret is at a string, not bytes,
     //      and the conversion will fail (since I'll expect a string of hex numbers)
     if (auto data = readFrame(t_handler, frame_id, t_position)) {
 
@@ -133,7 +133,7 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         convert_size(size, size_bytes);
 
         // create buffer with enough room for size (4), flags (2) and data (data_size)
-        // TODO this should probably be a vector or something
+        // NOTE this should probably be a vector or something
         char* payload = new char[4 + 2 + data_size];
 
         int i = 0;
@@ -181,8 +181,8 @@ void increment_pc(Filehandler& t_handler, std::uint32_t t_position) noexcept {
         // std::cout << "\n to file."<< std::endl;
 
 
-        // TODO data not null terminated, is it supposed to be?
-        // TODO currently it's a string, we might not want this
+        // NOTE data not null terminated, is it supposed to be?
+        // NOTE currently it's a string, we might not want this
         t_handler.deleteBytes(offset, 4 + 2 + size);
         t_handler.writeBytes(offset, payload, 4 + 2 + data_size);
 
