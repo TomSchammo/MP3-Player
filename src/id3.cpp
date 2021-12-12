@@ -574,8 +574,10 @@ void ID3::readID3(Song& t_song) noexcept {
                 log::info(fmt::format("{} > 0", size_remaining));
                 log::info(fmt::format("Continuing to read at position: {}", position));
 
-                // TODO I should probably choose less ambiguous names
+                // I need to keep the original position to do some calculations and set offsets later
                 std::uint32_t original_position_file = position;
+
+
                 auto frame_header = readFrameHeader(handler, position, version == 4);
                 auto result = parseFrame(handler, frame_header, position, t_song);
 
