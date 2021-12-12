@@ -39,6 +39,8 @@ namespace ID3 {
 
     // TODO reconsider readID3 return type
 
+    constexpr byte SIZE_OF_BYTE = 8;
+
 
     /**
      * Struct containing the data of the ID3 tag header.
@@ -171,7 +173,7 @@ namespace ID3 {
             // unless the integer is synchsafe, then
             // the msb of every byte is omitted, so we
             // only increase the factor by 7 bits.
-            factor += t_syncsafe ? 7 : 8;
+            factor += t_syncsafe ? SIZE_OF_BYTE-1 : SIZE_OF_BYTE;
         }
 
         log::debug(fmt::format("Converted bytes {:#04x} to {}", fmt::join(byte_buffer, ", "), number));
@@ -522,7 +524,7 @@ inline std::unique_ptr<std::vector<char>> convert_dec(std::uint64_t t_number) no
         auto byte = static_cast<std::uint8_t>(t_number % (16*16));
         bytes->insert(bytes->begin(), static_cast<char>(byte));
 
-        t_number = t_number >> 8;
+        t_number = t_number >> ID3::SIZE_OF_BYTE;
     }
 
     return bytes;
