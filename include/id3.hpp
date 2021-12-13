@@ -37,7 +37,6 @@ namespace ID3 {
 
     constexpr byte SIZE_OF_SIZE = 4;
 
-    // TODO reconsider readID3 return type
 
     constexpr byte SIZE_OF_BYTE = 8;
     constexpr byte LOCATION_TEXT_ENCODING = 0;
